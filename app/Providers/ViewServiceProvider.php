@@ -50,8 +50,8 @@ class ViewServiceProvider extends ServiceProvider
                 }));
             }
 
-            // FRONTEND
-            if (str_starts_with($routeName, 'frontend.')) {
+            // FRONTEND (includes auth routes like verification.notice, login, etc.)
+            if (!str_starts_with($routeName, 'admin.')) {
                 $allMenuCategories = Cache::remember('menu_categories', 300, function () {
                     return Category::whereNull('parent_id')
                         ->where('is_active', 1)
