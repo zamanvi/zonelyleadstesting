@@ -79,7 +79,8 @@
     .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
     .faq-content.open { max-height: 200px; }
     .booking-body { max-height: 0; overflow: hidden; transition: max-height 0.45s ease-out, opacity 0.3s ease; opacity: 0; }
-    .booking-body.open { max-height: 900px; opacity: 1; }
+    .booking-body.open { max-height: 1200px; opacity: 1; }
+    @media (max-width: 640px) { .booking-body.open { max-height: 2000px; } }
     .lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
     .lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.13); }
     .pro-glass { background: rgba(255,255,255,0.12); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.22); }

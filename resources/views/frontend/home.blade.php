@@ -83,7 +83,7 @@
         </div>
 
         {{-- Popular searches --}}
-        <div class="mt-6 flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center">
+        <div class="mt-6 flex flex-wrap gap-2 justify-center">
             @foreach([
                 ['q'=>'Plumber','icon'=>'fa-wrench'],
                 ['q'=>'Electrician','icon'=>'fa-bolt'],
@@ -233,9 +233,9 @@
             <div class="pro-card bg-white border border-slate-100 rounded-2xl overflow-hidden flex shadow-sm">
 
                 {{-- Photo --}}
-                <div class="relative w-28 sm:w-36 shrink-0">
+                <div class="relative w-24 sm:w-36 shrink-0">
                     @if($user->profile_photo)
-                    <img src="{{ asset($user->profile_photo) }}"
+                    <img src="{{ str_starts_with($user->profile_photo, 'http') ? $user->profile_photo : asset($user->profile_photo) }}"
                          onerror="this.src='';this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden');"
                          class="w-full h-full object-cover min-h-[160px]">
                     <div class="hidden w-full min-h-[160px] bg-teal-700 items-center justify-center text-white font-black text-2xl">
