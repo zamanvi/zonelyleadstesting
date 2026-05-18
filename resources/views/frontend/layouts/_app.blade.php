@@ -49,9 +49,9 @@
     <meta name="format-detection"             content="telephone=yes">
 
     {{-- Favicon ─────────────────────────────────────── --}}
-    <link rel="icon" href="{{ asset('frontend/img/zonely_logo.png') }}" type="image/png">
-    <link rel="shortcut icon" href="{{ asset('frontend/img/favicon.svg') }}" type="image/x-icon">
-    <link rel="apple-touch-icon" href="{{ asset('frontend/img/favicon.svg') }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('frontend/img/zonely_logo.png') }}" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="{{ asset('frontend/img/zonely_logo.png') }}">
 
     <meta name="google-site-verification" content="dwwJ-8RPBJ7ZKJVORVBjX84ehyNkdpSXMj3JsAqlZZQ">
 
