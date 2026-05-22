@@ -1,8 +1,8 @@
-# The Zonely
+# Zonely Leads
 
-Welcome to **The Zonely** – a dynamic web platform built to deliver exceptional user experiences.
+Welcome to **Zonely Leads** – a dynamic web platform built to deliver exceptional user experiences.
 
-🔗 **Website**: [https://thezonely.com](https://thezonely.com)
+🔗 **Website**: [https://www.zonelyleads.com](https://www.zonelyleads.com)
 
 ---
 
