@@ -39,7 +39,7 @@
                             <i class="fa-solid fa-camera"></i> Change Photo
                             <input type="file" name="profile_photo" accept="image/*" class="hidden" onchange="this.form.submit()">
                         </label>
-                        <p class="text-xs text-slate-400 mt-0.5">JPG, PNG, WebP · max 2MB</p>
+                        <p class="text-xs text-slate-400 mt-0.5">JPG, PNG, WebP · max 10MB</p>
                     </div>
                 </div>
                 <div class="grid sm:grid-cols-2 gap-4">

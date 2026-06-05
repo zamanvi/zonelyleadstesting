@@ -7,6 +7,7 @@ use App\Models\Review;
 use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -91,7 +92,7 @@ class SellerController extends Controller
                 'current_password' => ['required', 'current_password'],
                 'password'         => ['required', 'confirmed', 'min:8'],
             ]);
-            $user->update(['password' => bcrypt($request->password)]);
+            $user->update(['password' => Hash::make($request->password)]);
         }
 
         return back()->with('success', 'Settings saved.');
@@ -132,18 +133,18 @@ class SellerController extends Controller
     public function scheduleUpdate(Request $request)
     {
         $data = $request->validate([
-            'working_days'     => 'nullable|array',
-            'working_days.*'   => 'string',
-            'periods'          => 'nullable|array',
-            'periods.*.label'  => 'nullable|string|max:50',
-            'periods.*.from'   => 'nullable|string',
-            'periods.*.to'     => 'nullable|string',
-            'periods.*.duration' => 'nullable|integer',
-            'periods.*.buffer'   => 'nullable|integer',
-            'max_per_day'      => 'nullable|integer',
-            'advance_days'     => 'nullable|integer',
-            'min_notice_hours' => 'nullable|integer',
-            'booking_type'     => 'nullable|in:instant,manual',
+            'working_days'       => 'nullable|array',
+            'working_days.*'     => 'string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+            'periods'            => 'nullable|array|max:10',
+            'periods.*.label'    => 'nullable|string|max:50',
+            'periods.*.from'     => ['nullable', 'string', 'regex:/^\d{2}:\d{2}$/'],
+            'periods.*.to'       => ['nullable', 'string', 'regex:/^\d{2}:\d{2}$/'],
+            'periods.*.duration' => 'nullable|integer|min:5|max:480',
+            'periods.*.buffer'   => 'nullable|integer|min:0|max:120',
+            'max_per_day'        => 'nullable|integer|min:1|max:100',
+            'advance_days'       => 'nullable|integer|min:0|max:365',
+            'min_notice_hours'   => 'nullable|integer|min:0|max:72',
+            'booking_type'       => 'nullable|in:instant,manual',
         ]);
 
         Auth::user()->update(['schedule' => $data]);
@@ -241,10 +242,11 @@ class SellerController extends Controller
     {
         $lead = Lead::where('id', $id)->where('seller_id', Auth::id())->firstOrFail();
 
-        // Reuse existing token if already sent and not yet submitted
+        // Reuse existing token if sent within 30 days and not yet submitted
         $existing = Review::where('seller_id', Auth::id())
             ->where('lead_id', $lead->id)
             ->whereNull('token_used_at')
+            ->where('created_at', '>=', now()->subDays(30))
             ->first();
 
         if ($existing) {

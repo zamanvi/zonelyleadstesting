@@ -95,7 +95,7 @@
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="font-bold text-emerald-600">-${{ number_format($lead->fee ?? 68, 2) }}</p>
+                        <p class="font-bold text-emerald-600">-${{ number_format($lead->fee ?? 0, 2) }}</p>
                         <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Paid</span>
                     </div>
                 </div>

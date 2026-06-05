@@ -39,7 +39,7 @@
                     value="{{ url('/user/register/seller?ref=' . (auth()->user()->slug ?? auth()->user()->id)) }}"
                     readonly
                     class="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 focus:outline-none text-slate-600 font-mono">
-                <button onclick="copyRef()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-5 py-3 rounded-2xl text-sm transition shrink-0">
+                <button onclick="copyRef(this)" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-5 py-3 rounded-2xl text-sm transition shrink-0">
                     <i class="fa-solid fa-copy mr-1"></i> Copy
                 </button>
             </div>
@@ -121,11 +121,10 @@
 </div>
 
 <script>
-function copyRef() {
+function copyRef(btn) {
     const input = document.getElementById('refLink');
     input.select();
     navigator.clipboard.writeText(input.value).then(() => {
-        const btn = event.target.closest('button');
         btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
         btn.classList.replace('bg-teal-700','bg-emerald-500');
         setTimeout(() => {

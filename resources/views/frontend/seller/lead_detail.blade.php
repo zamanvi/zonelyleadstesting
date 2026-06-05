@@ -54,14 +54,21 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <a href="tel:{{ $lead->phone ?? '' }}"
+                    @if($lead->phone)
+                    <a href="tel:{{ $lead->phone }}"
                        class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm transition">
                         <i class="fa-solid fa-phone"></i> Call Now
                     </a>
-                    <a href="https://wa.me/{{ preg_replace('/\D/','',$lead->phone ?? '') }}" target="_blank"
+                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $lead->phone) }}" target="_blank"
                        class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition">
                         <i class="fa-brands fa-whatsapp"></i> WhatsApp
                     </a>
+                    @elseif($lead->email)
+                    <a href="mailto:{{ $lead->email }}"
+                       class="col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm transition">
+                        <i class="fa-solid fa-envelope"></i> Email Client
+                    </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -198,11 +205,14 @@
 </div>
 
 <script>
+const _csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+if (!_csrf) console.error('CSRF token meta tag missing');
+
 function setStatus(status) {
     if (!confirm('Mark this lead as ' + status + '?')) return;
-    fetch('/seller/leads/{{ $lead->id ?? 0 }}/status', {
+    fetch('/seller/leads/{{ $lead->id }}/status', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': _csrf },
         body: JSON.stringify({ status })
     }).then(() => location.reload());
 }
@@ -211,7 +221,7 @@ function requestReview(btn) {
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Generating...';
     fetch('{{ route('seller.lead.review-request', $lead->id) }}', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': _csrf },
     })
     .then(r => r.json())
     .then(data => {
@@ -238,9 +248,9 @@ function copyReviewLink() {
 }
 function saveNotes(btn) {
     const notes = document.getElementById('notesArea').value;
-    fetch('/seller/leads/{{ $lead->id ?? 0 }}/notes', {
+    fetch('/seller/leads/{{ $lead->id }}/notes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': _csrf },
         body: JSON.stringify({ notes })
     }).then(() => {
         btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Saved';
