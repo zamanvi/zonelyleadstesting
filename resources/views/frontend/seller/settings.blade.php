@@ -26,9 +26,9 @@
                         @if(auth()->user()->profile_photo)
                             <img src="{{ asset(auth()->user()->profile_photo) }}"
                                  onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&size=80&background=0D9488&color=fff'"
-                                 class="w-20 h-20 rounded-2xl object-cover shadow">
+                                 class="w-20 h-20 rounded-full object-cover shadow">
                         @else
-                            <div class="w-20 h-20 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-bold text-2xl shadow">
+                            <div class="w-20 h-20 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-2xl shadow">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                             </div>
                         @endif
@@ -49,8 +49,9 @@
                             class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Business Name</label>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Business Name <span class="text-red-500">*</span></label>
                         <input type="text" name="business_name" value="{{ old('business_name', auth()->user()->business_name) }}"
+                            required
                             class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                     </div>
                     <div>
@@ -69,9 +70,12 @@
                             class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Professional Title</label>
-                        <input type="text" name="title" value="{{ old('title', auth()->user()->title) }}"
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Professional Title <span class="text-xs text-slate-400 font-normal">(max 20 chars)</span></label>
+                        <input type="text" name="title" id="titleInput" value="{{ old('title', auth()->user()->title) }}"
+                            maxlength="20"
+                            oninput="updateTitleCount()"
                             class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                        <p class="text-xs text-slate-400 mt-1"><span id="titleCount">{{ strlen(old('title', auth()->user()->title ?? '')) }}</span>/20 characters</p>
                     </div>
                 </div>
                 <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 py-3 rounded-2xl text-base transition">
@@ -225,6 +229,14 @@ function saveNotification(key, val) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' },
         body: JSON.stringify({ key, value: val })
     });
+}
+function updateTitleCount() {
+    const input = document.getElementById('titleInput');
+    const count = document.getElementById('titleCount');
+    if (input && count) {
+        count.textContent = input.value.length;
+        count.style.color = input.value.length >= 20 ? '#ef4444' : '';
+    }
 }
 </script>
 @endsection

@@ -7,7 +7,7 @@
         'basics'      => filled($user->business_name) || filled($user->title),
         'bio'         => filled($user->bio),
         'contact'     => filled($user->whatsapp) || $user->contacts()->count() > 0,
-        'faqs'        => $user->faqs->count() > 0,
+        'faqs'        => $user->faqs->count() >= 5,
         'loc_services'=> (filled($user->city) || filled($user->zip_code)) && $user->services->count() > 0,
         'credentials' => $user->educations->count() > 0 || $user->memberships->count() > 0 || $user->experiences->count() > 0 || $user->certifications->count() > 0,
     ];
@@ -40,7 +40,7 @@
             <span class="text-xs text-slate-400 font-medium shrink-0">Your live page:</span>
             <span class="text-sm text-white font-mono truncate">zonelyleads.com/{{ $user->slug }}</span>
         </div>
-        <a href="{{ route('frontend.service.show', $user->slug) }}" target="_blank"
+        <a href="{{ route('frontend.service.show', $user->slug ?? $user->id) }}" target="_blank"
            class="shrink-0 flex items-center gap-1.5 text-xs font-bold text-teal-400 hover:text-teal-300 transition">
             <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Preview
         </a>
@@ -49,7 +49,7 @@
     {{-- Progress Header --}}
     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mb-6">
         <div class="flex items-center gap-4 mb-5">
-            <div class="w-14 h-14 rounded-2xl bg-teal-700 flex items-center justify-center shrink-0 overflow-hidden shadow">
+            <div class="w-14 h-14 rounded-full bg-teal-700 flex items-center justify-center shrink-0 overflow-hidden shadow">
                 @if($user->profile_photo)
                     <img src="{{ asset($user->profile_photo) }}" class="w-full h-full object-cover">
                 @else
@@ -205,19 +205,21 @@
                         <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ Answer questions before clients even ask</p>
                     </div>
                 </div>
-                <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                    {{ $isDone ? 'Complete' : 'Optional' }}
+                <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-500' }}">
+                    {{ $isDone ? 'Complete' : 'Required' }}
                 </span>
             </div>
             @if($isDone)
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs text-slate-600">
-                    <p class="font-semibold mb-1">{{ $user->faqs->count() }} question{{ $user->faqs->count() > 1 ? 's' : '' }} added</p>
+                    <p class="font-semibold mb-1">{{ $user->faqs->count() }}/5 questions added
+                        @if($user->faqs->count() < 5)<span class="text-red-500 font-normal"> ({{ 5 - $user->faqs->count() }} more needed)</span>@endif
+                    </p>
                     @if($user->faqs->first())
                         <p class="text-slate-500 truncate">{{ $user->faqs->first()->question }}</p>
                     @endif
                 </div>
             @else
-                <p class="text-xs text-slate-400">Add pricing FAQs, turnaround times, service area questions — builds trust and reduces back-and-forth</p>
+                <p class="text-xs text-slate-400">Add at least 5 FAQs — pricing, turnaround times, service area questions. <strong class="text-red-500">Minimum 5 required.</strong></p>
             @endif
             <div class="mt-3 flex items-center justify-end">
                 <span class="text-xs font-bold {{ $isDone ? 'text-slate-400 group-hover:text-teal-700' : 'text-teal-700' }} flex items-center gap-1 transition">
@@ -421,7 +423,7 @@
                 <p class="text-sm text-slate-500 mt-0.5">Complete sellers get 3× more leads on average.</p>
             @endif
         </div>
-        <a href="{{ route('frontend.service.show', $user->slug) }}" target="_blank"
+        <a href="{{ route('frontend.service.show', $user->slug ?? $user->id) }}" target="_blank"
            class="shrink-0 px-6 py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold flex items-center gap-2 transition">
             <i class="fa-solid fa-eye"></i> Preview My Page
         </a>

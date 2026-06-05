@@ -11,10 +11,18 @@
             <h1 class="text-xl font-bold text-slate-900">Hello, {{ explode(' ', auth()->user()->name)[0] }} 👋</h1>
             <p class="text-sm text-slate-500 mt-0.5">Find and contact local experts near you</p>
         </div>
-        <a href="{{ route('buyer.profile') }}"
-           class="w-10 h-10 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-sm shrink-0">
-            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-        </a>
+        <div class="flex items-center gap-2">
+            <form method="POST" action="{{ route('logout') }}" class="inline">
+                @csrf
+                <button type="submit" class="text-xs font-bold text-slate-400 hover:text-red-500 transition px-3 py-2 rounded-xl border border-slate-200 hover:border-red-200 bg-white">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+                </button>
+            </form>
+            <a href="{{ route('buyer.profile') }}"
+               class="w-10 h-10 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+            </a>
+        </div>
     </div>
 
     {{-- ── SEARCH ── --}}

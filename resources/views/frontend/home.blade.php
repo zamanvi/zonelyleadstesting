@@ -233,16 +233,16 @@
             <div class="pro-card bg-white border border-slate-100 rounded-2xl overflow-hidden flex shadow-sm">
 
                 {{-- Photo --}}
-                <div class="relative w-24 sm:w-36 shrink-0">
+                <div class="relative w-28 sm:w-36 shrink-0 self-stretch">
                     @if($user->profile_photo)
                     <img src="{{ str_starts_with($user->profile_photo, 'http') ? $user->profile_photo : asset($user->profile_photo) }}"
-                         onerror="this.src='';this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden');"
-                         class="w-full h-full object-cover min-h-[160px]">
-                    <div class="hidden w-full min-h-[160px] bg-teal-700 items-center justify-center text-white font-black text-2xl">
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                         class="w-full h-full object-cover object-center absolute inset-0" style="min-height:160px;">
+                    <div class="w-full h-full bg-teal-700 items-center justify-center text-white font-black text-2xl absolute inset-0" style="display:none;min-height:160px;">
                         {{ $initials }}
                     </div>
                     @else
-                    <div class="w-full min-h-[160px] bg-teal-700 flex items-center justify-center text-white font-black text-2xl">
+                    <div class="w-full h-full bg-teal-700 flex items-center justify-center text-white font-black text-2xl absolute inset-0" style="min-height:160px;">
                         {{ $initials }}
                     </div>
                     @endif

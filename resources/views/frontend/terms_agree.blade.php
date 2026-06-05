@@ -47,20 +47,23 @@
                 </ul>
             </div>
 
+            @if(!auth()->check() || auth()->user()->type !== 'buyer')
             <div>
                 <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
                     <span class="w-6 h-6 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center text-xs font-black shrink-0">3</span>
                     For Sellers — Lead Fees & Payment
                 </h3>
                 <ul class="list-disc list-inside space-y-1 text-slate-600">
-                    <li>Sellers are charged <strong class="text-slate-900">$68 per verified lead</strong>. This fee is subject to change with 14 days' notice.</li>
+                    <li>Sellers are charged <strong class="text-slate-900">$35–$50 per verified lead</strong>. Exact pricing depends on category and lead quality. This fee is subject to change with 14 days' notice.</li>
                     <li>A "verified lead" is defined as a contact request submitted by a real buyer through the Zonely platform.</li>
                     <li>Lead fees are non-refundable once a lead has been delivered and marked verified.</li>
                     <li>Sellers with unpaid lead fees may have their listings suspended until payment is made.</li>
                     <li>Dispute requests for lead quality must be submitted within 7 days of the lead's creation date.</li>
                 </ul>
             </div>
+            @endif
 
+            @if(!auth()->check() || auth()->user()->type !== 'buyer')
             <div>
                 <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
                     <span class="w-6 h-6 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center text-xs font-black shrink-0">4</span>
@@ -74,6 +77,7 @@
                     <li>Sellers agree to respond to verified leads in a timely and professional manner.</li>
                 </ul>
             </div>
+            @endif
 
             <div>
                 <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -88,10 +92,11 @@
                 </ul>
             </div>
 
+            @if(!auth()->check() || auth()->user()->type !== 'buyer')
             <div>
                 <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
                     <span class="w-6 h-6 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center text-xs font-black shrink-0">6</span>
-                    Affiliate & Referral Program
+                    Affiliate & Referral Program (Sellers)
                 </h3>
                 <ul class="list-disc list-inside space-y-1 text-slate-600">
                     <li>Users who refer new sellers earn a <strong class="text-slate-900">$10 commission</strong> when the referred seller receives their first verified lead.</li>
@@ -100,7 +105,23 @@
                     <li>Commission amounts and terms may change with 14 days' notice.</li>
                 </ul>
             </div>
+            @endif
 
+            @if(auth()->check() && auth()->user()->type === 'buyer')
+            <div>
+                <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center text-xs font-black shrink-0">6</span>
+                    Buyer Referral Program
+                </h3>
+                <ul class="list-disc list-inside space-y-1 text-slate-600">
+                    <li>Buyers who refer friends to Zonely may earn <strong class="text-slate-900">platform credits</strong> when their referral books a service.</li>
+                    <li>Referral credits can be used toward future bookings on the platform.</li>
+                    <li>Fraudulent referral activity will result in account suspension.</li>
+                </ul>
+            </div>
+            @endif
+
+            @if(!auth()->check() || auth()->user()->type !== 'buyer')
             <div>
                 <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
                     <span class="w-6 h-6 bg-teal-100 text-teal-700 rounded-lg flex items-center justify-center text-xs font-black shrink-0">7</span>
@@ -113,6 +134,7 @@
                     <li>Zonely may use a tracking phone number on your public listing to measure lead volume. Real phone numbers are never exposed to buyers unless you choose to share them.</li>
                 </ul>
             </div>
+            @endif
 
             <div>
                 <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -186,7 +208,7 @@
                            class="mt-0.5 w-5 h-5 rounded border-slate-300 text-teal-700 accent-teal-700 shrink-0 cursor-pointer"
                            onchange="toggleSubmit(this)">
                     <span class="text-sm text-slate-700 leading-relaxed">
-                        I have read and agree to Zonely's <strong class="text-slate-900">Terms & Conditions</strong>, including the lead fee policy ($68/lead for sellers), the affiliate program rules, and the privacy policy. I understand that submitting false information may result in account suspension.
+                        I have read and agree to Zonely's <strong class="text-slate-900">Terms &amp; Conditions</strong>, including the lead fee policy ($35–$50/lead for sellers), the affiliate program rules, and the privacy policy. I understand that submitting false information may result in account suspension.
                     </span>
                 </label>
 

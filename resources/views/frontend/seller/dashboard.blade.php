@@ -100,7 +100,12 @@
         <h2 class="text-xl font-bold text-slate-900">Welcome back, {{ $user->name }}!</h2>
         <p class="text-sm text-slate-500 mt-0.5">
             <span class="font-semibold text-teal-700">{{ $stats['total'] }} leads this month</span>
-            &nbsp;&bull;&nbsp; {{ $user->title ?? 'Your page' }} is live
+            &nbsp;&bull;&nbsp;
+            @if($user->status)
+                {{ $user->title ?? 'Your page' }} is <span class="text-emerald-600 font-bold">live</span>
+            @else
+                Your page is <span class="text-amber-600 font-bold">pending admin review</span>
+            @endif
             @if($unpaidCount > 0)
             &nbsp;&bull;&nbsp; <a href="{{ route('seller.billing') }}" class="text-red-500 font-semibold">{{ $unpaidCount }} unpaid →</a>
             @else
@@ -140,7 +145,11 @@
                 <p class="text-teal-200 text-sm mt-0.5 truncate">zonelyleads.com/{{ $user->slug }}</p>
             </div>
             <div class="flex flex-col items-end gap-1.5 shrink-0">
-                <span class="text-xs bg-white/20 px-3 py-1 rounded-lg font-bold">LIVE</span>
+                @if($user->status)
+                    <span class="text-xs bg-white/20 px-3 py-1 rounded-lg font-bold">LIVE</span>
+                @else
+                    <span class="text-xs bg-amber-400 text-amber-900 px-3 py-1 rounded-lg font-bold">Pending Review</span>
+                @endif
                 <span class="text-xs bg-emerald-500 px-3 py-1 rounded-lg font-bold flex items-center gap-1">
                     <span class="pulse-dot" style="width:6px;height:6px;background:white;"></span>Twilio
                 </span>
@@ -158,7 +167,7 @@
                     <span class="text-sm text-slate-400 ml-1">earned</span>
                 </div>
             </div>
-            <a href="{{ route('frontend.service.show', $user->slug) }}" target="_blank"
+            <a href="{{ route('frontend.service.show', $user->slug ?? $user->id) }}" target="_blank"
                class="text-sm font-semibold text-teal-700 hover:text-teal-800 flex items-center gap-1.5 transition">
                 View Page <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
             </a>
@@ -654,11 +663,11 @@
         </div>
         <div class="space-y-2.5 text-sm mb-4">
             <div class="flex justify-between">
-                <span class="text-slate-600">{{ $wonLeads->count() }} Won leads × ${{ $avgFee ?: 68 }}</span>
+                <span class="text-slate-600">{{ $wonLeads->count() }} Won leads × ${{ $avgFee ?: 40 }}</span>
                 <span class="font-bold text-slate-800">${{ number_format($totalBill) }}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-slate-600">{{ $pendLeads->count() }} Pending leads × ${{ $avgFee ?: 68 }}</span>
+                <span class="text-slate-600">{{ $pendLeads->count() }} Pending leads × ${{ $avgFee ?: 40 }}</span>
                 <span class="font-semibold text-amber-600">${{ number_format($pendBill) }} <span class="text-slate-400 font-normal">(on close)</span></span>
             </div>
             <div class="flex justify-between">

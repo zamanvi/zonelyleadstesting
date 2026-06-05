@@ -56,12 +56,13 @@
             </p>
         </section>
 
+        @if(!auth()->check() || auth()->user()->type !== 'buyer')
         <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
-            <h2 class="text-lg font-bold text-slate-900 mb-3">5. Fees, Billing & US Payment Standards</h2>
+            <h2 class="text-lg font-bold text-slate-900 mb-3">5. Fees, Billing &amp; US Payment Standards</h2>
             <p class="text-slate-600 leading-relaxed"> We operate on a phased revenue model:</p>
             <ul class="list-disc pl-5 text-slate-600 leading-relaxed space-y-2">
-                <li><strong>Phase 1 (Pay-Per-Lead):</strong> Sellers pay for verified, high-quality leads. A "Lead" is
-                    defined as a unique US-based inquiry made via call, WhatsApp, or the Zonely booking form.</li>
+                <li><strong>Phase 1 (Pay-Per-Lead):</strong> Sellers are charged <strong class="text-slate-800">$35&ndash;$50 per verified lead</strong> (exact amount depends on category and lead quality). A "Lead" is
+                    defined as a unique US-based inquiry made via call, WhatsApp, or the Zonely booking form. This fee is subject to change with 14 days' notice.</li>
                 <li><strong>Phase 2 (Commission):</strong> For specific categories, we may charge a percentage of the total
                     booking value.</li>
                 <li><strong>Subscriptions:</strong> Monthly fees for the Premium Dashboard are processed in USD. All fees
@@ -69,6 +70,7 @@
                     card or ACH until cancelled.</li>
             </ul>
         </section>
+        @endif
 
         <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
             <h2 class="text-lg font-bold text-slate-900 mb-3">6. Acceptable Use & Anti-Fraud</h2>
@@ -81,9 +83,10 @@
             </ul>
         </section>
 
+        @if(!auth()->check() || auth()->user()->type !== 'buyer')
         <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
-            <h2 class="text-lg font-bold text-slate-900 mb-3">7. Intellectual Property & Digital Millennium Copyright Act (DMCA)</h2>
-            <p class="text-slate-600 leading-relaxed">Zonely retains all rights to the platform’s software and trademarks.
+            <h2 class="text-lg font-bold text-slate-900 mb-3">7. Intellectual Property &amp; Digital Millennium Copyright Act (DMCA)</h2>
+            <p class="text-slate-600 leading-relaxed">Zonely retains all rights to the platform's software and trademarks.
             </p>
             <ul class="list-disc pl-5 text-slate-600 leading-relaxed space-y-2">
                 <li><strong>Sellers:</strong> You grant Zonely a non-exclusive, worldwide license to host and display your
@@ -92,17 +95,20 @@
                     set out in the US Digital Millennium Copyright Act.</li>
             </ul>
         </section>
+        @endif
 
+        @if(!auth()->check() || auth()->user()->type !== 'buyer')
         <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
-            <h2 class="text-lg font-bold text-slate-900 mb-3">8. Lead Verification & Call Tracking</h2>
+            <h2 class="text-lg font-bold text-slate-900 mb-3">8. Lead Verification &amp; Call Tracking</h2>
             <p class="text-slate-600 leading-relaxed">To maintain marketplace integrity:</p>
             <p class="text-slate-600 leading-relaxed">We use US-based tracking numbers and call recording to verify lead
                 quality.</p>
             <ul>
                 <li><strong>Transparency:</strong> Sellers are responsible for ensuring their use of Zonely communication
-                    tools complies with their specific state’s recording and privacy laws.</li>
+                    tools complies with their specific state's recording and privacy laws.</li>
             </ul>
         </section>
+        @endif
 
         <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
             <h2 class="text-lg font-bold text-slate-900 mb-3">9. Third-Party US Integrations</h2>

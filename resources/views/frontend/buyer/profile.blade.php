@@ -31,9 +31,9 @@
                 @if(auth()->user()->profile_photo)
                 <img src="{{ asset(auth()->user()->profile_photo) }}"
                      onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&size=80&background=3b82f6&color=fff'"
-                     class="w-20 h-20 rounded-2xl object-cover">
+                     class="w-20 h-20 rounded-full object-cover" id="profilePhotoImg">
                 @else
-                <div class="w-20 h-20 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-bold text-2xl">
+                <div class="w-20 h-20 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-2xl" id="profilePhotoDiv">
                     {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
                 @endif
@@ -83,12 +83,32 @@
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">City</label>
                             <input type="text" name="city" value="{{ old('city', auth()->user()->city) }}"
-                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">State / Province</label>
                             <input type="text" name="state" value="{{ old('state', auth()->user()->state) }}"
-                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Street Address</label>
+                        <input type="text" name="address" value="{{ old('address', auth()->user()->address) }}"
+                            placeholder="123 Main St"
+                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Country</label>
+                            <input type="text" name="country" value="{{ old('country', auth()->user()->country) }}"
+                                placeholder="United States"
+                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Zip / Postal Code</label>
+                            <input type="text" name="zip_code" value="{{ old('zip_code', auth()->user()->zip_code) }}"
+                                placeholder="10001"
+                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                         </div>
                     </div>
                 </div>

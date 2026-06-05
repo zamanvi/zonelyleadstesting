@@ -100,24 +100,24 @@
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
                             <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" required
-                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Phone <span class="text-red-500">*</span></label>
                             <input type="tel" name="phone" value="{{ old('phone', auth()->user()->phone) }}" required
                                 placeholder="+1 555 000 0000"
-                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                                class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
                         <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}"
-                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
+                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1.5">Message / Notes</label>
                         <textarea name="message" rows="3" placeholder="Describe what you need help with..."
-                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition resize-none">{{ old('message') }}</textarea>
+                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition resize-none">{{ old('message') }}</textarea>
                     </div>
                 </div>
             </div>
