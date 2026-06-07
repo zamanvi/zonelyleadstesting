@@ -152,10 +152,10 @@
         @foreach($pendingReviews as $booking)
         <div class="flex items-center gap-4 px-5 py-4 border-b border-amber-100 last:border-0">
             <div class="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center shrink-0 font-bold text-amber-600 text-sm">
-                {{ strtoupper(substr($booking->seller->name ?? 'PR', 0, 2)) }}
+                {{ strtoupper(substr($booking->seller?->name ?? 'PR', 0, 2)) }}
             </div>
             <div class="flex-1 min-w-0">
-                <p class="font-bold text-sm text-slate-900 truncate">{{ $booking->seller->name ?? 'Professional' }}</p>
+                <p class="font-bold text-sm text-slate-900 truncate">{{ $booking->seller?->name ?? 'Professional' }}</p>
                 <p class="text-xs text-slate-500">{{ $booking->service ?? 'Service' }}</p>
             </div>
             <a href="{{ route('buyer.review', $booking->id) }}"

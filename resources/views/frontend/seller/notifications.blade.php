@@ -25,18 +25,18 @@
         <div class="space-y-2" id="notifList">
             @forelse($notifications ?? [] as $notif)
             <div class="notif-item bg-white rounded-2xl border {{ $notif->read_at ? 'border-slate-100' : 'border-teal-100' }} shadow-sm p-4 flex items-start gap-4"
-                 data-type="{{ $notif->type ?? 'system' }}">
+                 data-type="{{ $notif->data['type'] ?? 'system' }}">
                 @php
                     $iconMap = ['lead'=>'fa-user-plus text-emerald-600','booking'=>'fa-calendar text-teal-700','review'=>'fa-star text-amber-500','payment'=>'fa-credit-card text-purple-600'];
                     $bgMap   = ['lead'=>'bg-emerald-100','booking'=>'bg-teal-100','review'=>'bg-amber-100','payment'=>'bg-purple-100'];
-                    $t = $notif->type ?? 'system';
+                    $t = $notif->data['type'] ?? 'system';
                 @endphp
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ $bgMap[$t] ?? 'bg-slate-100' }}">
                     <i class="fa-solid {{ $iconMap[$t] ?? 'fa-bell text-slate-500' }} text-sm"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-slate-900">{{ $notif->title ?? 'Notification' }}</p>
-                    <p class="text-sm text-slate-500 mt-0.5 leading-relaxed">{{ $notif->message ?? '' }}</p>
+                    <p class="text-sm font-bold text-slate-900">{{ $notif->data['title'] ?? 'Notification' }}</p>
+                    <p class="text-sm text-slate-500 mt-0.5 leading-relaxed">{{ $notif->data['message'] ?? '' }}</p>
                     <p class="text-xs text-slate-400 mt-1.5">{{ $notif->created_at?->diffForHumans() }}</p>
                 </div>
                 @if(!$notif->read_at)
