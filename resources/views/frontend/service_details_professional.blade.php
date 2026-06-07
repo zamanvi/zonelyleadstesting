@@ -610,7 +610,8 @@
                         <h4 class="font-semibold text-lg">Booking Request — {{ $user->name }}</h4>
                     </div>
                     <form action="{{ route('service.inquiry', $user->slug) }}" method="POST"
-                          class="px-5 md:px-8 pb-6 md:pb-8 pt-5">
+                          class="px-5 md:px-8 pb-6 md:pb-8 pt-5"
+                          data-track="inquiry_submit" data-track-lead="1">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                             <div>

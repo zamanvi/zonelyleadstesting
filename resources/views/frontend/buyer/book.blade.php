@@ -36,7 +36,8 @@
             </div>
         </div>
 
-        <form action="{{ route('buyer.book.store') ?? '#' }}" method="POST" id="bookingForm">
+        <form action="{{ route('buyer.book.store') ?? '#' }}" method="POST" id="bookingForm"
+              data-track="booking_submit" data-track-lead="1">
             @csrf
             <input type="hidden" name="seller_id" value="{{ $seller->id }}">
             <input type="hidden" name="selected_date" id="selectedDate">

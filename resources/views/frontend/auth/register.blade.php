@@ -55,7 +55,8 @@
             @endif
 
             {{-- Form --}}
-            <form id="registerForm" action="{{ route('user.submit.register') }}" method="POST">
+            <form id="registerForm" action="{{ route('user.submit.register') }}" method="POST"
+                  data-track="sign_up" data-track-register="1">
                 @csrf
                 <input type="hidden" name="type" value="{{ $type }}">
 

@@ -42,4 +42,12 @@ return [
         'from'    => env('TELNYX_FROM'),
     ],
 
+    // ── Marketing Analytics ────────────────────────────────────────
+    // Set these environment variables on Railway to activate tracking.
+    'analytics' => [
+        'ga4_id'      => env('GOOGLE_ANALYTICS_ID'),   // e.g. G-XXXXXXXXXX
+        'fb_pixel_id' => env('FACEBOOK_PIXEL_ID'),     // e.g. 123456789012345
+        'clarity_id'  => env('MICROSOFT_CLARITY_ID'),  // e.g. abcdefghij
+    ],
+
 ];
