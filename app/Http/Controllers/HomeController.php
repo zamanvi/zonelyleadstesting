@@ -581,6 +581,12 @@ class HomeController extends Controller
         if (auth()->user()?->agreed_terms_at) {
             return redirect()->route('dashboard');
         }
+
+        $user = auth()->user();
+        if ($user && $user->type === 'seller') {
+            return view('frontend.seller.terms');
+        }
+
         return view('frontend.terms_agree');
     }
 
