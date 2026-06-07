@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\PlatformCharge;
 use App\Models\Review;
 use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
@@ -96,6 +97,33 @@ class SellerController extends Controller
         }
 
         return back()->with('success', 'Settings saved.');
+    }
+
+    public function pricing()
+    {
+        $user = Auth::user()->load('category');
+
+        $categoryId = $user->category_id;
+        $stateId    = \App\Models\State::where('name', $user->state)->value('id');
+        $cityId     = \App\Models\City::where('name', $user->city)->value('id');
+
+        $leadFee      = PlatformCharge::resolve('lead_fee', $categoryId, $stateId, $cityId);
+        $affiliateComm = PlatformCharge::resolve('affiliate_commission', $categoryId, $stateId, $cityId);
+
+        $rules = PlatformCharge::active()
+            ->whereIn('type', ['lead_fee', 'affiliate_commission'])
+            ->where(function ($q) use ($categoryId, $stateId, $cityId) {
+                $q->whereNull('category_id')->whereNull('state_id')->whereNull('city_id')
+                  ->orWhere('category_id', $categoryId)
+                  ->orWhere('state_id', $stateId)
+                  ->orWhere('city_id', $cityId);
+            })
+            ->with(['category', 'state', 'city'])
+            ->orderBy('type')
+            ->orderByDesc('priority')
+            ->get();
+
+        return view('frontend.seller.pricing', compact('user', 'leadFee', 'affiliateComm', 'rules'));
     }
 
     public function billing()

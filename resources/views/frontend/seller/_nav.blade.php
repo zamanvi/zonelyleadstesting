@@ -4,6 +4,7 @@
         ['route' => route('seller.dashboard'),     'name' => 'seller.dashboard',     'icon' => 'fa-gauge-high',          'label' => 'Dashboard'],
         ['route' => route('seller.onboarding'),    'name' => 'seller.onboarding',    'icon' => 'fa-user-pen',            'label' => 'Profile'],
         ['route' => route('seller.settings'),      'name' => 'seller.settings',      'icon' => 'fa-gear',                'label' => 'Settings'],
+        ['route' => route('seller.pricing'),       'name' => 'seller.pricing',       'icon' => 'fa-tag',                 'label' => 'Pricing'],
         ['route' => route('seller.billing'),       'name' => 'seller.billing',       'icon' => 'fa-file-invoice-dollar', 'label' => 'Billing'],
         ['route' => route('seller.schedule'),      'name' => 'seller.schedule',      'icon' => 'fa-calendar-days',       'label' => 'Schedule'],
         ['route' => route('seller.reviews'),       'name' => 'seller.reviews',       'icon' => 'fa-star',                'label' => 'Reviews'],
