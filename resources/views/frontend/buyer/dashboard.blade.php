@@ -228,7 +228,7 @@
                     <p class="text-xs text-slate-400">Updates & alerts</p>
                 </div>
             </a>
-            <a href="{{ route('help') }}"
+            <a href="{{ route('frontend.help') }}"
                class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-3 hover:border-teal-200 hover:shadow-md transition group">
                 <div class="w-11 h-11 bg-teal-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-teal-100 transition">
                     <i class="fa-solid fa-circle-question text-teal-700 text-sm"></i>
