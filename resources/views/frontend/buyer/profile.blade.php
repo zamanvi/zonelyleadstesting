@@ -93,7 +93,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1.5">Street Address</label>
-                        <input type="text" name="address" value="{{ old('address', auth()->user()->address) }}"
+                        <input type="text" name="work_address" value="{{ old('work_address', auth()->user()->work_address) }}"
                             placeholder="123 Main St"
                             class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-800 font-medium focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                     </div>

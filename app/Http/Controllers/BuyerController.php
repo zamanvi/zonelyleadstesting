@@ -179,7 +179,7 @@ class BuyerController extends Controller
             'phone'         => 'nullable|string|max:50',
             'city'          => 'nullable|string|max:100',
             'state'         => 'nullable|string|max:100',
-            'address'       => 'nullable|string|max:255',
+            'work_address'  => 'nullable|string|max:255',
             'country'       => 'nullable|string|max:100',
             'zip_code'      => 'nullable|string|max:20',
             'profile_photo' => 'nullable|image|max:10240',

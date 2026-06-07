@@ -215,7 +215,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | Buyer Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware('terms')->prefix('buyer')->name('buyer.')->group(function () {
+    Route::middleware(['user', 'terms'])->prefix('buyer')->name('buyer.')->group(function () {
         Route::get('dashboard', [BuyerController::class, 'dashboard'])->name('dashboard');
         Route::get('bookings', [BuyerController::class, 'bookings'])->name('bookings');
         Route::post('bookings/{id}/cancel', [BuyerController::class, 'cancelBooking'])->name('bookings.cancel');
