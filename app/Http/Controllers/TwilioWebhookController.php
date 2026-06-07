@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CallLog;
+use App\Models\City;
 use App\Models\Lead;
+use App\Models\PlatformCharge;
 use App\Models\Setting;
+use App\Models\State;
 use App\Models\TwilioNumber;
 use App\Services\Sms\SmsService;
 use Illuminate\Http\Request;
@@ -42,6 +45,10 @@ class TwilioWebhookController extends Controller
             'called_at'     => now(),
         ]);
 
+        $stateId = State::where('name', $seller->state)->value('id');
+        $cityId  = City::where('name', $seller->city)->value('id');
+        $leadFee = PlatformCharge::resolve('lead_fee', $seller->category_id, $stateId, $cityId);
+
         $lead = Lead::create([
             'seller_id' => $seller->id,
             'name'      => 'Phone Lead',
@@ -50,7 +57,7 @@ class TwilioWebhookController extends Controller
             'service'   => 'Phone Call',
             'message'   => 'Inbound call via Zonely tracking number.',
             'status'    => 'new',
-            'fee'       => 68,
+            'fee'       => $leadFee,
         ]);
 
         $log->update(['lead_id' => $lead->id]);

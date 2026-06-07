@@ -329,7 +329,10 @@ class PageController extends Controller
             'referred_user_id' => 'required|exists:users,id',
             'amount'           => 'required|numeric|min:0',
         ]);
-        AffiliateCommission::create($request->only('referrer_id', 'referred_user_id', 'amount'));
+        AffiliateCommission::create(array_merge(
+            $request->only('referrer_id', 'referred_user_id', 'amount'),
+            ['status' => 'pending', 'referral_type' => 'seller']
+        ));
         return back()->with('success', 'Commission created.');
     }
 

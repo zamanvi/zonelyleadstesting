@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AffiliateCommission extends Model
 {
-    protected $fillable = ['referrer_id', 'referred_user_id', 'amount', 'status', 'paid_at', 'note'];
+    protected $fillable = ['referrer_id', 'referred_user_id', 'amount', 'status', 'paid_at', 'note', 'referral_type', 'points_awarded'];
 
     protected $casts = ['paid_at' => 'datetime'];
 

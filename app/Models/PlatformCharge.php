@@ -92,13 +92,13 @@ class PlatformCharge extends Model
     }
 
     // ── Helpers ────────────────────────────────────────
-    public function scopeLabel(self $charge): string
+    public function getLabel(): string
     {
         $parts = [];
-        if ($charge->city)     $parts[] = $charge->city->name;
-        if ($charge->state)    $parts[] = $charge->state->name;
-        if ($charge->category) $parts[] = $charge->category->title;
-        if (empty($parts))     $parts[] = 'Global Default';
+        if ($this->city)     $parts[] = $this->city->name;
+        if ($this->state)    $parts[] = $this->state->name;
+        if ($this->category) $parts[] = $this->category->title;
+        if (empty($parts))   $parts[] = 'Global Default';
         return implode(' · ', $parts);
     }
 

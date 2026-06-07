@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Blog;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\Lead;
+use App\Models\PlatformCharge;
+use App\Models\State;
 use App\Models\User;
 use App\Models\AffiliateCommission;
 use App\Services\Sms\SmsService;
@@ -517,6 +520,11 @@ class HomeController extends Controller
             'email' => 'required|email|max:255',
         ]);
 
+        $stateId    = \App\Models\State::where('name', $seller->state)->value('id');
+        $cityId     = \App\Models\City::where('name', $seller->city)->value('id');
+        $leadFee    = PlatformCharge::resolve('lead_fee', $seller->category_id, $stateId, $cityId);
+        $affComm    = PlatformCharge::resolve('affiliate_commission', $seller->category_id, $stateId, $cityId);
+
         $lead = Lead::create([
             'seller_id' => $seller->id,
             'name'      => $request->name,
@@ -525,14 +533,14 @@ class HomeController extends Controller
             'service'   => $request->service ?? 'General Inquiry',
             'message'   => $request->message ?? null,
             'status'    => 'new',
-            'fee'       => 68,
+            'fee'       => $leadFee,
         ]);
 
         // Auto-create affiliate commission on seller's FIRST lead
         if ($seller->referred_by && $lead && $seller->leads()->count() === 1) {
             AffiliateCommission::firstOrCreate(
                 ['referrer_id' => $seller->referred_by, 'referred_user_id' => $seller->id],
-                ['amount' => 10, 'status' => 'pending']
+                ['amount' => $affComm, 'status' => 'pending', 'referral_type' => 'seller']
             );
         }
 
@@ -556,6 +564,10 @@ class HomeController extends Controller
         $waNumber = $seller->contacts()->where('type', 'whatsapp')->value('value')
             ?? $seller->whatsapp;
 
+        $waStateId  = \App\Models\State::where('name', $seller->state)->value('id');
+        $waCityId   = \App\Models\City::where('name', $seller->city)->value('id');
+        $waLeadFee  = PlatformCharge::resolve('lead_fee', $seller->category_id, $waStateId, $waCityId);
+
         $lead = Lead::create([
             'seller_id' => $seller->id,
             'name'      => 'WhatsApp Lead',
@@ -564,7 +576,7 @@ class HomeController extends Controller
             'service'   => 'WhatsApp Click',
             'message'   => 'Client clicked WhatsApp from Zonely profile.',
             'status'    => 'new',
-            'fee'       => 68,
+            'fee'       => $waLeadFee,
         ]);
 
         if ($seller->twilio_enabled && $seller->phone) {
@@ -586,7 +598,7 @@ class HomeController extends Controller
         if ($user && $user->type === 'seller') {
             return view('frontend.seller.terms');
         }
-        if ($user && $user->type === 'buyer') {
+        if ($user && $user->type === 'user') {
             return view('frontend.buyer.terms');
         }
 
