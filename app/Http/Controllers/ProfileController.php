@@ -199,6 +199,6 @@ class ProfileController extends Controller
     public function blockedlist()
     {
         $user = Auth::user();
-        return 'Dear Valued Vendor, ' . $user->name . '. You are currently blocked. Please contact your admin.';
+        return view('frontend.blocked', compact('user'));
     }
 }

@@ -28,9 +28,6 @@ class UserMiddleware
         if ($user->type === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-        if ($user->type === 'profile') {
-            return redirect()->route('profile.dashboard');
-        }
         return redirect()->route('user.login');
     }
 }

@@ -244,11 +244,15 @@ class SellerController extends Controller
 
     public function notifications()
     {
-        return view('frontend.seller.notifications', ['notifications' => collect()]);
+        $user          = Auth::user();
+        $notifications = $user->notifications()->latest()->paginate(20);
+        $user->unreadNotifications()->update(['read_at' => now()]);
+        return view('frontend.seller.notifications', compact('notifications'));
     }
 
     public function notificationsReadAll()
     {
+        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
         return response()->json(['success' => true]);
     }
 
