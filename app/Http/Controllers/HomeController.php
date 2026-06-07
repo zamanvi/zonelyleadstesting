@@ -586,6 +586,9 @@ class HomeController extends Controller
         if ($user && $user->type === 'seller') {
             return view('frontend.seller.terms');
         }
+        if ($user && $user->type === 'buyer') {
+            return view('frontend.buyer.terms');
+        }
 
         return view('frontend.terms_agree');
     }
