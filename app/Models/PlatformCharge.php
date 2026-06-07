@@ -49,8 +49,16 @@ class PlatformCharge extends Model
      */
     public static function resolve(string $type, ?int $categoryId = null, ?int $stateId = null, ?int $cityId = null): float
     {
-        $defaultKey = $type === 'lead_fee' ? 'default_lead_fee' : 'default_affiliate_commission';
-        $default    = (float) (Setting::where('key', $defaultKey)->value('value') ?? ($type === 'lead_fee' ? 35 : 10));
+        $defaultKey = match($type) {
+            'lead_fee'                  => 'default_lead_fee',
+            'buyer_referral_commission' => 'default_buyer_referral_commission',
+            default                     => 'default_affiliate_commission',
+        };
+        $fallback = match($type) {
+            'lead_fee' => 35,
+            default    => 10,
+        };
+        $default = (float) (Setting::where('key', $defaultKey)->value('value') ?? $fallback);
 
         $query = static::active()->ofType($type)->orderByDesc('priority');
 

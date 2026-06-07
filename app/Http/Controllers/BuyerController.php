@@ -236,16 +236,52 @@ class BuyerController extends Controller
     public function affiliate()
     {
         $user        = Auth::user();
-        $commissions = $user->commissionsEarned()->with('referredUser')->latest()->get();
+        $commissions = $user->commissionsEarned()
+                           ->with('referredUser')
+                           ->where('referral_type', 'buyer')
+                           ->latest()
+                           ->get();
+
+        $totalRefs = $user->referrals()->where('type', 'user')->count();
+
+        // Tier progress
+        $nextMilestone = $totalRefs < 3  ? 3  :
+                        ($totalRefs < 5  ? 5  :
+                        ($totalRefs < 10 ? 10 :
+                        ($totalRefs < 25 ? 25 : 50)));
+        $tierLabel  = $totalRefs < 3  ? 'Starter'    :
+                     ($totalRefs < 5  ? 'Rising'     :
+                     ($totalRefs < 10 ? 'Trusted'    :
+                     ($totalRefs < 25 ? 'Elite'      : 'Zonely Pro')));
+        $nextLabel  = $totalRefs < 3  ? 'Rising'     :
+                     ($totalRefs < 5  ? 'Trusted'    :
+                     ($totalRefs < 10 ? 'Elite'      :
+                     ($totalRefs < 25 ? 'Zonely Pro' : 'Zonely Pro')));
+        $tierPct    = min(100, $nextMilestone > 0 ? round($totalRefs / $nextMilestone * 100) : 100);
+        $remaining  = max(0, $nextMilestone - $totalRefs);
+
+        // Earnings projection
+        $projections = [
+            ['refs' => 1,  'cash' => \App\Models\PlatformCharge::resolve('buyer_referral_commission'),    'pts' => 35],
+            ['refs' => 3,  'cash' => \App\Models\PlatformCharge::resolve('buyer_referral_commission') * 3, 'pts' => 105],
+            ['refs' => 5,  'cash' => \App\Models\PlatformCharge::resolve('buyer_referral_commission') * 5, 'pts' => 175],
+            ['refs' => 10, 'cash' => \App\Models\PlatformCharge::resolve('buyer_referral_commission') * 10,'pts' => 380],
+        ];
 
         $stats = [
-            'referrals' => $user->referrals()->where('type', 'seller')->count(),
+            'referrals' => $totalRefs,
             'earned'    => $commissions->sum('amount'),
             'pending'   => $commissions->where('status', 'pending')->sum('amount'),
             'paid_out'  => $commissions->where('status', 'paid')->sum('amount'),
         ];
 
-        return view('frontend.buyer.affiliate', compact('user', 'commissions', 'stats'));
+        $refUrl = url('/user/register?ref=' . ($user->slug ?? $user->id));
+
+        return view('frontend.buyer.affiliate', compact(
+            'user', 'commissions', 'stats',
+            'totalRefs', 'tierLabel', 'nextLabel', 'tierPct', 'remaining',
+            'projections', 'refUrl'
+        ));
     }
 
     public function notifications()

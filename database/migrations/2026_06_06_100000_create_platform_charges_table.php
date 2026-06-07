@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('platform_charges', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['lead_fee', 'affiliate_commission']);
+            $table->enum('type', ['lead_fee', 'affiliate_commission', 'buyer_referral_commission']);
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('state_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('city_id')->nullable()->constrained()->nullOnDelete();

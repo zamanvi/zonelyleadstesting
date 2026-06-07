@@ -42,8 +42,8 @@
                         </div>
                         <div class="form-text">Charged to seller per lead when no specific rule applies</div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small">Default Affiliate Commission ($)</label>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Default Seller Affiliate Commission ($)</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
                             <input type="number" name="default_affiliate_commission" class="form-control"
@@ -51,9 +51,18 @@
                         </div>
                         <div class="form-text">Paid to referrer when referred seller gets first lead</div>
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-dark w-100">
-                            <i class="fas fa-save me-1"></i> Save Defaults
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Default Buyer Referral Commission ($)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" name="default_buyer_referral_commission" class="form-control"
+                                   value="{{ $defaultBuyerRefComm }}" min="0" max="9999" step="0.01" required>
+                        </div>
+                        <div class="form-text">Paid to buyer who refers another buyer</div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-dark w-100 mt-4">
+                            <i class="fas fa-save me-1"></i> Save
                         </button>
                     </div>
                 </div>
@@ -76,7 +85,8 @@
                         <select name="preview_type" class="form-select" required>
                             <option value="">-- Select type --</option>
                             <option value="lead_fee"              {{ request('preview_type') === 'lead_fee'             ? 'selected' : '' }}>Lead Fee</option>
-                            <option value="affiliate_commission"  {{ request('preview_type') === 'affiliate_commission' ? 'selected' : '' }}>Affiliate Commission</option>
+                            <option value="affiliate_commission"       {{ request('preview_type') === 'affiliate_commission'       ? 'selected' : '' }}>Seller Affiliate Commission</option>
+                            <option value="buyer_referral_commission" {{ request('preview_type') === 'buyer_referral_commission' ? 'selected' : '' }}>Buyer Referral Commission</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -150,7 +160,8 @@
                     <select name="type" class="form-select form-select-sm">
                         <option value="">All Types</option>
                         <option value="lead_fee"             {{ request('type') === 'lead_fee'             ? 'selected' : '' }}>Lead Fee</option>
-                        <option value="affiliate_commission" {{ request('type') === 'affiliate_commission' ? 'selected' : '' }}>Affiliate Commission</option>
+                        <option value="affiliate_commission"       {{ request('type') === 'affiliate_commission'       ? 'selected' : '' }}>Seller Affiliate Commission</option>
+                        <option value="buyer_referral_commission" {{ request('type') === 'buyer_referral_commission' ? 'selected' : '' }}>Buyer Referral Commission</option>
                     </select>
                 </div>
                 <div class="col-md-3">

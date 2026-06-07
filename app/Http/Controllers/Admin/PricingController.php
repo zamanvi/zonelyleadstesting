@@ -28,8 +28,9 @@ class PricingController extends Controller
 
         $categories      = Category::whereNull('parent_id')->with('children')->orderBy('title')->get();
         $states          = State::orderBy('name')->get();
-        $defaultLeadFee  = Setting::where('key', 'default_lead_fee')->value('value') ?? 35;
-        $defaultAffComm  = Setting::where('key', 'default_affiliate_commission')->value('value') ?? 10;
+        $defaultLeadFee       = Setting::where('key', 'default_lead_fee')->value('value') ?? 35;
+        $defaultAffComm       = Setting::where('key', 'default_affiliate_commission')->value('value') ?? 10;
+        $defaultBuyerRefComm  = Setting::where('key', 'default_buyer_referral_commission')->value('value') ?? 5;
 
         // Preview resolver
         $preview = null;
@@ -50,14 +51,14 @@ class PricingController extends Controller
 
         return view('admin.pricing.index', compact(
             'charges', 'categories', 'states',
-            'defaultLeadFee', 'defaultAffComm', 'preview'
+            'defaultLeadFee', 'defaultAffComm', 'defaultBuyerRefComm', 'preview'
         ));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'type'           => 'required|in:lead_fee,affiliate_commission',
+            'type'           => 'required|in:lead_fee,affiliate_commission,buyer_referral_commission',
             'category_id'    => 'nullable|exists:categories,id',
             'state_id'       => 'nullable|exists:states,id',
             'city_id'        => 'nullable|exists:cities,id',
@@ -82,7 +83,7 @@ class PricingController extends Controller
         $charge = PlatformCharge::findOrFail($id);
 
         $data = $request->validate([
-            'type'           => 'required|in:lead_fee,affiliate_commission',
+            'type'           => 'required|in:lead_fee,affiliate_commission,buyer_referral_commission',
             'category_id'    => 'nullable|exists:categories,id',
             'state_id'       => 'nullable|exists:states,id',
             'city_id'        => 'nullable|exists:cities,id',
@@ -114,11 +115,12 @@ class PricingController extends Controller
     public function updateDefaults(Request $request)
     {
         $request->validate([
-            'default_lead_fee'             => 'required|numeric|min:0|max:9999',
-            'default_affiliate_commission' => 'required|numeric|min:0|max:9999',
+            'default_lead_fee'                  => 'required|numeric|min:0|max:9999',
+            'default_affiliate_commission'      => 'required|numeric|min:0|max:9999',
+            'default_buyer_referral_commission' => 'required|numeric|min:0|max:9999',
         ]);
 
-        foreach (['default_lead_fee', 'default_affiliate_commission'] as $key) {
+        foreach (['default_lead_fee', 'default_affiliate_commission', 'default_buyer_referral_commission'] as $key) {
             Setting::updateOrCreate(['key' => $key], ['value' => $request->$key]);
         }
 
