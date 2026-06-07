@@ -13,6 +13,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.0",
+        "resend/resend-laravel": "*",
         "twilio/sdk": "^8.11"
     },
     "require-dev": {
