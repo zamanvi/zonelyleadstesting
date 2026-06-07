@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 
 class SellerController extends Controller
 {
+    use \App\Http\Controllers\Concerns\UpdatesUserCredentials;
     public function onboarding()
     {
         $user = Auth::user()->load(['services', 'educations', 'memberships', 'languages', 'faqs', 'category', 'experiences', 'certifications']);
@@ -36,17 +37,47 @@ class SellerController extends Controller
 
     public function affiliate()
     {
-        $user        = Auth::user();
-        $commissions = $user->commissionsEarned()->with('referredUser')->latest()->get();
+        $user        = Auth::user()->load('category');
+        $commissions = $user->commissionsEarned()->with('referredUser')
+                           ->where('referral_type', 'seller')
+                           ->latest()->get();
+
+        $totalRefs = $user->referrals()->count();
+
+        // Tier progress
+        $nextMilestone = $totalRefs < 3  ? 3  : ($totalRefs < 5  ? 5  : ($totalRefs < 10 ? 10 : ($totalRefs < 25 ? 25 : 50)));
+        $tierLabel     = $totalRefs < 3  ? 'Starter' : ($totalRefs < 5  ? 'Rising' : ($totalRefs < 10 ? 'Trusted' : ($totalRefs < 25 ? 'Elite' : 'Zonely Pro')));
+        $nextLabel     = $totalRefs < 3  ? 'Rising'  : ($totalRefs < 5  ? 'Trusted' : ($totalRefs < 10 ? 'Elite'   : 'Zonely Pro'));
+        $tierPct       = min(100, $nextMilestone > 0 ? round($totalRefs / $nextMilestone * 100) : 100);
+        $remaining     = max(0, $nextMilestone - $totalRefs);
+
+        // Dynamic commission rate
+        $stateId    = \App\Models\State::where('name', $user->state)->value('id');
+        $cityId     = \App\Models\City::where('name', $user->city)->value('id');
+        $commRate   = PlatformCharge::resolve('affiliate_commission', $user->category_id, $stateId, $cityId);
+
+        // Earnings projections
+        $projections = [
+            ['refs' => 1,  'cash' => $commRate,      'pts' => 35],
+            ['refs' => 3,  'cash' => $commRate * 3,  'pts' => 105],
+            ['refs' => 5,  'cash' => $commRate * 5,  'pts' => 200],
+            ['refs' => 10, 'cash' => $commRate * 10, 'pts' => 450],
+        ];
 
         $stats = [
-            'referrals' => $user->referrals()->count(),
+            'referrals' => $totalRefs,
             'earned'    => $commissions->sum('amount'),
             'pending'   => $commissions->where('status', 'pending')->sum('amount'),
             'paid_out'  => $commissions->where('status', 'paid')->sum('amount'),
         ];
 
-        return view('frontend.seller.affiliate', compact('user', 'commissions', 'stats'));
+        $refUrl = url('/user/register/seller?ref=' . ($user->slug ?? $user->id));
+
+        return view('frontend.seller.affiliate', compact(
+            'user', 'commissions', 'stats',
+            'totalRefs', 'tierLabel', 'nextLabel', 'tierPct', 'remaining',
+            'projections', 'commRate', 'refUrl'
+        ));
     }
 
     public function settings()
@@ -72,24 +103,9 @@ class SellerController extends Controller
             $data['profile_photo'] = ImageOptimizer::saveProfilePhoto($request->file('profile_photo'));
         }
 
-        $emailChanged = $user->email !== $request->email;
+        $this->handleEmailChange($user, $request);
         $user->update($data);
-
-        if ($emailChanged) {
-            $user->email_verified_at = null;
-            $user->save();
-            if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail) {
-                $user->sendEmailVerificationNotification();
-            }
-        }
-
-        if ($request->filled('password')) {
-            $request->validate([
-                'current_password' => ['required', 'current_password'],
-                'password'         => ['required', 'confirmed', 'min:8'],
-            ]);
-            $user->update(['password' => Hash::make($request->password)]);
-        }
+        $this->handlePasswordChange($user, $request);
 
         return back()->with('success', 'Settings saved.');
     }

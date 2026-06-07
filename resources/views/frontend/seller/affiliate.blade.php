@@ -18,35 +18,9 @@
 
 @section('content')
 @php
-    $refUrl      = url('/user/register/seller?ref=' . (auth()->user()->slug ?? auth()->user()->id));
-    $totalRefs   = $stats['referrals'] ?? 0;
-    $earned      = $stats['earned']    ?? 0;
-    $pending     = $stats['pending']   ?? 0;
-    $paidOut     = $stats['paid_out']  ?? 0;
-
-    // Tier progress — based on referral count
-    $nextMilestone = $totalRefs < 3  ? 3  :
-                    ($totalRefs < 5  ? 5  :
-                    ($totalRefs < 10 ? 10 :
-                    ($totalRefs < 25 ? 25 : 50)));
-    $tierLabel  = $totalRefs < 3  ? 'Starter'  :
-                 ($totalRefs < 5  ? 'Rising'   :
-                 ($totalRefs < 10 ? 'Trusted'  :
-                 ($totalRefs < 25 ? 'Elite'    : 'Zonely Pro')));
-    $nextLabel  = $totalRefs < 3  ? 'Rising'   :
-                 ($totalRefs < 5  ? 'Trusted'  :
-                 ($totalRefs < 10 ? 'Elite'    :
-                 ($totalRefs < 25 ? 'Zonely Pro': 'Zonely Pro')));
-    $tierPct    = $nextMilestone > 0 ? min(100, round($totalRefs / $nextMilestone * 100)) : 100;
-    $remaining  = max(0, $nextMilestone - $totalRefs);
-
-    // Earnings projection
-    $projections = [
-        ['refs'=>1,  'cash'=>10,  'pts'=>35],
-        ['refs'=>3,  'cash'=>30,  'pts'=>105],
-        ['refs'=>5,  'cash'=>50,  'pts'=>200],
-        ['refs'=>10, 'cash'=>120, 'pts'=>450],
-    ];
+    $earned  = $stats['earned']   ?? 0;
+    $pending = $stats['pending']  ?? 0;
+    $paidOut = $stats['paid_out'] ?? 0;
 @endphp
 
 <div class="pb-12">
@@ -72,7 +46,7 @@
                         <span class="text-emerald-400">cash + points + rank.</span>
                     </h1>
                     <p class="text-teal-200 text-sm mt-2 max-w-sm">
-                        Share your link. When they join and get their first lead — you earn <strong class="text-white">$10 cash</strong> and <strong class="text-white">+35 points</strong> instantly. Every milestone they hit keeps rewarding you.
+                        Share your link. When they join and get their first lead — you earn <strong class="text-white">${{ number_format($commRate, 0) }} cash</strong> and <strong class="text-white">+35 points</strong> instantly. Every milestone they hit keeps rewarding you.
                     </p>
                 </div>
                 <div class="shrink-0 hidden sm:block text-center bg-white/10 rounded-2xl px-5 py-4">
@@ -237,7 +211,7 @@
                  'badge'=>'Instant points'],
                 ['icon'=>'fa-coins',       'color'=>'bg-amber-100 text-amber-600', 'num'=>'03',
                  'title'=>'They get a lead — you get paid',
-                 'desc' =>'First verified lead delivered to them → $10 cash + bonus points credited to you. Every milestone after keeps rewarding you.',
+                 'desc' =>'First verified lead delivered to them → $' . number_format($commRate, 0) . ' cash + bonus points credited to you. Every milestone after keeps rewarding you.',
                  'badge'=>'Cash + points forever'],
             ] as $s)
             <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
@@ -266,13 +240,13 @@
 
         <div class="space-y-2">
             @foreach([
-                ['event'=>'Referred seller joins platform',       'cash'=>'$10',  'pts'=>'+35', 'color'=>'text-emerald-600'],
-                ['event'=>'They complete their first job',        'cash'=>'$10',  'pts'=>'+25', 'color'=>'text-emerald-600'],
-                ['event'=>'They reach Rising tier',               'cash'=>'—',    'pts'=>'+50', 'color'=>'text-blue-600'],
-                ['event'=>'They reach Trusted tier',              'cash'=>'$15',  'pts'=>'+100','color'=>'text-purple-600'],
-                ['event'=>'They reach Elite tier',                'cash'=>'$25',  'pts'=>'+200','color'=>'text-teal-600'],
-                ['event'=>'They pay 3 months platform fees',      'cash'=>'—',    'pts'=>'+75', 'color'=>'text-teal-600'],
-                ['event'=>'They refer another seller (2nd level)','cash'=>'—',    'pts'=>'+20', 'color'=>'text-amber-600'],
+                ['event'=>'Referred seller joins platform',       'cash'=>'$'.number_format($commRate,0), 'pts'=>'+35', 'color'=>'text-emerald-600'],
+                ['event'=>'They complete their first job',        'cash'=>'$'.number_format($commRate,0), 'pts'=>'+25', 'color'=>'text-emerald-600'],
+                ['event'=>'They reach Rising tier',               'cash'=>'—',                            'pts'=>'+50', 'color'=>'text-blue-600'],
+                ['event'=>'They reach Trusted tier',              'cash'=>'—',                            'pts'=>'+100','color'=>'text-purple-600'],
+                ['event'=>'They reach Elite tier',                'cash'=>'—',                            'pts'=>'+200','color'=>'text-teal-600'],
+                ['event'=>'They pay 3 months platform fees',      'cash'=>'—',                            'pts'=>'+75', 'color'=>'text-teal-600'],
+                ['event'=>'They refer another seller (2nd level)','cash'=>'—',                            'pts'=>'+20', 'color'=>'text-amber-600'],
             ] as $r)
             <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition">
                 <div class="flex items-center gap-3">

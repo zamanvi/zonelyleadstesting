@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class BuyerController extends Controller
 {
+    use \App\Http\Controllers\Concerns\UpdatesUserCredentials;
     public function dashboard()
     {
         $user = Auth::user();
@@ -186,24 +187,9 @@ class BuyerController extends Controller
             $data['profile_photo'] = ImageOptimizer::saveProfilePhoto($request->file('profile_photo'));
         }
 
-        $emailChanged = $user->email !== $request->email;
+        $this->handleEmailChange($user, $request);
         $user->update($data);
-
-        if ($emailChanged) {
-            $user->email_verified_at = null;
-            $user->save();
-            if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail) {
-                $user->sendEmailVerificationNotification();
-            }
-        }
-
-        if ($request->filled('password')) {
-            $request->validate([
-                'current_password' => ['required', 'current_password'],
-                'password'         => ['required', 'confirmed', 'min:8'],
-            ]);
-            $user->update(['password' => bcrypt($request->password)]);
-        }
+        $this->handlePasswordChange($user, $request);
 
         return back()->with('success', 'Profile updated.');
     }

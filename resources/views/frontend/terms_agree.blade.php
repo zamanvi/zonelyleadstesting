@@ -54,7 +54,7 @@
                     For Sellers — Lead Fees & Payment
                 </h3>
                 <ul class="list-disc list-inside space-y-1 text-slate-600">
-                    <li>Sellers are charged <strong class="text-slate-900">$35–$50 per verified lead</strong>. Exact pricing depends on category and lead quality. This fee is subject to change with 14 days' notice.</li>
+                    <li>Sellers are charged a <strong class="text-slate-900">fee per verified lead</strong>. The exact amount varies by service category, state, and city and is visible in your Seller Dashboard. This fee is subject to change with 14 days' notice.</li>
                     <li>A "verified lead" is defined as a contact request submitted by a real buyer through the Zonely platform.</li>
                     <li>Lead fees are non-refundable once a lead has been delivered and marked verified.</li>
                     <li>Sellers with unpaid lead fees may have their listings suspended until payment is made.</li>
@@ -208,7 +208,7 @@
                            class="mt-0.5 w-5 h-5 rounded border-slate-300 text-teal-700 accent-teal-700 shrink-0 cursor-pointer"
                            onchange="toggleSubmit(this)">
                     <span class="text-sm text-slate-700 leading-relaxed">
-                        I have read and agree to Zonely's <strong class="text-slate-900">Terms &amp; Conditions</strong>, including the lead fee policy ($35–$50/lead for sellers), the affiliate program rules, and the privacy policy. I understand that submitting false information may result in account suspension.
+                        I have read and agree to Zonely's <strong class="text-slate-900">Terms &amp; Conditions</strong>, including the lead fee policy, the affiliate program rules, and the privacy policy. I understand that submitting false information may result in account suspension.
                     </span>
                 </label>
 

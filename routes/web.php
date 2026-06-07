@@ -318,7 +318,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Pricing Rules
-        Route::prefix('pricing')->name('pricing.')->group(function () {
+        Route::middleware('manager.module:pricing')->prefix('pricing')->name('pricing.')->group(function () {
             Route::get('/',                  [PricingController::class, 'index'])->name('index');
             Route::post('/',                 [PricingController::class, 'store'])->name('store');
             Route::put('{id}',               [PricingController::class, 'update'])->name('update');

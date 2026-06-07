@@ -61,8 +61,7 @@
             <h2 class="text-lg font-bold text-slate-900 mb-3">5. Fees, Billing &amp; US Payment Standards</h2>
             <p class="text-slate-600 leading-relaxed"> We operate on a phased revenue model:</p>
             <ul class="list-disc pl-5 text-slate-600 leading-relaxed space-y-2">
-                <li><strong>Phase 1 (Pay-Per-Lead):</strong> Sellers are charged <strong class="text-slate-800">$35&ndash;$50 per verified lead</strong> (exact amount depends on category and lead quality). A "Lead" is
-                    defined as a unique US-based inquiry made via call, WhatsApp, or the Zonely booking form. This fee is subject to change with 14 days' notice.</li>
+                <li><strong>Phase 1 (Pay-Per-Lead):</strong> Sellers are charged a <strong class="text-slate-800">fee per verified lead</strong> (exact amount depends on service category, state, and city — visible in your Seller Dashboard). A "Lead" is defined as a unique US-based inquiry made via call, WhatsApp, or the Zonely booking form. This fee is subject to change with 14 days' notice.</li>
                 <li><strong>Phase 2 (Commission):</strong> For specific categories, we may charge a percentage of the total
                     booking value.</li>
                 <li><strong>Subscriptions:</strong> Monthly fees for the Premium Dashboard are processed in USD. All fees
