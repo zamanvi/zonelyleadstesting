@@ -52,8 +52,8 @@ class SellerController extends Controller
         $remaining     = max(0, $nextMilestone - $totalRefs);
 
         // Dynamic commission rate
-        $stateId    = \App\Models\State::where('name', $user->state)->value('id');
-        $cityId     = \App\Models\City::where('name', $user->city)->value('id');
+        $stateId    = \App\Models\State::where('title', $user->state)->value('id');
+        $cityId     = \App\Models\City::where('title', $user->city)->value('id');
         $commRate   = PlatformCharge::resolve('affiliate_commission', $user->category_id, $stateId, $cityId);
 
         // Earnings projections
@@ -99,15 +99,38 @@ class SellerController extends Controller
             'profile_photo' => 'nullable|image|max:10240',
         ]);
 
+        // Remove profile_photo from $data — only set if new file uploaded
+        unset($data['profile_photo']);
         if ($request->hasFile('profile_photo')) {
             $data['profile_photo'] = ImageOptimizer::saveProfilePhoto($request->file('profile_photo'));
         }
 
         $this->handleEmailChange($user, $request);
         $user->update($data);
-        $this->handlePasswordChange($user, $request);
 
         return back()->with('success', 'Settings saved.');
+    }
+
+    public function settingsPasswordUpdate(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password'         => ['required', 'confirmed', 'min:8'],
+        ]);
+        Auth::user()->update(['password' => Hash::make($request->password)]);
+        return back()->with('success', 'Password updated successfully.');
+    }
+
+    public function settingsDestroy(Request $request)
+    {
+        $request->validate(['password' => 'required']);
+        $user = Auth::user();
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['password' => 'Incorrect password.']);
+        }
+        $user->delete();
+        Auth::logout();
+        return redirect('/')->with('success', 'Account deleted.');
     }
 
     public function pricing()
@@ -115,8 +138,8 @@ class SellerController extends Controller
         $user = Auth::user()->load('category');
 
         $categoryId = $user->category_id;
-        $stateId    = \App\Models\State::where('name', $user->state)->value('id');
-        $cityId     = \App\Models\City::where('name', $user->city)->value('id');
+        $stateId    = \App\Models\State::where('title', $user->state)->value('id');
+        $cityId     = \App\Models\City::where('title', $user->city)->value('id');
 
         $leadFee      = PlatformCharge::resolve('lead_fee', $categoryId, $stateId, $cityId);
         $affiliateComm = PlatformCharge::resolve('affiliate_commission', $categoryId, $stateId, $cityId);

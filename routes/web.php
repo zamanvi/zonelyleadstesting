@@ -186,6 +186,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('affiliate', [SellerController::class, 'affiliate'])->name('affiliate');
         Route::get('settings', [SellerController::class, 'settings'])->name('settings');
         Route::put('settings', [SellerController::class, 'settingsUpdate'])->name('settings.update');
+        Route::put('settings/password', [SellerController::class, 'settingsPasswordUpdate'])->name('settings.password');
+        Route::delete('settings/account', [SellerController::class, 'settingsDestroy'])->name('settings.destroy');
         Route::get('pricing', [SellerController::class, 'pricing'])->name('pricing');
         Route::get('billing', [SellerController::class, 'billing'])->name('billing');
         Route::post('billing/{lead}/pay', [SellerController::class, 'payLead'])->name('billing.pay');

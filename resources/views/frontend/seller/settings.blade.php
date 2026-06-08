@@ -89,7 +89,7 @@
             <h2 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-lock text-teal-700 text-sm"></i> Change Password
             </h2>
-            <form action="{{ route('seller.settings.update') }}" method="POST" class="space-y-4">
+            <form action="{{ route('seller.settings.password') }}" method="POST" class="space-y-4">
                 @csrf @method('PUT')
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Current Password</label>
@@ -206,7 +206,7 @@
             <h3 class="font-bold text-lg text-slate-900">Delete Account?</h3>
             <p class="text-sm text-slate-500 mt-1">All your data, leads, and profile will be permanently removed.</p>
         </div>
-        <form action="{{ route('profile.destroy') }}" method="POST" class="space-y-4">
+        <form action="{{ route('seller.settings.destroy') }}" method="POST" class="space-y-4">
             @csrf @method('DELETE')
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Enter password to confirm</label>
