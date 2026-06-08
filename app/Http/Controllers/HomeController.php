@@ -167,9 +167,9 @@ class HomeController extends Controller
             ->whereIn('category_id', $categoryIds)
             ->latest()
             ->paginate(12);
-        $meta_title = $category->name . ' — Zonely';
-        $meta_description = 'Find trusted local ' . $category->name . ' experts near you with Zonely.';
-        $meta_keywords = $category->name . ' near me;';
+        $meta_title = $category->title . ' — Zonely';
+        $meta_description = 'Find trusted local ' . $category->title . ' experts near you with Zonely.';
+        $meta_keywords = $category->title . ' near me;';
         return view('frontend.service_all', compact('users', 'category', 'meta_title', 'meta_description', 'meta_keywords'));
     }
 
@@ -225,8 +225,8 @@ class HomeController extends Controller
             'email' => 'required|email|max:255',
         ]);
 
-        $stateId    = \App\Models\State::where('name', $seller->state)->value('id');
-        $cityId     = \App\Models\City::where('name', $seller->city)->value('id');
+        $stateId    = \App\Models\State::where('title', $seller->state)->value('id');
+        $cityId     = \App\Models\City::where('title', $seller->city)->value('id');
         $leadFee    = PlatformCharge::resolve('lead_fee', $seller->category_id, $stateId, $cityId);
         $affComm    = PlatformCharge::resolve('affiliate_commission', $seller->category_id, $stateId, $cityId);
 
@@ -269,8 +269,8 @@ class HomeController extends Controller
         $waNumber = $seller->contacts()->where('type', 'whatsapp')->value('value')
             ?? $seller->whatsapp;
 
-        $waStateId  = \App\Models\State::where('name', $seller->state)->value('id');
-        $waCityId   = \App\Models\City::where('name', $seller->city)->value('id');
+        $waStateId  = \App\Models\State::where('title', $seller->state)->value('id');
+        $waCityId   = \App\Models\City::where('title', $seller->city)->value('id');
         $waLeadFee  = PlatformCharge::resolve('lead_fee', $seller->category_id, $waStateId, $waCityId);
 
         $lead = Lead::create([

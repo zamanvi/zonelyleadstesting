@@ -73,7 +73,9 @@
     @yield('content')
 
     @auth
-        @include('frontend.layouts._account_nav')
+        @unless(View::hasSection('hideAccountNav'))
+            @include('frontend.layouts._account_nav')
+        @endunless
     @endauth
 
     @unless(View::hasSection('hideLayoutFooter'))

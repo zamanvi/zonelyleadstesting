@@ -64,6 +64,7 @@
 @endsection
 
 @section('hideLayoutFooter', true)
+@section('hideAccountNav', true)
 
 @section('css')
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
@@ -800,7 +801,10 @@
     }
 
     @if(session('inquiry_success'))
-        document.getElementById('bookingBody').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Auto-open form and scroll to success message
+        const _body = document.getElementById('bookingBody');
+        if (!_body.classList.contains('open')) toggleBooking();
+        setTimeout(() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
     @endif
 
     function trackWa(url) {
