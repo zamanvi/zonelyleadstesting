@@ -51,6 +51,9 @@ class SellerController extends Controller
         $tierPct       = min(100, $nextMilestone > 0 ? round($totalRefs / $nextMilestone * 100) : 100);
         $remaining     = max(0, $nextMilestone - $totalRefs);
 
+        // Check + award tier milestone points every time affiliate page loads
+        \App\Services\PointsService::checkTierMilestones($user);
+
         // Dynamic commission rate
         $stateId    = \App\Models\State::where('title', $user->state)->value('id');
         $cityId     = \App\Models\City::where('title', $user->city)->value('id');
@@ -71,12 +74,14 @@ class SellerController extends Controller
             'paid_out'  => $commissions->where('status', 'paid')->sum('amount'),
         ];
 
-        $refUrl = url('/user/register/seller?ref=' . ($user->slug ?? $user->id));
+        $refUrl     = url('/user/register/seller?ref=' . ($user->slug ?? $user->id));
+        $userPoints = $user->fresh()->points; // refresh after possible tier award
+        $pointsLog  = $user->pointsLog()->latest()->limit(10)->get();
 
         return view('frontend.seller.affiliate', compact(
             'user', 'commissions', 'stats',
             'totalRefs', 'tierLabel', 'nextLabel', 'tierPct', 'remaining',
-            'projections', 'commRate', 'refUrl'
+            'projections', 'commRate', 'refUrl', 'userPoints', 'pointsLog'
         ));
     }
 

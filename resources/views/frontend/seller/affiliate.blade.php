@@ -113,6 +113,34 @@
         </div>
     </div>
 
+    {{-- ── POINTS BALANCE ── --}}
+    <div class="bg-gradient-to-br from-violet-600 to-purple-700 rounded-3xl p-5 mb-6 shadow-sm">
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <p class="text-violet-200 text-xs font-bold uppercase tracking-widest mb-1">Your Points Balance</p>
+                <p class="text-4xl font-black text-white">{{ number_format($userPoints) }} <span class="text-lg font-semibold text-violet-300">pts</span></p>
+                <p class="text-violet-300 text-xs mt-1">Tier: <strong class="text-white">{{ \App\Services\PointsService::getTierByPoints($userPoints) }}</strong></p>
+            </div>
+            <div class="shrink-0 w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                <i class="fa-solid fa-star text-amber-300 text-2xl"></i>
+            </div>
+        </div>
+
+        @if($pointsLog->count())
+        <div class="mt-4 space-y-1.5">
+            <p class="text-violet-300 text-[10px] font-bold uppercase tracking-widest mb-2">Recent Activity</p>
+            @foreach($pointsLog as $log)
+            <div class="flex items-center justify-between bg-white/10 rounded-xl px-3 py-2">
+                <p class="text-white text-xs truncate flex-1 mr-2">{{ $log->reason }}</p>
+                <span class="text-emerald-300 font-black text-sm shrink-0">+{{ $log->points }}</span>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <p class="text-violet-300 text-xs mt-3">Earn your first points by sharing your referral link below.</p>
+        @endif
+    </div>
+
     {{-- ── TIER PROGRESS ── --}}
     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mb-6">
         <div class="flex items-center justify-between mb-4">

@@ -12,6 +12,7 @@ use App\Models\State;
 use App\Models\User;
 use App\Models\AffiliateCommission;
 use App\Services\Sms\SmsService;
+use App\Services\PointsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -92,6 +93,17 @@ class HomeController extends Controller
             'referred_by'   => $referrer?->id,
         ]);
         Auth::login($user);
+
+        // Award points to referrer for this new signup
+        PointsService::onReferralJoin($user);
+        // Award 2nd-level points to grandparent referrer
+        PointsService::onSecondLevelReferral($user);
+        // Check if referrer just hit a tier milestone
+        if ($user->referred_by) {
+            $ref = User::find($user->referred_by);
+            if ($ref) PointsService::checkTierMilestones($ref);
+        }
+
         if ($user->type === 'user') {
             return redirect()->route('buyer.dashboard')->with('success', 'Welcome to Zonely! Find local experts near you.');
         }
@@ -277,6 +289,13 @@ class HomeController extends Controller
                 ]);
             }
         }
+
+        // Award points: referrer of seller gets +25 on first lead
+        PointsService::onReferralFirstJob($seller);
+
+        // Award points: referrer of buyer gets +25 on first booking
+        $buyer = Auth::user();
+        if ($buyer) PointsService::onReferralFirstJob($buyer);
 
         if ($seller->twilio_enabled && $seller->phone) {
             $msg = "🔔 New Zonely Lead!\n"

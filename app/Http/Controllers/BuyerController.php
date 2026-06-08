@@ -259,6 +259,9 @@ class BuyerController extends Controller
         $tierPct    = min(100, $nextMilestone > 0 ? round($totalRefs / $nextMilestone * 100) : 100);
         $remaining  = max(0, $nextMilestone - $totalRefs);
 
+        // Check + award tier milestone points every time affiliate page loads
+        \App\Services\PointsService::checkTierMilestones($user);
+
         // Resolve once — reuse for projections and pass to blade
         $commRate = PlatformCharge::resolve('buyer_referral_commission');
 
@@ -276,12 +279,14 @@ class BuyerController extends Controller
             'paid_out'  => $commissions->where('status', 'paid')->sum('amount'),
         ];
 
-        $refUrl = url('/user/register/user?ref=' . ($user->slug ?? $user->id));
+        $refUrl     = url('/user/register/user?ref=' . ($user->slug ?? $user->id));
+        $userPoints = $user->fresh()->points;
+        $pointsLog  = $user->pointsLog()->latest()->limit(10)->get();
 
         return view('frontend.buyer.affiliate', compact(
             'user', 'commissions', 'stats',
             'totalRefs', 'tierLabel', 'nextLabel', 'tierPct', 'remaining',
-            'projections', 'refUrl', 'commRate'
+            'projections', 'refUrl', 'commRate', 'userPoints', 'pointsLog'
         ));
     }
 
