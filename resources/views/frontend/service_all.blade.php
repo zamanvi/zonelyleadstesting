@@ -141,15 +141,81 @@
         @endforeach
     </div>
     @else
-    <div class="text-center py-20">
-        <i class="fa-solid fa-user-slash text-5xl text-slate-200 mb-4"></i>
-        <p class="font-bold text-slate-400 text-lg">No professionals found</p>
-        <p class="text-slate-400 text-sm mt-1">Try a different search term</p>
-        <a href="{{ route('frontend.service.all') }}"
-           class="inline-block mt-5 bg-teal-700 text-white font-bold px-6 py-3 rounded-2xl text-sm hover:bg-teal-800 transition"
-           style="min-height:unset;">
-            Browse All
-        </a>
+    {{-- ── Empty State ── --}}
+    <div class="py-16 px-4 max-w-2xl mx-auto">
+
+        {{-- Icon + heading --}}
+        <div class="text-center mb-10">
+            <div class="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-magnifying-glass text-3xl text-slate-300"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800">
+                No {{ isset($category) ? $category->title : 'professionals' }} found
+                @if(isset($city)) in {{ $city }}@endif
+            </h2>
+            <p class="text-slate-500 text-sm mt-2">We're growing fast — new professionals join every week.</p>
+        </div>
+
+        {{-- Two cards side by side --}}
+        <div class="grid sm:grid-cols-2 gap-4 mb-8">
+
+            {{-- Card 1: For the visitor (buyer) --}}
+            <div class="bg-teal-50 border border-teal-100 rounded-3xl p-6">
+                <div class="w-10 h-10 bg-teal-700 rounded-2xl flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-bell text-white text-sm"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-base mb-1">Get Notified</h3>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Leave your details — we'll alert you the moment a {{ isset($category) ? $category->title : 'professional' }} joins in your area.</p>
+                <a href="{{ route('user.register1') }}"
+                   class="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition"
+                   style="min-height:unset;">
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i> Create Free Account
+                </a>
+            </div>
+
+            {{-- Card 2: For the seller --}}
+            <div class="bg-amber-50 border border-amber-100 rounded-3xl p-6">
+                <div class="w-10 h-10 bg-amber-500 rounded-2xl flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-briefcase text-white text-sm"></i>
+                </div>
+                <h3 class="font-bold text-slate-900 text-base mb-1">
+                    Are you a {{ isset($category) ? $category->title : 'professional' }}?
+                </h3>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Be the first in your area. Join free — pay only when you get a verified lead.</p>
+                <a href="{{ route('user.register', 'seller') }}"
+                   class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-bold px-4 py-2.5 rounded-xl transition"
+                   style="min-height:unset;">
+                    <i class="fa-solid fa-rocket text-[10px]"></i> Join Free — Be First
+                </a>
+            </div>
+
+        </div>
+
+        {{-- Related categories --}}
+        @if(isset($category) && $category->parent && $category->parent->children->count() > 1)
+        <div class="bg-white border border-slate-100 rounded-3xl p-6 mb-6">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Try a related category</p>
+            <div class="flex flex-wrap gap-2">
+                @foreach($category->parent->children->where('id', '!=', $category->id)->take(6) as $sibling)
+                <a href="{{ route('frontend.category', $sibling->slug) }}"
+                   class="px-3 py-1.5 bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-slate-700 hover:text-teal-700 text-xs font-semibold rounded-xl transition"
+                   style="min-height:unset;">
+                    {{ $sibling->title }}
+                </a>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- Browse all fallback --}}
+        <div class="text-center">
+            <a href="{{ route('frontend.service.all') }}"
+               class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-teal-700 transition"
+               style="min-height:unset;">
+                <i class="fa-solid fa-grid-2 text-xs"></i> Browse all professionals
+            </a>
+        </div>
+
     </div>
     @endif
 
