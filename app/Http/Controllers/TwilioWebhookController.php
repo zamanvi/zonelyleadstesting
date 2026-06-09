@@ -36,37 +36,46 @@ class TwilioWebhookController extends Controller
 
         $seller = $twilioNumber->seller;
 
-        $log = CallLog::create([
-            'seller_id'     => $seller->id,
-            'twilio_number' => $toNumber,
-            'caller_number' => $fromNumber,
-            'call_sid'      => $callSid,
-            'status'        => 'ringing',
-            'called_at'     => now(),
-        ]);
+        try {
+            $log = CallLog::create([
+                'seller_id'     => $seller->id,
+                'twilio_number' => $toNumber,
+                'caller_number' => $fromNumber,
+                'call_sid'      => $callSid,
+                'status'        => 'ringing',
+                'called_at'     => now(),
+            ]);
 
-        $stateId = State::where('name', $seller->state)->value('id');
-        $cityId  = City::where('name', $seller->city)->value('id');
-        $leadFee = PlatformCharge::resolve('lead_fee', $seller->category_id, $stateId, $cityId);
+            $stateId = State::where('title', $seller->state)->value('id');
+            $cityId  = City::where('title', $seller->city)->value('id');
+            $leadFee = PlatformCharge::resolve('lead_fee', $seller->category_id, $stateId, $cityId);
 
-        $lead = Lead::create([
-            'seller_id' => $seller->id,
-            'name'      => 'Phone Lead',
-            'phone'     => $fromNumber,
-            'email'     => '',
-            'service'   => 'Phone Call',
-            'message'   => 'Inbound call via Zonely tracking number.',
-            'status'    => 'new',
-            'fee'       => $leadFee,
-        ]);
+            $lead = Lead::create([
+                'seller_id' => $seller->id,
+                'name'      => 'Phone Lead',
+                'phone'     => $fromNumber,
+                'email'     => '',
+                'service'   => 'Phone Call',
+                'message'   => 'Inbound call via Zonely tracking number.',
+                'status'    => 'new',
+                'fee'       => $leadFee,
+            ]);
 
-        $log->update(['lead_id' => $lead->id]);
+            $log->update(['lead_id' => $lead->id]);
 
-        if ($seller->twilio_enabled && $seller->phone) {
-            (new SmsService())->send(
-                $seller->phone,
-                "📞 Incoming Zonely call!\nFrom: {$fromNumber}\nAnswering now — mark Won/Lost after: " . route('seller.dashboard')
-            );
+            if ($seller->twilio_enabled && $seller->phone) {
+                (new SmsService())->send(
+                    $seller->phone,
+                    "📞 Incoming Zonely call!\nFrom: {$fromNumber}\nAnswering now — mark Won/Lost after: " . route('seller.dashboard')
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::error('TwilioWebhook voice DB error: ' . $e->getMessage(), [
+                'call_sid' => $callSid,
+                'to'       => $toNumber,
+                'from'     => $fromNumber,
+            ]);
+            // Still forward the call even if DB logging fails
         }
 
         return response($this->twimlDial($seller->phone), 200)

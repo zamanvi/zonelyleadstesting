@@ -1,16 +1,16 @@
 ﻿@extends('layouts.admin2')
-@section('title', 'Twilio — Seller Notifications')
+@section('title', 'SMS — Seller Notifications')
 
 @section('content')
 <div class="mt-5 pt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-0 fw-bold"><i class="fas fa-users text-primary me-2"></i>Twilio — Seller Notifications</h4>
+            <h4 class="mb-0 fw-bold"><i class="fas fa-users text-primary me-2"></i>SMS — Seller Notifications</h4>
             <p class="text-muted small mb-0">Enable SMS lead alerts per seller</p>
         </div>
         <a href="{{ route('admin.twilio.settings') }}" class="btn btn-outline-danger btn-sm">
-            <i class="fas fa-key me-1"></i> Twilio Settings
+            <i class="fas fa-key me-1"></i> SMS Settings
         </a>
     </div>
 
@@ -18,7 +18,7 @@
     <div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
         <i class="fas fa-triangle-exclamation fa-lg"></i>
         <div>
-            <strong>Twilio not configured.</strong>
+            <strong>SMS provider not configured.</strong>
             <a href="{{ route('admin.twilio.settings') }}" class="alert-link ms-1">Add credentials first →</a>
         </div>
     </div>
@@ -42,7 +42,7 @@
         <div class="col-sm-4">
             <div class="section-card text-center p-3">
                 <p class="fs-3 fw-black text-success mb-0">{{ $sellers->where('twilio_enabled', true)->count() }}</p>
-                <p class="small text-muted mb-0">Twilio Active</p>
+                <p class="small text-muted mb-0">SMS Active</p>
             </div>
         </div>
         <div class="col-sm-4">
@@ -62,7 +62,7 @@
                             <th class="ps-4">Seller</th>
                             <th>Phone (SMS target)</th>
                             <th>Status</th>
-                            <th>Twilio</th>
+                            <th>SMS</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
@@ -114,7 +114,7 @@
                                     <button type="submit"
                                             class="btn btn-sm {{ $seller->twilio_enabled ? 'btn-outline-danger' : 'btn-outline-success' }}"
                                             {{ !$configured ? 'disabled' : '' }}
-                                            title="{{ $seller->twilio_enabled ? 'Disable Twilio' : 'Enable Twilio' }}">
+                                            title="{{ $seller->twilio_enabled ? 'Disable SMS' : 'Enable SMS' }}">
                                         <i class="fas {{ $seller->twilio_enabled ? 'fa-toggle-on text-success' : 'fa-toggle-off' }} me-1"></i>
                                         {{ $seller->twilio_enabled ? 'Enabled' : 'Enable' }}
                                     </button>
