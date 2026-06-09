@@ -72,7 +72,7 @@
                     <p class="font-bold text-sm text-slate-900 truncate">{{ $sellerName }}</p>
                     <p class="text-xs text-slate-500">{{ $review->lead?->service ?? 'Service' }}</p>
                 </div>
-                <a href="{{ route('buyer.review', $review->id) }}"
+                <a href="{{ route('buyer.review', $review->seller_id) }}"
                    class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shrink-0 shadow-sm">
                     ⭐ Review
                 </a>

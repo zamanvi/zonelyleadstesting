@@ -212,7 +212,7 @@ class SellerController extends Controller
     {
         $data = $request->validate([
             'working_days'       => 'nullable|array',
-            'working_days.*'     => 'string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+            'working_days.*'     => 'string|in:mon,tue,wed,thu,fri,sat,sun',
             'periods'            => 'nullable|array|max:10',
             'periods.*.label'    => 'nullable|string|max:50',
             'periods.*.from'     => ['nullable', 'string', 'regex:/^\d{2}:\d{2}$/'],
