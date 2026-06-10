@@ -197,8 +197,56 @@ class SellerController extends Controller
     public function payLead(Request $request, $id)
     {
         $lead = Lead::where('id', $id)->where('seller_id', Auth::id())->firstOrFail();
-        $lead->update(['paid_at' => now()]);
-        return back()->with('success', 'Lead marked as paid.');
+
+        if ($lead->paid_at) {
+            return response()->json(['error' => 'Already paid'], 422);
+        }
+
+        $orderId = $request->input('paypal_order_id');
+        if (!$orderId) {
+            return response()->json(['error' => 'Missing PayPal order ID'], 422);
+        }
+
+        // Verify PayPal order
+        $verified = $this->verifyPayPalOrder($orderId, $lead->fee);
+        if (!$verified) {
+            return response()->json(['error' => 'PayPal payment verification failed'], 422);
+        }
+
+        $lead->update(['paid_at' => now(), 'paypal_order_id' => $orderId]);
+
+        return response()->json(['ok' => true]);
+    }
+
+    private function verifyPayPalOrder(string $orderId, float $expectedAmount): bool
+    {
+        $clientId     = config('services.paypal.client_id');
+        $clientSecret = config('services.paypal.client_secret');
+        $mode         = config('services.paypal.mode', 'sandbox');
+        $baseUrl      = $mode === 'live'
+            ? 'https://api-m.paypal.com'
+            : 'https://api-m.sandbox.paypal.com';
+
+        // Get access token
+        $tokenResponse = \Http::withBasicAuth($clientId, $clientSecret)
+            ->asForm()
+            ->post("{$baseUrl}/v1/oauth2/token", ['grant_type' => 'client_credentials']);
+
+        if (!$tokenResponse->ok()) return false;
+        $accessToken = $tokenResponse->json('access_token');
+
+        // Get order details
+        $orderResponse = \Http::withToken($accessToken)
+            ->get("{$baseUrl}/v2/checkout/orders/{$orderId}");
+
+        if (!$orderResponse->ok()) return false;
+
+        $order = $orderResponse->json();
+        if (($order['status'] ?? '') !== 'COMPLETED') return false;
+
+        $paid = (float) ($order['purchase_units'][0]['payments']['captures'][0]['amount']['value'] ?? 0);
+
+        return abs($paid - $expectedAmount) < 0.01;
     }
 
     public function schedule()

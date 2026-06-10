@@ -11,7 +11,7 @@ class Lead extends Model
 
     protected $fillable = [
         'seller_id', 'name', 'phone', 'email', 'service',
-        'location', 'zip_code', 'message', 'status', 'fee', 'paid_at', 'notes',
+        'location', 'zip_code', 'message', 'status', 'fee', 'paid_at', 'paypal_order_id', 'notes',
     ];
 
     protected $casts = ['paid_at' => 'datetime'];
