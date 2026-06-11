@@ -352,8 +352,16 @@
                         <i class="fa-solid fa-phone {{ $iconClr }}"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="font-bold text-slate-900">{{ $lead->phone ?? 'Unknown' }}</p>
-                        <p class="text-sm text-slate-500">{{ $lead->service ?? 'General Inquiry' }}</p>
+                        <p class="font-bold text-slate-900">{{ $lead->name ?? 'Unknown' }}</p>
+                        <div class="flex flex-wrap gap-2 mt-0.5">
+                            @if($lead->phone)
+                            <a href="tel:{{ $lead->phone }}" class="text-xs text-teal-700 font-semibold hover:underline"><i class="fa-solid fa-phone text-[10px] mr-1"></i>{{ $lead->phone }}</a>
+                            @endif
+                            @if($lead->email)
+                            <a href="mailto:{{ $lead->email }}" class="text-xs text-blue-600 font-semibold hover:underline"><i class="fa-solid fa-envelope text-[10px] mr-1"></i>{{ $lead->email }}</a>
+                            @endif
+                        </div>
+                        <p class="text-sm text-slate-500 mt-0.5">{{ $lead->service ?? 'General Inquiry' }}@if($lead->location) · {{ $lead->location }}@endif</p>
                         <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
                             <span class="text-[11px] text-slate-400">{{ $lead->created_at?->format('M d · g:i A') }}</span>
                             @if($lPaid)
@@ -722,19 +730,21 @@ function searchLeads() {
 }
 
 function exportLeads() {
-    const rows = [['Phone','Service','Status','Date','Fee','Note']];
-    document.querySelectorAll('#leadsList .lead-card').forEach(card => {
-        const cells = card.querySelectorAll('p');
-        const note  = card.querySelector('input[type="text"]')?.value || '';
-        rows.push([
-            cells[0]?.textContent.trim(),
-            cells[1]?.textContent.trim(),
-            card.dataset.status,
-            cells[2]?.textContent.trim(),
-            card.querySelector('[class*="font-bold px-3"]')?.textContent.trim() || '',
-            note
-        ]);
-    });
+    const rows = [['Name','Phone','Email','Service','Location','Status','Date','Fee','Paid','Note']];
+    @foreach($leads as $lead)
+    rows.push([
+        @json($lead->name ?? 'Unknown'),
+        @json($lead->phone ?? ''),
+        @json($lead->email ?? ''),
+        @json($lead->service ?? ''),
+        @json($lead->location ?? ''),
+        @json($lead->status ?? 'new'),
+        @json($lead->created_at?->format('M d, Y g:i A') ?? ''),
+        @json('$' . number_format($lead->fee ?? 0, 2)),
+        @json($lead->paid_at ? 'Paid ' . $lead->paid_at->format('M d, Y') : 'Unpaid'),
+        @json($lead->notes ?? ''),
+    ]);
+    @endforeach
     const csv = rows.map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
