@@ -747,26 +747,66 @@
     </div>
 </div>
 
+{{-- ── EMAIL MODAL ──────────────────────────────────────────────── --}}
+<div id="emailModal" class="hidden fixed inset-0 bg-black/50 z-[999] flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-900 text-lg">Send Email to {{ $user->name }}</h3>
+            <button onclick="document.getElementById('emailModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        @if(session('email_success'))
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-2xl mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check"></i> {{ session('email_success') }}
+        </div>
+        @endif
+        <form action="{{ route('service.email', $user->slug) }}" method="POST" class="space-y-3">
+            @csrf
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Full Name *</label>
+                <input type="text" name="name" required placeholder="John Smith" value="{{ old('name') }}"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-400 transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Your Email *</label>
+                <input type="email" name="email" required placeholder="john@gmail.com" value="{{ old('email') }}"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-400 transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Phone (optional)</label>
+                <input type="tel" name="phone" placeholder="(917) 000-0000" value="{{ old('phone') }}"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-400 transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Message *</label>
+                <textarea name="message" required rows="3" placeholder="Describe what you need..."
+                          class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-400 transition resize-none">{{ old('message') }}</textarea>
+            </div>
+            <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-2xl text-sm transition">
+                <i class="fas fa-paper-plane mr-2"></i> Send Email
+            </button>
+        </form>
+    </div>
+</div>
+
 {{-- ── MOBILE STICKY CTA ────────────────────────────────────────── --}}
 <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-2xl px-4 py-3 flex gap-3">
-    @if($callNumber)
-    <a href="tel:{{ $callNumber }}"
-       class="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900 py-3 rounded-2xl font-semibold text-base transition">
-        <i class="fas fa-phone"></i> Call Now
-    </a>
-    @endif
     @if($waNumber)
     <button onclick="trackWa('{{ route('service.wa.click', $user->slug) }}')"
        class="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white py-3 rounded-2xl font-semibold text-base transition cursor-pointer">
         <i class="fab fa-whatsapp"></i> WhatsApp
     </button>
     @endif
-    @if(!$callNumber && !$waNumber)
+    <button onclick="document.getElementById('emailModal').classList.remove('hidden')"
+       class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold text-base transition">
+        <i class="fas fa-envelope"></i> Email
+    </button>
     <a href="#contact"
-       class="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900 py-3 rounded-2xl font-semibold text-base transition">
-        <i class="fas fa-envelope"></i> Contact
+       class="flex-1 flex items-center justify-center gap-2 bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-2xl font-semibold text-base transition">
+        <i class="fas fa-calendar-check"></i> Book
     </a>
-    @endif
 </div>
 
 </div>

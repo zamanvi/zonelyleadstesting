@@ -43,6 +43,14 @@
                     </a>
                     @endforeach
                 </div>
+                <div class="btn-group btn-group-sm">
+                    @foreach([''=>'All Channels','form'=>'📋 Form','whatsapp'=>'💬 WhatsApp','email'=>'📧 Email'] as $val=>$label)
+                    <a href="{{ request()->fullUrlWithQuery(['source'=>$val?:null,'page'=>1]) }}"
+                       class="btn {{ request('source',$val===''?'':null)===$val ? 'btn-info text-white' : 'btn-outline-light' }}">
+                        {{ $label }}
+                    </a>
+                    @endforeach
+                </div>
                 <input type="text" id="leadSearch" class="form-control form-control-sm"
                        placeholder="Search..." style="min-width:180px"
                        oninput="filterLeads(this.value)">
@@ -56,6 +64,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
+                            <th>Channel</th>
                             <th>Contact</th>
                             <th>Seller</th>
                             <th>Service / Location</th>
@@ -78,6 +87,19 @@
                         @endphp
                         <tr>
                             <td class="text-muted small">{{ ($leads->currentPage()-1)*$leads->perPage()+$i+1 }}</td>
+
+                            {{-- Channel --}}
+                            <td>
+                                @php
+                                    $srcBadge = match($lead->source ?? 'form') {
+                                        'whatsapp' => ['💬 WhatsApp','badge bg-success'],
+                                        'email'    => ['📧 Email','badge bg-primary'],
+                                        'phone'    => ['📞 Phone','badge bg-warning text-dark'],
+                                        default    => ['📋 Form','badge bg-secondary'],
+                                    };
+                                @endphp
+                                <span class="{{ $srcBadge[1] }}">{{ $srcBadge[0] }}</span>
+                            </td>
 
                             {{-- Contact --}}
                             <td>

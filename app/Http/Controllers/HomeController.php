@@ -245,6 +245,7 @@ class HomeController extends Controller
 
         $lead = Lead::create([
             'seller_id' => $seller->id,
+            'source'    => 'form',
             'name'      => $request->name,
             'phone'     => $request->phone,
             'email'     => $request->email,
@@ -324,6 +325,7 @@ class HomeController extends Controller
 
         $lead = Lead::create([
             'seller_id' => $seller->id,
+            'source'    => 'whatsapp',
             'name'      => 'WhatsApp Lead',
             'phone'     => '',
             'email'     => '',
@@ -340,6 +342,59 @@ class HomeController extends Controller
 
         $clean = preg_replace('/[^0-9]/', '', $waNumber ?? '');
         return response()->json(['url' => 'https://wa.me/' . $clean]);
+    }
+
+    function emailInquiry(Request $request, $slug)
+    {
+        $seller = User::activeSellers()->where('slug', $slug)->firstOrFail();
+
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => 'required|email|max:255',
+            'phone'   => 'nullable|string|max:50',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $stateId = \App\Models\State::where('title', $seller->state)->value('id');
+        $cityId  = \App\Models\City::where('title', $seller->city)->value('id');
+        $leadFee = PlatformCharge::resolve('lead_fee', $seller->category_id, $stateId, $cityId);
+
+        $lead = Lead::create([
+            'seller_id' => $seller->id,
+            'source'    => 'email',
+            'name'      => $request->name,
+            'phone'     => $request->phone ?? '',
+            'email'     => $request->email,
+            'service'   => 'Email Inquiry',
+            'message'   => $request->message,
+            'status'    => 'new',
+            'fee'       => $leadFee,
+        ]);
+
+        // Send email to seller
+        \Mail::raw(
+            "New email inquiry from {$request->name} via Zonely!\n\n"
+            . "Name: {$request->name}\n"
+            . "Email: {$request->email}\n"
+            . ($request->phone ? "Phone: {$request->phone}\n" : '')
+            . "Message: {$request->message}\n\n"
+            . "View lead: " . route('seller.dashboard'),
+            function ($m) use ($seller, $request) {
+                $m->to($seller->email)
+                  ->subject("New Inquiry from {$request->name} — Zonely");
+            }
+        );
+
+        // SMS alert
+        if ($seller->twilio_enabled && $seller->phone) {
+            $msg = "📧 New Email Lead!\n"
+                 . "From: {$request->name}\n"
+                 . "Email: {$request->email}\n"
+                 . "View: " . route('seller.dashboard');
+            (new \App\Services\Sms\SmsService())->send($seller->phone, $msg);
+        }
+
+        return back()->with('email_success', 'Your message has been sent! ' . $seller->name . ' will reply to your email shortly.');
     }
 
     function termsAgree()

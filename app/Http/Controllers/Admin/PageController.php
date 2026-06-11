@@ -241,8 +241,10 @@ class PageController extends Controller
             'pending_revenue' => (float) ($s->pending_revenue ?? 0),
         ];
         $status = request('status');
+        $source = request('source');
         $leads = Lead::with('seller:id,name,profile_photo,slug')
             ->when($status, fn($q) => $q->where('status', $status))
+            ->when($source, fn($q) => $q->where('source', $source))
             ->latest()
             ->paginate(25);
         return view('admin.leads.index', compact('stats', 'leads'));

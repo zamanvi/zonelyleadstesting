@@ -96,6 +96,7 @@ Route::post('user/register', [HomeController::class, 'user_submit_register'])->n
 
 Route::post('/service/{slug}/inquiry', [HomeController::class, 'serviceInquiry'])->name('service.inquiry');
 Route::post('/service/{slug}/wa-click', [HomeController::class, 'waClick'])->name('service.wa.click');
+Route::post('/service/{slug}/email', [HomeController::class, 'emailInquiry'])->name('service.email');
 
 // Public review link — no login required (seller sends token link to buyer)
 Route::get('/r/{token}', [ReviewController::class, 'show'])->name('review.show');

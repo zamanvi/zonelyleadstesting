@@ -10,7 +10,7 @@ class Lead extends Model
     use HasFactory;
 
     protected $fillable = [
-        'seller_id', 'name', 'phone', 'email', 'service',
+        'seller_id', 'source', 'name', 'phone', 'email', 'service',
         'location', 'zip_code', 'message', 'status', 'fee', 'paid_at', 'paypal_order_id', 'notes',
     ];
 

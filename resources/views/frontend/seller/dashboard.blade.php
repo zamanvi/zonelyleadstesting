@@ -310,7 +310,7 @@
     </div>
 
     {{-- Filter Tabs --}}
-    <div class="flex gap-2 mb-5 overflow-x-auto scroll-hide pb-1">
+    <div class="flex gap-2 mb-3 overflow-x-auto scroll-hide pb-1">
         <button onclick="filterLeads(this,'all')"
                 class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-teal-700 text-white">
             All ({{ $stats['total'] }})
@@ -326,6 +326,25 @@
         <button onclick="filterLeads(this,'lost')"
                 class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
             Lost ({{ $leads->where('status','lost')->count() }})
+        </button>
+    </div>
+    {{-- Source Filter --}}
+    <div class="flex gap-2 mb-5 overflow-x-auto scroll-hide pb-1">
+        <button onclick="filterSource(this,'all')"
+                class="source-btn active px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-white">
+            All Channels
+        </button>
+        <button onclick="filterSource(this,'form')"
+                class="source-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+            📋 Form ({{ $leads->where('source','form')->count() }})
+        </button>
+        <button onclick="filterSource(this,'whatsapp')"
+                class="source-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+            💬 WhatsApp ({{ $leads->where('source','whatsapp')->count() }})
+        </button>
+        <button onclick="filterSource(this,'email')"
+                class="source-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+            📧 Email ({{ $leads->where('source','email')->count() }})
         </button>
     </div>
 
@@ -344,14 +363,23 @@
             $pendBtn = $lStatus==='pending' ? 'pending-active' : 'bg-slate-100 text-slate-500 hover:bg-amber-100 hover:text-amber-700 transition';
             $lostBtn = $lStatus==='lost'    ? 'lost-active'    : 'bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition';
         @endphp
+        @php
+            $sourceLabel = match($lead->source ?? 'form') {
+                'whatsapp' => ['💬 WhatsApp', 'bg-emerald-100 text-emerald-700'],
+                'email'    => ['📧 Email', 'bg-blue-100 text-blue-700'],
+                'phone'    => ['📞 Phone', 'bg-amber-100 text-amber-700'],
+                default    => ['📋 Form', 'bg-slate-100 text-slate-600'],
+            };
+        @endphp
         <div class="lead-card bg-white rounded-3xl p-5 border {{ $borderClr }} shadow-sm {{ $lStatus==='lost' ? 'opacity-60' : '' }}"
-             data-status="{{ $lStatus }}" data-id="{{ $lead->id }}">
+             data-status="{{ $lStatus }}" data-id="{{ $lead->id }}" data-source="{{ $lead->source ?? 'form' }}">
             <div class="flex items-start justify-between gap-3">
                 <div class="flex items-start gap-3 flex-1 min-w-0">
                     <div class="w-11 h-11 {{ $iconBg }} rounded-2xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-phone {{ $iconClr }}"></i>
                     </div>
                     <div class="min-w-0">
+                        <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 {{ $sourceLabel[1] }}">{{ $sourceLabel[0] }}</span>
                         <p class="font-bold text-slate-900">{{ $lead->name ?? 'Unknown' }}</p>
                         <div class="flex flex-wrap gap-2 mt-0.5">
                             @if($lead->phone)
@@ -681,14 +709,33 @@
 
 @section('scripts')
 <script>
+let activeStatus = 'all';
+let activeSource = 'all';
+
+function applyFilters() {
+    document.querySelectorAll('#leadsList .lead-card').forEach(card => {
+        const statusOk = activeStatus === 'all' || card.dataset.status === activeStatus;
+        const sourceOk = activeSource === 'all' || card.dataset.source === activeSource;
+        card.style.display = (statusOk && sourceOk) ? 'block' : 'none';
+    });
+}
+
 function filterLeads(btn, status) {
+    activeStatus = status;
     document.querySelectorAll('.filter-btn').forEach(b => {
         b.className = 'filter-btn px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition';
     });
     btn.className = 'filter-btn active px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-teal-700 text-white';
-    document.querySelectorAll('#leadsList .lead-card').forEach(card => {
-        card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
+    applyFilters();
+}
+
+function filterSource(btn, source) {
+    activeSource = source;
+    document.querySelectorAll('.source-btn').forEach(b => {
+        b.className = 'source-btn px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition';
     });
+    btn.className = 'source-btn active px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-white';
+    applyFilters();
 }
 
 function setStatus(btn, newStatus) {
