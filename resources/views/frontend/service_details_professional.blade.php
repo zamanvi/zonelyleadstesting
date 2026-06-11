@@ -15,7 +15,7 @@
     $wa               = $user->contacts->where('type','whatsapp')->first();
     $trackingNumber   = $user->twilioNumber?->number;
     $rawPhone         = $phone?->value ?? $user->phone;
-    $callNumber       = $trackingNumber ?? ($user->show_phone ? $rawPhone : null);
+    $callNumber       = null; // Phone tracking disabled until Twilio is configured
     $waNumber         = $wa?->value ?? $user->whatsapp;
     $activeServices   = $user->services->where('is_active', true);
     $tags             = array_filter(array_map('trim', explode(',', $user->tags ?? '')));

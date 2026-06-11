@@ -110,9 +110,10 @@
                 <div class="space-y-3">
                     @forelse($user->contacts as $contact)
                     @php
-                        $icon  = match($contact->type) { 'email'=>'fas fa-envelope','phone'=>'fas fa-phone','address'=>'fas fa-map-marker-alt','whatsapp'=>'fab fa-whatsapp',default=>'fas fa-info-circle' };
-                        $href  = match($contact->type) { 'email'=>'mailto:'.$contact->value,'phone'=>'tel:'.$contact->value,'whatsapp'=>'https://wa.me/'.preg_replace('/[^0-9]/','', $contact->value),default=>'#' };
-                        $color = match($contact->type) { 'whatsapp'=>'bg-emerald-500 hover:bg-emerald-600','phone'=>'bg-teal-700 hover:bg-teal-800',default=>'bg-slate-800 hover:bg-slate-700' };
+                        if ($contact->type === 'phone') continue; // Phone hidden until Twilio ready
+                        $icon  = match($contact->type) { 'email'=>'fas fa-envelope','address'=>'fas fa-map-marker-alt','whatsapp'=>'fab fa-whatsapp',default=>'fas fa-info-circle' };
+                        $href  = match($contact->type) { 'email'=>'mailto:'.$contact->value,'whatsapp'=>'https://wa.me/'.preg_replace('/[^0-9]/','', $contact->value),default=>'#' };
+                        $color = match($contact->type) { 'whatsapp'=>'bg-emerald-500 hover:bg-emerald-600',default=>'bg-slate-800 hover:bg-slate-700' };
                     @endphp
                     <a href="{{ $href }}"
                        class="flex items-center gap-3 w-full {{ $color }} text-white font-bold py-3.5 px-5 rounded-2xl transition text-sm">
