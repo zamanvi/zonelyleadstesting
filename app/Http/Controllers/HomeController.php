@@ -204,10 +204,7 @@ class HomeController extends Controller
             $user->setRelation('certifications', collect());
         }
 
-        $view = $user->seller_service_type === 'professional'
-            ? 'frontend.service_details_professional'
-            : 'frontend.service_details';
-        return view($view, compact('user'));
+        return view('frontend.service_details_professional', compact('user'));
     }
 
     function shareCard($slug)
