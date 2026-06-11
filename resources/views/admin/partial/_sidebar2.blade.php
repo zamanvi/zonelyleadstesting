@@ -176,8 +176,8 @@
         <li class="nav-item">
             <a href="{{ route('admin.settings.contact') }}"
                class="{{ Route::is('admin.settings.*') ? 'active' : '' }}">
-                <i class="fas fa-headset"></i>
-                <span class="nav-text ms-2">Contact Settings</span>
+                <i class="fas fa-sliders"></i>
+                <span class="nav-text ms-2">Platform Settings</span>
             </a>
         </li>
 

@@ -555,6 +555,11 @@ class PageController extends Controller
             'support_email'    => Setting::get('support_email', ''),
             'support_whatsapp' => Setting::get('support_whatsapp', ''),
             'support_name'     => Setting::get('support_name', 'Zonely Admin Team'),
+            'social_facebook'  => Setting::get('social_facebook', ''),
+            'social_linkedin'  => Setting::get('social_linkedin', ''),
+            'sister_site_name' => Setting::get('sister_site_name', 'Sister Site'),
+            'sister_site_url'  => Setting::get('sister_site_url', ''),
+            'copyright_text'   => Setting::get('copyright_text', ''),
         ];
         return view('admin.settings.contact', compact('settings'));
     }
@@ -565,10 +570,22 @@ class PageController extends Controller
             'support_email'    => 'required|email|max:255',
             'support_whatsapp' => 'nullable|string|max:30',
             'support_name'     => 'nullable|string|max:100',
+            'social_facebook'  => 'nullable|url|max:255',
+            'social_linkedin'  => 'nullable|url|max:255',
+            'sister_site_name' => 'nullable|string|max:100',
+            'sister_site_url'  => 'nullable|url|max:255',
+            'copyright_text'   => 'nullable|string|max:255',
         ]);
+
         Setting::set('support_email',    $request->support_email);
         Setting::set('support_whatsapp', $request->support_whatsapp ?? '');
         Setting::set('support_name',     $request->support_name ?? 'Zonely Admin Team');
-        return back()->with('success', 'Contact settings updated successfully.');
+        Setting::set('social_facebook',  $request->social_facebook ?? '');
+        Setting::set('social_linkedin',  $request->social_linkedin ?? '');
+        Setting::set('sister_site_name', $request->sister_site_name ?? 'Sister Site');
+        Setting::set('sister_site_url',  $request->sister_site_url ?? '');
+        Setting::set('copyright_text',   $request->copyright_text ?? '');
+
+        return back()->with('success', 'Platform settings updated successfully.');
     }
 }
