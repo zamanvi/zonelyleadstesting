@@ -16,7 +16,8 @@ class CertificationController extends Controller
 
     public function create()
     {
-        return view('frontend.profile.certifications.create');
+        $user = Auth::user()->load('category');
+        return view('frontend.profile.certifications.create', compact('user'));
     }
 
     public function store(Request $request)

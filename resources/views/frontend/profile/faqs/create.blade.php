@@ -3,6 +3,42 @@
 @section('page-title', 'Add Question')
 
 @section('content')
+@php
+    $motherCat = strtolower($user->category?->parent?->title ?? $user->category?->title ?? '');
+    $isHealthcare = str_contains($motherCat, 'health') || str_contains($motherCat, 'wellness') || str_contains($motherCat, 'medical');
+    $isHome       = str_contains($motherCat, 'home')   || str_contains($motherCat, 'repair')  || str_contains($motherCat, 'service');
+    $isBeauty     = str_contains($motherCat, 'beauty') || str_contains($motherCat, 'personal care') || str_contains($motherCat, 'salon');
+
+    $faqSuggestions = $isHealthcare ? [
+        'Are you accepting new patients?',
+        'Do you accept insurance?',
+        'How do I book an appointment?',
+        'What are your office hours?',
+        'Do you offer telehealth visits?',
+        'What should I bring to my first visit?',
+    ] : ($isHome ? [
+        'Do you offer free estimates?',
+        'Are you licensed and insured?',
+        'How quickly can you start the job?',
+        'Do you guarantee your work?',
+        'What areas do you serve?',
+        'Do you clean up after the job?',
+    ] : ($isBeauty ? [
+        'How do I book an appointment?',
+        'What is your cancellation policy?',
+        'Do you offer a consultation before the service?',
+        'What products do you use?',
+        'How long does the service take?',
+        'Do you do bridal or group bookings?',
+    ] : [
+        'How quickly do you respond?',
+        'Do you offer virtual/remote services?',
+        'What are your hours?',
+        'How do I get started?',
+        'Do you offer free consultations?',
+        'What payment methods do you accept?',
+    ]));
+@endphp
 <div class="pb-10 max-w-2xl mx-auto">
 
     <div class="mb-6 flex items-center gap-3">
@@ -26,14 +62,7 @@
     <div class="mb-4 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
         <p class="text-xs font-bold text-slate-600 mb-2">Common questions clients ask:</p>
         <div class="flex flex-wrap gap-2" id="suggestions">
-            @foreach([
-                'How quickly do you respond?',
-                'Do you offer virtual/remote services?',
-                'What are your hours?',
-                'How do I get started?',
-                'Do you offer free consultations?',
-                'What payment methods do you accept?',
-            ] as $s)
+            @foreach($faqSuggestions as $s)
             <button type="button" onclick="fillQuestion(this)"
                 class="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:border-teal-400 hover:text-teal-800 transition">
                 {{ $s }}

@@ -16,7 +16,8 @@ class FaqController extends Controller
 
     public function create()
     {
-        return view('frontend.profile.faqs.create');
+        $user = Auth::user()->load('category');
+        return view('frontend.profile.faqs.create', compact('user'));
     }
 
     public function store(Request $request)

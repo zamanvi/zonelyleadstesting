@@ -3,6 +3,28 @@
 @section('page-title', 'Add Service')
 
 @section('content')
+@php
+    $motherCat = strtolower($user->category?->parent?->title ?? $user->category?->title ?? '');
+    $isHealthcare = str_contains($motherCat, 'health') || str_contains($motherCat, 'wellness') || str_contains($motherCat, 'medical');
+    $isHome       = str_contains($motherCat, 'home')   || str_contains($motherCat, 'repair')  || str_contains($motherCat, 'service');
+    $isBeauty     = str_contains($motherCat, 'beauty') || str_contains($motherCat, 'personal care') || str_contains($motherCat, 'salon');
+
+    $serviceTitlePlaceholder = $isHealthcare
+        ? 'e.g. Initial Consultation (60 min)'
+        : ($isHome
+            ? 'e.g. Full Bathroom Remodel'
+            : ($isBeauty
+                ? 'e.g. Balayage + Toner'
+                : 'e.g. Individual Tax Return (1040)'));
+
+    $featurePlaceholder = $isHealthcare
+        ? "Detailed health assessment\nPersonalized treatment plan\nFollow-up support included"
+        : ($isHome
+            ? "Free on-site estimate\nLicensed & insured technicians\nClean-up included"
+            : ($isBeauty
+                ? "Includes blow-dry & style\nComplimentary gloss treatment\nAftercare advice included"
+                : "Federal & New York State Return\nItemized deductions & credits\nE-filed within 3 business days"));
+@endphp
 <div class="pb-10 max-w-2xl mx-auto">
 
     <div class="mb-6 flex items-center gap-3">
@@ -31,7 +53,7 @@
                 Service Title <span class="text-red-500">*</span>
             </label>
             <input type="text" name="title" value="{{ old('title') }}" required
-                placeholder="e.g. Individual Tax Return (1040)"
+                placeholder="{{ $serviceTitlePlaceholder }}"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
         </div>
 
@@ -82,7 +104,7 @@
                 One feature per line — displayed as <span class="text-emerald-600 font-semibold">✓ checkmarks</span> on your public page
             </p>
             <textarea name="features" rows="4"
-                placeholder="Federal & New York State Return&#10;Itemized deductions & credits&#10;EITC & Child Tax Credit optimization"
+                placeholder="{{ $featurePlaceholder }}"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition resize-none font-mono">{{ old('features') }}</textarea>
         </div>
 

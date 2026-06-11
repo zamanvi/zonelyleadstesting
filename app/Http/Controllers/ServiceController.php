@@ -16,7 +16,8 @@ class ServiceController extends Controller
 
     public function create()
     {
-        return view('frontend.profile.services.create');
+        $user = Auth::user()->load('category');
+        return view('frontend.profile.services.create', compact('user'));
     }
 
     public function store(Request $request)

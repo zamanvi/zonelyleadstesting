@@ -3,6 +3,27 @@
 @section('page-title', 'Add Certification')
 
 @section('content')
+@php
+    $motherCat = strtolower($user->category?->parent?->title ?? $user->category?->title ?? '');
+    $isHealthcare = str_contains($motherCat, 'health') || str_contains($motherCat, 'wellness') || str_contains($motherCat, 'medical');
+    $isHome       = str_contains($motherCat, 'home')   || str_contains($motherCat, 'repair')  || str_contains($motherCat, 'service');
+    $isBeauty     = str_contains($motherCat, 'beauty') || str_contains($motherCat, 'personal care') || str_contains($motherCat, 'salon');
+
+    $certNamePlaceholder   = $isHealthcare ? 'e.g. MD, Board Certification in Internal Medicine'
+        : ($isHome    ? 'e.g. Master Plumber License, OSHA 10 Certified'
+        : ($isBeauty  ? 'e.g. Cosmetology License, Keratin Treatment Certified'
+        :               'e.g. CPA, CFA, Series 65, PMP'));
+
+    $certIssuerPlaceholder = $isHealthcare ? 'e.g. American Board of Internal Medicine'
+        : ($isHome    ? 'e.g. NYC Dept. of Buildings, OSHA'
+        : ($isBeauty  ? 'e.g. NY State Division of Licensing Services'
+        :               'e.g. AICPA, CFA Institute, FINRA'));
+
+    $credIdPlaceholder = $isHealthcare ? 'e.g. NPI #1234567890'
+        : ($isHome    ? 'e.g. License #MPL-56789'
+        : ($isBeauty  ? 'e.g. License #COS-12345'
+        :               'e.g. License #123456'));
+@endphp
 <div class="pb-10 max-w-2xl mx-auto">
 
     <div class="mb-6 flex items-center gap-3">
@@ -27,14 +48,14 @@
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
             <label class="block text-sm font-bold text-slate-700 mb-2">Certification Name <span class="text-red-500">*</span></label>
             <input type="text" name="name" value="{{ old('name') }}" required
-                placeholder="e.g. CPA, CFA, Series 65, PMP"
+                placeholder="{{ $certNamePlaceholder }}"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
         </div>
 
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
             <label class="block text-sm font-bold text-slate-700 mb-2">Issuing Organization</label>
             <input type="text" name="issuer" value="{{ old('issuer') }}"
-                placeholder="e.g. AICPA, CFA Institute, FINRA"
+                placeholder="{{ $certIssuerPlaceholder }}"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
         </div>
 
@@ -58,7 +79,7 @@
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
             <label class="block text-sm font-bold text-slate-700 mb-2">Credential ID <span class="text-slate-400 font-normal">(optional)</span></label>
             <input type="text" name="credential_id" value="{{ old('credential_id') }}"
-                placeholder="e.g. License #123456"
+                placeholder="{{ $credIdPlaceholder }}"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
         </div>
 

@@ -15,7 +15,8 @@ class MembershipController extends Controller
 
     public function create()
     {
-        return view('frontend.profile.memberships.create');
+        $user = auth()->user()->load('category');
+        return view('frontend.profile.memberships.create', compact('user'));
     }
 
     public function store(Request $request)
