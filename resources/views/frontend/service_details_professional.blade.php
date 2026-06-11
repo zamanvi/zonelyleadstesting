@@ -6,6 +6,21 @@
 
     $meta_title       = 'Trusted ' . ($user->category?->title ?? 'Professional') . ' in ' . ($cityName ?? 'Your City') . ($stateName ? ', '.$stateName : '') . ' | ' . $user->name;
     $meta_description = $user->name . ' — verified ' . ($user->category?->title ?? 'professional') . ($cityName ? ' in '.$cityName : '') . '. ' . Str::limit(strip_tags($user->about ?? $user->bio ?? ''), 120);
+    // Mother category detection for section labels
+    $motherTitle = strtolower($user->category?->parent?->title ?? $user->category?->title ?? '');
+    $isHealthcare = str_contains($motherTitle, 'health') || str_contains($motherTitle, 'wellness');
+    $isHome       = str_contains($motherTitle, 'home')   || str_contains($motherTitle, 'repair');
+    $isBeauty     = str_contains($motherTitle, 'beauty') || str_contains($motherTitle, 'personal care');
+
+    $expSectionTitle  = $isHome ? 'Experience & Trade Memberships'
+        : ($isBeauty  ? 'Experience & Professional Orgs'
+        : ($isHealthcare ? 'Experience & Associations'
+        :                  'Experience & Membership'));
+
+    $eduSectionTitle  = $isHome || $isBeauty ? 'Licenses & Certifications'
+        : ($isHealthcare ? 'Education & Medical Credentials'
+        :                  'Education & Certification');
+
     $reviewCount      = $user->reviews->count();
     $avgRating        = $reviewCount ? round($user->reviews->avg('rating'), 1) : null;
     $schedule         = is_array($user->schedule) ? $user->schedule : (json_decode($user->schedule, true) ?? []);
@@ -422,7 +437,7 @@
                 <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-briefcase text-white text-base"></i>
                 </div>
-                <h4 class="font-bold text-lg text-white">Experience & Membership</h4>
+                <h4 class="font-bold text-lg text-white">{{ $expSectionTitle }}</h4>
             </div>
             <div class="grid grid-cols-1 {{ $hasExperiences && $hasMemberships ? 'md:grid-cols-2' : '' }} divide-y md:divide-y-0 md:divide-x divide-slate-100">
 
@@ -493,7 +508,7 @@
                 <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-graduation-cap text-white text-base"></i>
                 </div>
-                <h4 class="font-bold text-lg text-white">Education & Certification</h4>
+                <h4 class="font-bold text-lg text-white">{{ $eduSectionTitle }}</h4>
             </div>
             <div class="grid grid-cols-1 {{ $hasEducation && $hasCertifications ? 'md:grid-cols-2' : '' }} divide-y md:divide-y-0 md:divide-x divide-slate-100">
 

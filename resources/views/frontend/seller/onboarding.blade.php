@@ -3,6 +3,27 @@
 
 @section('content')
 @php
+    // Detect mother category for category-aware hints
+    $motherCat = $user->category?->parent?->title ?? $user->category?->title ?? '';
+    $motherCat = strtolower($motherCat);
+    $isHealthcare  = str_contains($motherCat, 'health') || str_contains($motherCat, 'wellness') || str_contains($motherCat, 'medical');
+    $isHome        = str_contains($motherCat, 'home') || str_contains($motherCat, 'repair') || str_contains($motherCat, 'service');
+    $isBeauty      = str_contains($motherCat, 'beauty') || str_contains($motherCat, 'personal care') || str_contains($motherCat, 'salon');
+
+    $certHint = $isHealthcare ? 'Medical license, board certifications, specializations'
+        : ($isHome    ? 'Contractor license, insurance certificate, trade certifications'
+        : ($isBeauty  ? 'Cosmetology license, beauty certifications, specialist training'
+        :               'CPA, CFA, bar license, professional credentials'));
+
+    $memberHint = $isHealthcare ? 'Medical associations, health boards, specialist societies'
+        : ($isHome    ? 'Trade associations, union memberships, contractor orgs'
+        : ($isBeauty  ? 'Beauty associations, professional orgs, industry groups'
+        :               'Bar associations, boards, professional orgs'));
+
+    $faqHint = $isBeauty
+        ? 'Add at least 5 FAQs — pricing, availability, booking process, products used. <strong class="text-red-500">Minimum 5 required.</strong>'
+        : 'Add at least 5 FAQs — pricing, turnaround times, service area questions. <strong class="text-red-500">Minimum 5 required.</strong>';
+
     $done = [
         'basics'      => filled($user->business_name) || filled($user->title),
         'bio'         => filled($user->bio),
@@ -218,7 +239,7 @@
                     @endif
                 </div>
             @else
-                <p class="text-xs text-slate-400">Add at least 5 FAQs — pricing, turnaround times, service area questions. <strong class="text-red-500">Minimum 5 required.</strong></p>
+                <p class="text-xs text-slate-400">{!! $faqHint !!}</p>
             @endif
             <div class="mt-3 flex items-center justify-end">
                 <span class="text-xs font-bold {{ $isDone ? 'text-slate-400 group-hover:text-teal-700' : 'text-teal-700' }} flex items-center gap-1 transition">
@@ -376,7 +397,7 @@
                                     {{ $user->certifications->first()->name ?? '' }}
                                 </p>
                             @else
-                                <p class="text-slate-400">CPA, CFA, licenses, professional credentials</p>
+                                <p class="text-slate-400">{{ $certHint }}</p>
                             @endif
                         </div>
                     </div>
@@ -397,7 +418,7 @@
                                     {{ $user->memberships->first()->name ?? '' }}
                                 </p>
                             @else
-                                <p class="text-slate-400">Bar associations, boards, professional orgs</p>
+                                <p class="text-slate-400">{{ $memberHint }}</p>
                             @endif
                         </div>
                     </div>
