@@ -293,7 +293,7 @@
                 <div class="col-6 col-md-3">
                     <a href="{{ $a['route'] }}"
                        class="d-block p-3 border rounded text-center text-decoration-none hover-shadow"
-                       {{ isset($a['confirm']) ? "onclick=\"return confirm('Clear all cache?')\"" : '' }}>
+                       {!! isset($a['confirm']) ? "onclick=\"return confirm('Clear all cache?')\"" : '' !!}>
                         <i class="fas {{ $a['icon'] }} fa-2x {{ $a['color'] }} mb-2"></i>
                         <div class="fw-bold text-dark small mb-1">{{ $a['label'] }}</div>
                         <span class="badge {{ $a['bc'] }}">{{ $a['badge'] }}</span>

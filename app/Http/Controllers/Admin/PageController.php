@@ -80,17 +80,16 @@ class PageController extends Controller
             ->groupByRaw("DATE_FORMAT(created_at, '%Y-%m')")
             ->pluck('cnt', 'ym');
 
-        $leadMonths = $leadCounts = $userMonths = $userCounts = [];
+        $leadMonths = $leadCounts = $userCounts = [];
         for ($i = 5; $i >= 0; $i--) {
             $month = now()->subMonths($i);
             $key = $month->format('Y-m');
             $leadMonths[] = $month->format('M');
             $leadCounts[] = (int) ($rawLeadMonths[$key] ?? 0);
-            $userMonths[] = $month->format('M');
             $userCounts[] = (int) ($rawUserMonths[$key] ?? 0);
         }
 
-        $recentSellers     = User::where('type', 'seller')->latest()->take(5)->get();
+        $recentSellers     = User::where('type', 'seller')->with('category:id,title')->latest()->take(5)->get();
         $pendingVerify     = User::where('type', 'seller')->where('status', false)->latest()->take(5)->get();
         $recentLeads       = Lead::with('seller:id,name')->latest()->take(5)->get();
         $recentCommissions = AffiliateCommission::with('referrer:id,name')->latest()->take(5)->get();
@@ -102,7 +101,7 @@ class PageController extends Controller
             'sellers', 'buyers', 'unverified', 'staffCount',
             'totalLeads', 'newLeads', 'wonLeads', 'revenue', 'pendingRev',
             'pendingComm', 'paidComm', 'blogCount', 'catCount', 'cityCount',
-            'leadMonths', 'leadCounts', 'userMonths', 'userCounts',
+            'leadMonths', 'leadCounts', 'userCounts',
             'recentSellers', 'pendingVerify', 'recentLeads', 'recentCommissions',
             'leadStatusData', 'staffRoleCounts'
         ));
