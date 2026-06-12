@@ -44,7 +44,7 @@
                     @endforeach
                 </div>
                 <div class="btn-group btn-group-sm">
-                    @foreach([''=>'All Channels','form'=>'📋 Form','whatsapp'=>'💬 WhatsApp','email'=>'📧 Email'] as $val=>$label)
+                    @foreach([''=>'All Channels','form'=>'📋 Form','phone'=>'📞 Phone','whatsapp'=>'💬 WhatsApp','email'=>'📧 Email'] as $val=>$label)
                     <a href="{{ request()->fullUrlWithQuery(['source'=>$val?:null,'page'=>1]) }}"
                        class="btn {{ request('source',$val===''?'':null)===$val ? 'btn-info text-white' : 'btn-outline-light' }}">
                         {{ $label }}
@@ -63,7 +63,7 @@
                 <table class="table table-hover align-middle mb-0" id="leadsTable">
                     <thead class="table-light">
                         <tr>
-                            <th>#</th>
+                            <th>Lead ID</th>
                             <th>Channel</th>
                             <th>Contact</th>
                             <th>Seller</th>
@@ -86,7 +86,7 @@
                             };
                         @endphp
                         <tr>
-                            <td class="text-muted small">{{ ($leads->currentPage()-1)*$leads->perPage()+$i+1 }}</td>
+                            <td class="fw-bold small text-nowrap">#ZL-{{ $lead->id }}</td>
 
                             {{-- Channel --}}
                             <td>

@@ -52,6 +52,7 @@ class TwilioWebhookController extends Controller
 
             $lead = Lead::create([
                 'seller_id' => $seller->id,
+                'source'    => 'phone',
                 'name'      => 'Phone Lead',
                 'phone'     => $fromNumber,
                 'email'     => '',
@@ -66,7 +67,7 @@ class TwilioWebhookController extends Controller
             if ($seller->twilio_enabled && $seller->phone) {
                 (new SmsService())->send(
                     $seller->phone,
-                    "📞 Incoming Zonely call!\nFrom: {$fromNumber}\nAnswering now — mark Won/Lost after: " . route('seller.dashboard')
+                    "📞 Incoming Zonely call!\nFrom: {$fromNumber}\nView your new lead: " . route('seller.dashboard')
                 );
             }
         } catch (\Throwable $e) {

@@ -38,7 +38,7 @@
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h2 class="font-bold text-slate-900">Unpaid Lead Fees</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Pay to continue receiving leads and unlock full chat</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Pay to continue receiving leads</p>
                 </div>
                 @if(($balance['unpaid_count'] ?? 0) > 0)
                 <button onclick="payAll()" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-3 sm:py-2.5 rounded-2xl text-sm transition">
@@ -52,10 +52,15 @@
                 <div class="px-5 py-4 flex items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center font-black text-sm text-amber-600">
-                            {{ strtoupper(substr($lead->phone ?? 'LD', -2)) }}
+                            #{{ $lead->id }}
                         </div>
                         <div>
-                            <p class="font-bold text-sm text-slate-900">{{ $lead->phone ?? 'Unknown' }}</p>
+                            <p class="font-bold text-sm text-slate-900">
+                                #ZL-{{ $lead->id }}
+                                @if($lead->name && $lead->name !== 'Phone Lead')
+                                    · {{ $lead->name }}
+                                @endif
+                            </p>
                             <p class="text-sm text-slate-500">{{ $lead->service ?? 'General' }} · {{ $lead->created_at?->format('M d, Y') }}</p>
                         </div>
                     </div>
@@ -88,10 +93,15 @@
                 <div class="px-5 py-4 flex items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-sm text-emerald-600">
-                            {{ strtoupper(substr($lead->phone ?? 'LD', -2)) }}
+                            #{{ $lead->id }}
                         </div>
                         <div>
-                            <p class="font-bold text-sm text-slate-900">{{ $lead->phone ?? 'Unknown' }}</p>
+                            <p class="font-bold text-sm text-slate-900">
+                                #ZL-{{ $lead->id }}
+                                @if($lead->name && $lead->name !== 'Phone Lead')
+                                    · {{ $lead->name }}
+                                @endif
+                            </p>
                             <p class="text-sm text-slate-500">{{ $lead->service ?? 'General' }} · {{ $lead->paid_at?->format('M d, Y') }}</p>
                         </div>
                     </div>
