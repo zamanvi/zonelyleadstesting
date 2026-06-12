@@ -81,7 +81,7 @@ class StateController extends Controller
 
         $state->update($data);
 
-        return redirect()->route('countries.states.index', $country)
+        return redirect()->route('admin.countries.states.index', $country)
                          ->with('success', 'State updated successfully');
     }
 

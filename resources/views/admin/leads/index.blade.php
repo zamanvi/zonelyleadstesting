@@ -58,7 +58,7 @@
     </div>
 
     {{-- ── Revenue by Period ── --}}
-    <div class="card mb-4">
+    <div class="section-card mb-4">
         <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Revenue by Period</h6>
             <div class="btn-group btn-group-sm">
@@ -86,7 +86,7 @@
     </div>
 
     {{-- ── Leads Table ── --}}
-    <div class="card">
+    <div class="section-card">
         <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Leads</h5>
             <div class="d-flex gap-2 align-items-center flex-wrap">

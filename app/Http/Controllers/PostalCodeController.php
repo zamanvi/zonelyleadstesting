@@ -44,7 +44,7 @@ class PostalCodeController extends Controller
         PostalCode::create($data);
 
         return redirect()->route('admin.cities.postal-codes.index', $city)
-                         ->with('success', 'City created successfully');
+                         ->with('success', 'Postal code created successfully');
     }
 
     /**
@@ -82,7 +82,7 @@ class PostalCodeController extends Controller
         $postalCode->update($data);
 
         return redirect()->route('admin.cities.postal-codes.index', $city)
-                         ->with('success', 'City updated successfully');
+                         ->with('success', 'Postal code updated successfully');
     }
 
     /**
@@ -93,6 +93,6 @@ class PostalCodeController extends Controller
         $postalCode->delete();
 
         return redirect()->route('admin.cities.postal-codes.index', $city)
-                         ->with('success', 'City deleted successfully');
+                         ->with('success', 'Postal code deleted successfully');
     }
 }
