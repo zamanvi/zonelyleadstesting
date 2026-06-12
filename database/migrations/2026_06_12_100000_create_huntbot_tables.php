@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('state', 100)->nullable();
             $table->string('category');
             $table->enum('status', ['draft', 'running', 'paused', 'completed'])->default('draft');
+            $table->enum('source', ['auto', 'manual'])->default('manual');
             $table->unsignedInteger('total_found')->default(0);
             $table->unsignedInteger('total_contacted')->default(0);
             $table->unsignedInteger('total_replied')->default(0);

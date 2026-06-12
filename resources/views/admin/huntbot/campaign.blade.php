@@ -1,5 +1,5 @@
 @extends('layouts.admin2')
-@section('title', 'Hunt: ' . $campaign->city . ' — ' . $campaign->category)
+@section('title', 'Campaign: ' . $campaign->city)
 
 @section('content')
 <div class="mt-5 pt-4">
@@ -9,7 +9,7 @@
     <a href="{{ route('admin.huntbot.index') }}" class="btn btn-sm btn-outline-secondary rounded-3">
         <i class="fas fa-arrow-left"></i>
     </a>
-    <div>
+    <div class="flex-grow-1">
         <h4 class="mb-0 fw-bold">
             <i class="fas fa-crosshairs text-danger me-2"></i>
             {{ $campaign->city }}{{ $campaign->state ? ', '.$campaign->state : '' }}
@@ -19,9 +19,26 @@
         <p class="text-muted small mb-0">
             Campaign #{{ $campaign->id }} · {{ $campaign->created_at->format('M j, Y') }}
             @php $sc = ['draft'=>'secondary','running'=>'primary','paused'=>'warning','completed'=>'success'][$campaign->status] ?? 'secondary' @endphp
-            <span class="badge bg-{{ $sc }}-subtle text-{{ $sc }} ms-2">{{ ucfirst($campaign->status) }}</span>
+            <span class="badge bg-{{ $sc }}-subtle text-{{ $sc }} ms-1">{{ ucfirst($campaign->status) }}</span>
+            @if($campaign->source === 'manual')
+            <span class="badge bg-light text-secondary border ms-1" style="font-size:9px">Manual</span>
+            @else
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" style="font-size:9px">Auto Hunt</span>
+            @endif
         </p>
     </div>
+    {{-- Campaign status control --}}
+    <form action="{{ route('admin.huntbot.campaign.status', $campaign->id) }}" method="POST" class="d-flex gap-2">
+        @csrf @method('PATCH')
+        @foreach(['running'=>['primary','Play'],'paused'=>['warning','Pause'],'completed'=>['success','Done']] as $s=>[$col,$lbl])
+        @if($campaign->status !== $s)
+        <button type="submit" name="status" value="{{ $s }}"
+            class="btn btn-sm btn-outline-{{ $col }} rounded-3">
+            <i class="fas fa-{{ $s==='running'?'play':($s==='paused'?'pause':'check') }} me-1"></i>{{ $lbl }}
+        </button>
+        @endif
+        @endforeach
+    </form>
 </div>
 
 @if(session('success'))
@@ -37,190 +54,253 @@
 </div>
 @endif
 
-{{-- Stats row --}}
+{{-- Stats --}}
 <div class="row g-3 mb-4">
+    @foreach([['primary',$campaign->total_found,'Leads'],['warning',$campaign->total_contacted,'SMS Sent'],['info',$campaign->total_replied,'Replied'],['success',$campaign->total_registered,'Registered']] as [$col,$val,$lbl])
     <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm rounded-3 p-3 text-center">
-            <div class="fw-black fs-3 text-primary">{{ $campaign->total_found }}</div>
-            <div class="text-muted small">Found</div>
+            <div class="fw-black fs-3 text-{{ $col }}">{{ $val }}</div>
+            <div class="text-muted small">{{ $lbl }}</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm rounded-3 p-3 text-center">
-            <div class="fw-black fs-3 text-warning">{{ $campaign->total_contacted }}</div>
-            <div class="text-muted small">SMS Sent</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm rounded-3 p-3 text-center">
-            <div class="fw-black fs-3 text-info">{{ $campaign->total_replied }}</div>
-            <div class="text-muted small">Replied</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm rounded-3 p-3 text-center">
-            <div class="fw-black fs-3 text-success">{{ $campaign->total_registered }}</div>
-            <div class="text-muted small">Registered</div>
-        </div>
-    </div>
+    @endforeach
 </div>
 
-{{-- Launch SMS Panel --}}
-<div class="card border-0 shadow-sm rounded-3 mb-4">
-    <div class="card-body p-4">
-        <h6 class="fw-bold mb-3"><i class="fas fa-paper-plane text-primary me-2"></i>Launch SMS Campaign</h6>
-        <form action="{{ route('admin.huntbot.launch', $campaign->id) }}" method="POST" id="launchForm">
-            @csrf
-            <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label fw-semibold small">SMS Template</label>
+<div class="row g-4">
+
+{{-- ── LEFT: Add Leads + Launch ── --}}
+<div class="col-lg-4">
+
+    {{-- Add Lead Tabs --}}
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-header bg-transparent border-bottom px-4 pt-4 pb-0">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#panel-single">
+                        <i class="fas fa-plus me-1"></i>Add One
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#panel-bulk">
+                        <i class="fas fa-list me-1"></i>Bulk Paste
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content">
+
+            {{-- Single lead --}}
+            <div class="tab-pane fade show active" id="panel-single">
+                <div class="card-body p-4">
+                    <form action="{{ route('admin.huntbot.lead.add', $campaign->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Business Name <span class="text-danger">*</span></label>
+                            <input type="text" name="business_name" required
+                                placeholder="e.g. Ali's Plumbing Service"
+                                class="form-control rounded-3">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Phone</label>
+                            <input type="text" name="phone"
+                                placeholder="+1 718 555 0100"
+                                class="form-control rounded-3">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Address</label>
+                            <input type="text" name="address"
+                                placeholder="123 Main St, Brooklyn NY"
+                                class="form-control rounded-3">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Website</label>
+                            <input type="url" name="website_url"
+                                placeholder="https://example.com (leave blank = no website)"
+                                class="form-control rounded-3">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-3 fw-bold">
+                            <i class="fas fa-plus me-2"></i>Add Lead
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {{-- Bulk paste --}}
+            <div class="tab-pane fade" id="panel-bulk">
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-3">
+                        Paste one business per line. Format:<br>
+                        <code>Business Name, Phone, Address</code><br>
+                        Phone and Address are optional.
+                    </p>
+                    <form action="{{ route('admin.huntbot.lead.bulk', $campaign->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <textarea name="bulk_data" rows="8" required
+                                class="form-control rounded-3 font-monospace"
+                                style="font-size:12px"
+                                placeholder="Ali's Plumbing, +17185550100, Brooklyn NY&#10;Sunrise Hair Salon, +17185550200&#10;Green Lawn Care"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-3 fw-bold">
+                            <i class="fas fa-file-import me-2"></i>Import Leads
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- SMS Launch --}}
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3"><i class="fas fa-paper-plane text-primary me-2"></i>Send SMS</h6>
+            <form action="{{ route('admin.huntbot.launch', $campaign->id) }}" method="POST" id="launchForm">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Template</label>
                     <select name="template_key" class="form-select rounded-3">
-                        @foreach(['professional' => 'Professional Services', 'healthcare' => 'Healthcare', 'home' => 'Home Services', 'beauty' => 'Beauty'] as $key => $label)
+                        @foreach(['professional'=>'Professional','healthcare'=>'Healthcare','home'=>'Home Services','beauty'=>'Beauty'] as $key=>$label)
                         <option value="{{ $key }}" {{ ($campaign->sms_template_key ?? 'professional') === $key ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold small">Target</label>
-                    <select id="filterTarget" class="form-select rounded-3">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Send to</label>
+                    <select id="filterTarget" class="form-select rounded-3" onchange="applyFilter(this.value)">
                         <option value="no_website">No website only (recommended)</option>
-                        <option value="all">All found businesses</option>
+                        <option value="all_with_phone">All with phone number</option>
                         <option value="selected">Selected rows only</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-danger w-100 rounded-3 fw-bold" id="launchBtn">
-                        <i class="fas fa-rocket me-2"></i>Send SMS
-                    </button>
+                <div id="leadIdsContainer"></div>
+                <button type="submit" class="btn btn-danger w-100 rounded-3 fw-bold" id="launchBtn">
+                    <i class="fas fa-rocket me-2"></i>Launch SMS
+                </button>
+            </form>
+            <p class="text-muted mt-2 mb-0" style="font-size:11px">
+                <i class="fas fa-info-circle me-1"></i>Only leads with a phone number receive SMS. ~$0.0075/SMS via Twilio.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+{{-- ── RIGHT: Leads Table ── --}}
+<div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="p-4 pb-3 d-flex justify-content-between align-items-center border-bottom flex-wrap gap-2">
+                <h6 class="fw-bold mb-0">
+                    <i class="fas fa-store text-muted me-2"></i>
+                    {{ $leads->count() }} Leads
+                </h6>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-secondary rounded-3" onclick="selectAll()">All</button>
+                    <button class="btn btn-sm btn-outline-secondary rounded-3" onclick="selectNone()">None</button>
+                    <button class="btn btn-sm btn-outline-warning rounded-3" onclick="selectNoWebsite()">No Website</button>
                 </div>
             </div>
-            {{-- Hidden lead_ids populated by JS --}}
-            <div id="leadIdsContainer"></div>
-        </form>
-        <p class="text-muted mt-2 mb-0" style="font-size:11px">
-            <i class="fas fa-info-circle me-1"></i>
-            Only businesses with a phone number will receive an SMS. Twilio charges ~$0.0075/SMS.
-        </p>
-    </div>
-</div>
 
-{{-- Leads Table --}}
-<div class="card border-0 shadow-sm rounded-3">
-    <div class="card-body p-0">
-        <div class="p-4 pb-3 d-flex justify-content-between align-items-center border-bottom">
-            <h6 class="fw-bold mb-0">
-                <i class="fas fa-store text-muted me-2"></i>
-                {{ $leads->count() }} Businesses Found
-            </h6>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-secondary rounded-3" onclick="selectAll()">Select All</button>
-                <button class="btn btn-sm btn-outline-secondary rounded-3" onclick="selectNone()">None</button>
-                <button class="btn btn-sm btn-outline-warning rounded-3" onclick="selectNoWebsite()">No Website Only</button>
+            @if($leads->isEmpty())
+            <div class="p-5 text-center text-muted">
+                <i class="fas fa-store-slash fa-3x mb-3 opacity-25"></i>
+                <p class="mb-1 fw-semibold">No leads yet</p>
+                <p class="small mb-0">Add businesses using the form on the left.</p>
             </div>
-        </div>
-
-        @if($leads->isEmpty())
-        <div class="p-5 text-center text-muted">
-            <i class="fas fa-store-slash fa-3x mb-3 opacity-25"></i>
-            <p class="mb-0">No leads in this campaign.</p>
-        </div>
-        @else
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="ps-4" style="width:40px">
-                            <input type="checkbox" class="form-check-input" id="checkAll" onchange="toggleAll(this)">
-                        </th>
-                        <th>Business</th>
-                        <th>Phone</th>
-                        <th>Website</th>
-                        <th>Rating</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($leads as $lead)
-                    <tr class="lead-row {{ $lead->has_website ? 'has-website' : 'no-website' }}"
-                        data-id="{{ $lead->id }}"
-                        data-has-website="{{ $lead->has_website ? '1' : '0' }}">
-                        <td class="ps-4">
-                            <input type="checkbox" class="form-check-input lead-check" value="{{ $lead->id }}"
-                                {{ !$lead->has_website ? 'checked' : '' }}>
-                        </td>
-                        <td>
-                            <div class="fw-semibold">{{ $lead->business_name }}</div>
-                            <div class="text-muted small">{{ Str::limit($lead->address, 55) }}</div>
-                        </td>
-                        <td>
-                            @if($lead->phone)
-                                <a href="tel:{{ $lead->phone }}" class="text-decoration-none fw-semibold small">{{ $lead->phone }}</a>
-                            @else
-                                <span class="text-muted small">—</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($lead->has_website)
-                                <a href="{{ $lead->website_url }}" target="_blank" class="text-success small text-truncate d-block" style="max-width:160px">
+            @else
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size:13px">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4" style="width:36px">
+                                <input type="checkbox" class="form-check-input" id="checkAll" onchange="toggleAll(this)">
+                            </th>
+                            <th>Business</th>
+                            <th>Phone</th>
+                            <th>Website</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($leads as $lead)
+                        <tr class="lead-row" data-id="{{ $lead->id }}" data-has-website="{{ $lead->has_website ? '1' : '0' }}" data-has-phone="{{ $lead->phone ? '1' : '0' }}">
+                            <td class="ps-4">
+                                <input type="checkbox" class="form-check-input lead-check" value="{{ $lead->id }}"
+                                    {{ (!$lead->has_website && $lead->phone) ? 'checked' : '' }}>
+                            </td>
+                            <td>
+                                <div class="fw-semibold">{{ $lead->business_name }}</div>
+                                @if($lead->address)
+                                <div class="text-muted" style="font-size:11px">{{ Str::limit($lead->address, 45) }}</div>
+                                @endif
+                            </td>
+                            <td>
+                                @if($lead->phone)
+                                <a href="tel:{{ $lead->phone }}" class="text-decoration-none fw-semibold" style="font-size:12px">{{ $lead->phone }}</a>
+                                @else
+                                <span class="text-muted">—</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($lead->has_website && $lead->website_url)
+                                <a href="{{ $lead->website_url }}" target="_blank" class="text-success text-truncate d-block" style="max-width:120px;font-size:11px">
                                     <i class="fas fa-check-circle me-1"></i>{{ parse_url($lead->website_url, PHP_URL_HOST) ?? 'Yes' }}
                                 </a>
-                            @else
-                                <span class="badge bg-danger-subtle text-danger"><i class="fas fa-times me-1"></i>No Website</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($lead->rating)
-                                <span class="fw-bold small">{{ $lead->rating }} ★</span>
-                                <span class="text-muted small">({{ $lead->review_count }})</span>
-                            @else
-                                <span class="text-muted small">—</span>
-                            @endif
-                        </td>
-                        <td>
-                            @php
-                                $statuses = [
-                                    'found'      => ['secondary', 'Found'],
-                                    'selected'   => ['info', 'Selected'],
-                                    'contacted'  => ['warning', 'SMS Sent'],
-                                    'replied'    => ['primary', 'Replied'],
-                                    'registered' => ['success', 'Registered'],
-                                    'skipped'    => ['light', 'Skipped'],
-                                ];
-                                [$color, $label] = $statuses[$lead->status] ?? ['secondary', 'Unknown'];
-                            @endphp
-                            <span class="badge bg-{{ $color }}-subtle text-{{ $color }} rounded-pill">{{ $label }}</span>
-                            @if($lead->sms_sent_at)
+                                @elseif($lead->has_website)
+                                <span class="text-success" style="font-size:11px"><i class="fas fa-check-circle me-1"></i>Yes</span>
+                                @else
+                                <span class="badge bg-danger-subtle text-danger" style="font-size:10px"><i class="fas fa-times me-1"></i>None</span>
+                                @endif
+                            </td>
+                            <td>
+                                @php
+                                    $map = ['found'=>['secondary','Found'],'selected'=>['info','Selected'],'contacted'=>['warning','SMS Sent'],'replied'=>['primary','Replied'],'registered'=>['success','Registered'],'skipped'=>['light','Skipped']];
+                                    [$col,$lbl] = $map[$lead->status] ?? ['secondary','?'];
+                                @endphp
+                                <span class="badge bg-{{ $col }}-subtle text-{{ $col }} rounded-pill">{{ $lbl }}</span>
+                                @if($lead->sms_sent_at)
                                 <div class="text-muted" style="font-size:10px">{{ $lead->sms_sent_at->format('M j g:ia') }}</div>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary rounded-3 dropdown-toggle" data-bs-toggle="dropdown">
-                                    Update
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    @foreach(['replied' => 'Mark Replied', 'registered' => 'Mark Registered', 'skipped' => 'Skip'] as $s => $sl)
-                                    <li>
-                                        <form action="{{ route('admin.huntbot.lead.status', $lead->id) }}" method="POST">
-                                            @csrf @method('PATCH')
-                                            <input type="hidden" name="status" value="{{ $s }}">
-                                            <button type="submit" class="dropdown-item">{{ $sl }}</button>
-                                        </form>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light rounded-3 dropdown-toggle" data-bs-toggle="dropdown" style="font-size:11px">
+                                        <i class="fas fa-ellipsis"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" style="font-size:12px">
+                                        @foreach(['replied'=>'Mark Replied','registered'=>'Mark Registered','skipped'=>'Skip','found'=>'Reset to Found'] as $s=>$sl)
+                                        <li>
+                                            <form action="{{ route('admin.huntbot.lead.status', $lead->id) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <input type="hidden" name="status" value="{{ $s }}">
+                                                <button type="submit" class="dropdown-item">{{ $sl }}</button>
+                                            </form>
+                                        </li>
+                                        @endforeach
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('admin.huntbot.lead.delete', $lead->id) }}" method="POST"
+                                                onsubmit="return confirm('Delete this lead?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
         </div>
-        @endif
     </div>
 </div>
 
+</div>
 </div>
 
 <script>
@@ -236,42 +316,35 @@ function selectNone() {
 }
 function selectNoWebsite() {
     document.querySelectorAll('.lead-row').forEach(row => {
-        const cb = row.querySelector('.lead-check');
-        cb.checked = row.dataset.hasWebsite === '0';
+        row.querySelector('.lead-check').checked = row.dataset.hasWebsite === '0' && row.dataset.hasPhone === '1';
     });
 }
-
-document.getElementById('filterTarget').addEventListener('change', function() {
-    const val = this.value;
+function applyFilter(val) {
     if (val === 'no_website') selectNoWebsite();
-    else if (val === 'all') selectAll();
-    // 'selected' = leave checkboxes as-is
-});
+    else if (val === 'all_with_phone') {
+        document.querySelectorAll('.lead-row').forEach(row => {
+            row.querySelector('.lead-check').checked = row.dataset.hasPhone === '1';
+        });
+    }
+    // 'selected' → leave as-is
+}
 
 document.getElementById('launchForm').addEventListener('submit', function(e) {
     const container = document.getElementById('leadIdsContainer');
     container.innerHTML = '';
     document.querySelectorAll('.lead-check:checked').forEach(cb => {
         const inp = document.createElement('input');
-        inp.type = 'hidden';
-        inp.name = 'lead_ids[]';
-        inp.value = cb.value;
+        inp.type = 'hidden'; inp.name = 'lead_ids[]'; inp.value = cb.value;
         container.appendChild(inp);
     });
-
-    const checked = document.querySelectorAll('.lead-check:checked').length;
-    if (checked === 0) {
-        e.preventDefault();
-        alert('Please select at least one business to contact.');
-        return;
-    }
-
+    const count = document.querySelectorAll('.lead-check:checked').length;
+    if (count === 0) { e.preventDefault(); alert('Select at least one business.'); return; }
     const btn = document.getElementById('launchBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending ' + checked + ' SMS...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending ' + count + ' SMS…';
 });
 
-// Auto-select no-website on page load
+// Default: select no-website leads
 selectNoWebsite();
 </script>
 @endsection

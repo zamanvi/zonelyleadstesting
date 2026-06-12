@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class HuntCampaign extends Model
 {
     protected $fillable = [
-        'created_by', 'city', 'state', 'category', 'status',
+        'created_by', 'city', 'state', 'category', 'status', 'source',
         'total_found', 'total_contacted', 'total_replied', 'total_registered',
         'sms_template_key',
     ];

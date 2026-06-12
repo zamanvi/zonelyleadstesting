@@ -357,12 +357,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // HuntBot — AI Seller Acquisition
         Route::prefix('huntbot')->name('huntbot.')->group(function () {
-            Route::get('/',                              [HuntBotController::class, 'index'])->name('index');
-            Route::post('hunt',                          [HuntBotController::class, 'hunt'])->name('hunt');
-            Route::get('campaign/{campaign}',            [HuntBotController::class, 'campaign'])->name('campaign');
-            Route::post('campaign/{campaign}/launch',    [HuntBotController::class, 'launch'])->name('launch');
-            Route::patch('lead/{lead}/status',           [HuntBotController::class, 'updateLeadStatus'])->name('lead.status');
-            Route::post('templates',                     [HuntBotController::class, 'saveTemplates'])->name('templates');
+            Route::get('/',                                  [HuntBotController::class, 'index'])->name('index');
+            Route::post('hunt',                              [HuntBotController::class, 'hunt'])->name('hunt');
+            Route::post('manual',                            [HuntBotController::class, 'manual'])->name('manual');
+            Route::get('campaign/{campaign}',                [HuntBotController::class, 'campaign'])->name('campaign');
+            Route::post('campaign/{campaign}/launch',        [HuntBotController::class, 'launch'])->name('launch');
+            Route::patch('campaign/{campaign}/status',       [HuntBotController::class, 'updateCampaignStatus'])->name('campaign.status');
+            Route::post('campaign/{campaign}/lead',          [HuntBotController::class, 'addLead'])->name('lead.add');
+            Route::post('campaign/{campaign}/lead/bulk',     [HuntBotController::class, 'bulkLeads'])->name('lead.bulk');
+            Route::patch('lead/{lead}/status',               [HuntBotController::class, 'updateLeadStatus'])->name('lead.status');
+            Route::delete('lead/{lead}',                     [HuntBotController::class, 'deleteLead'])->name('lead.delete');
+            Route::post('templates',                         [HuntBotController::class, 'saveTemplates'])->name('templates');
         });
     });
 
