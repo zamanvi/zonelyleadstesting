@@ -195,6 +195,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pricing', [SellerController::class, 'pricing'])->name('pricing');
         Route::get('billing', [SellerController::class, 'billing'])->name('billing');
         Route::post('billing/{lead}/pay', [SellerController::class, 'payLead'])->name('billing.pay');
+        Route::post('billing/pay-bulk',   [SellerController::class, 'payLeads'])->name('billing.pay.bulk');
         Route::get('schedule', [SellerController::class, 'schedule'])->name('schedule');
         Route::post('schedule', [SellerController::class, 'scheduleUpdate'])->name('schedule.update');
         Route::get('reviews', [SellerController::class, 'reviews'])->name('reviews');

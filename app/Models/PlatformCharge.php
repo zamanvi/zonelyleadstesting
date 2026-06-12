@@ -51,12 +51,14 @@ class PlatformCharge extends Model
     {
         $defaultKey = match($type) {
             'lead_fee'                  => 'default_lead_fee',
+            'payment_threshold'         => 'default_payment_threshold',
             'buyer_referral_commission' => 'default_buyer_referral_commission',
             default                     => 'default_affiliate_commission',
         };
         $fallback = match($type) {
-            'lead_fee' => 35,
-            default    => 10,
+            'lead_fee'          => 35,
+            'payment_threshold' => 30,
+            default             => 10,
         };
         $default = (float) (Setting::where('key', $defaultKey)->value('value') ?? $fallback);
 

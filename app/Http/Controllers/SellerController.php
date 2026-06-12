@@ -200,20 +200,34 @@ class SellerController extends Controller
 
     public function billing()
     {
-        $user        = Auth::user();
-        $unpaidLeads = $user->leads()->whereNull('paid_at')->latest()->get();
-        $paidLeads   = $user->leads()->whereNotNull('paid_at')->latest()->get();
+        $user     = Auth::user();
+        $period   = request('period', 'month');
+        $allLeads = $user->leads()->latest()->get();
 
-        $now = now();
+        $periodLeads = match($period) {
+            'today' => $allLeads->filter(fn($l) => $l->created_at->isToday()),
+            'week'  => $allLeads->filter(fn($l) => $l->created_at->isCurrentWeek()),
+            'year'  => $allLeads->filter(fn($l) => $l->created_at->isCurrentYear()),
+            default => $allLeads->filter(fn($l) => $l->created_at->isCurrentMonth()),
+        };
+
+        $stateId  = \App\Models\State::where('title', $user->state)->value('id');
+        $cityId   = \App\Models\City::where('title', $user->city)->value('id');
+        $threshold = PlatformCharge::resolve('payment_threshold', $user->category_id, $stateId, $cityId);
+
+        $unpaidAll = $allLeads->whereNull('paid_at');
         $balance = [
-            'unpaid'       => $unpaidLeads->sum('fee'),
-            'unpaid_count' => $unpaidLeads->count(),
-            'paid_month'   => $paidLeads->filter(fn($l) => $l->paid_at && $l->paid_at->month === $now->month && $l->paid_at->year === $now->year)->sum('fee'),
-            'paid_count'   => $paidLeads->count(),
-            'total_paid'   => $paidLeads->sum('fee'),
+            'unpaid'       => $unpaidAll->sum('fee'),
+            'unpaid_count' => $unpaidAll->count(),
+            'total_paid'   => $allLeads->whereNotNull('paid_at')->sum('fee'),
+            'total_billed' => $allLeads->sum('fee'),
+            'total_leads'  => $allLeads->count(),
+            'period_billed'=> $periodLeads->sum('fee'),
+            'period_paid'  => $periodLeads->whereNotNull('paid_at')->sum('fee'),
+            'period_count' => $periodLeads->count(),
         ];
 
-        return view('frontend.seller.billing', compact('unpaidLeads', 'paidLeads', 'balance'));
+        return view('frontend.seller.billing', compact('allLeads', 'balance', 'period', 'threshold'));
     }
 
     public function payLead(Request $request, $id)
@@ -229,7 +243,6 @@ class SellerController extends Controller
             return response()->json(['error' => 'Missing PayPal order ID'], 422);
         }
 
-        // Verify PayPal order
         $verified = $this->verifyPayPalOrder($orderId, $lead->fee);
         if (!$verified) {
             return response()->json(['error' => 'PayPal payment verification failed'], 422);
@@ -238,6 +251,35 @@ class SellerController extends Controller
         $lead->update(['paid_at' => now(), 'paypal_order_id' => $orderId]);
 
         return response()->json(['ok' => true]);
+    }
+
+    public function payLeads(Request $request)
+    {
+        $ids     = $request->input('lead_ids', []);
+        $orderId = $request->input('paypal_order_id');
+
+        if (empty($ids) || !$orderId) {
+            return response()->json(['error' => 'Missing data'], 422);
+        }
+
+        $leads = Lead::whereIn('id', $ids)
+            ->where('seller_id', Auth::id())
+            ->whereNull('paid_at')
+            ->get();
+
+        if ($leads->isEmpty()) {
+            return response()->json(['error' => 'No valid leads'], 422);
+        }
+
+        $total    = $leads->sum('fee');
+        $verified = $this->verifyPayPalOrder($orderId, $total);
+        if (!$verified) {
+            return response()->json(['error' => 'PayPal payment verification failed'], 422);
+        }
+
+        $leads->each(fn($l) => $l->update(['paid_at' => now(), 'paypal_order_id' => $orderId]));
+
+        return response()->json(['ok' => true, 'paid' => $leads->count()]);
     }
 
     private function verifyPayPalOrder(string $orderId, float $expectedAmount): bool
