@@ -218,9 +218,9 @@ class SellerController extends Controller
             default => $allLeads->filter(fn($l) => $l->created_at->isCurrentMonth()),
         };
 
-        $stateId  = \App\Models\State::where('title', $user->state)->value('id');
-        $cityId   = \App\Models\City::where('title', $user->city)->value('id');
-        $threshold = PlatformCharge::resolve('payment_threshold', $user->category_id, $stateId, $cityId);
+        $stateId   = \App\Models\State::where('title', $user->state)->value('id');
+        $cityId    = \App\Models\City::where('title', $user->city)->value('id');
+        $threshold = (int) PlatformCharge::resolve('lead_threshold', $user->category_id, $stateId, $cityId);
 
         $unpaidAll = $allLeads->whereNull('paid_at');
         $balance = [

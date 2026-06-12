@@ -17,8 +17,8 @@
 @section('content')
 @php
     $unpaidCount = $balance['unpaid_count'];
-    $threshold   = $threshold ?? 30;
-    $overdue     = $balance['unpaid'] >= $threshold;
+    $threshold   = $threshold ?? 3;
+    $overdue     = $unpaidCount >= $threshold;
 @endphp
 
 <div class="max-w-2xl mx-auto px-4 py-6 pb-20 lg:px-6 lg:py-8">
@@ -42,7 +42,7 @@
         <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg shrink-0"></i>
         <div>
             <p class="text-sm font-bold text-red-700">Balance has reached your payment threshold</p>
-            <p class="text-xs text-red-500 mt-0.5">Pay now to keep receiving new leads — ${{ number_format($balance['unpaid'], 2) }} outstanding</p>
+            <p class="text-xs text-red-500 mt-0.5">Pay now to keep receiving new leads — {{ $unpaidCount }} unpaid leads</p>
         </div>
     </div>
     <button onclick="payAllDue()"
@@ -71,7 +71,7 @@
     </div>
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 text-center">
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Threshold</p>
-        <p class="text-2xl font-black text-slate-900">${{ number_format($threshold, 2) }}</p>
+        <p class="text-2xl font-black text-slate-900">{{ $threshold }} leads</p>
         <p class="text-[11px] text-slate-400 mt-0.5">set by Zonely</p>
     </div>
 </div>
@@ -93,15 +93,15 @@
         </div>
         <div class="px-5 py-4">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Payment threshold</p>
-            <p class="text-sm font-bold text-slate-800">${{ number_format($threshold, 2) }} balance limit</p>
-            @php $pct = $threshold > 0 ? min(100, round($balance['unpaid'] / $threshold * 100)) : 0; @endphp
+            <p class="text-sm font-bold text-slate-800">Pay after {{ $threshold }} unpaid leads</p>
+            @php $pct = $threshold > 0 ? min(100, round($unpaidCount / $threshold * 100)) : 0; @endphp
             <div class="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                 <div class="h-1.5 rounded-full transition-all {{ $pct >= 100 ? 'bg-red-500' : ($pct >= 75 ? 'bg-amber-400' : 'bg-teal-500') }}"
                      style="width:{{ $pct }}%"></div>
             </div>
             <p class="text-[11px] text-slate-400 mt-1">
-                ${{ number_format($balance['unpaid'], 2) }} of ${{ number_format($threshold, 2) }}
-                @if($pct >= 100) · <span class="text-red-500 font-semibold">overdue</span>
+                {{ $unpaidCount }} of {{ $threshold }} leads unpaid
+                @if($pct >= 100) · <span class="text-red-500 font-semibold">payment due</span>
                 @elseif($pct >= 75) · almost due
                 @endif
             </p>
