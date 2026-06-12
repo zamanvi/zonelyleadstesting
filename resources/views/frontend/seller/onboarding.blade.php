@@ -52,7 +52,7 @@
     $pct       = round($completed / $total * 100);
 @endphp
 
-<div class="pb-12 max-w-4xl mx-auto">
+<div class="pb-12 max-w-4xl mx-auto px-4 lg:px-6">
 
     {{-- Flash --}}
     @if(session('success'))
@@ -82,7 +82,7 @@
     </div>
 
     {{-- Progress Header --}}
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mb-6">
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-6 mb-6">
         <div class="flex items-center gap-4 mb-5">
             <div class="w-14 h-14 rounded-full bg-teal-700 flex items-center justify-center shrink-0 overflow-hidden shadow">
                 @if($user->profile_photo)
@@ -101,8 +101,8 @@
                 </p>
             </div>
             @if($pct >= 80)
-            <span class="shrink-0 px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl flex items-center gap-1">
-                <i class="fa-solid fa-circle-check"></i> Page Ready
+            <span class="shrink-0 px-2 sm:px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl flex items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> <span class="hidden sm:inline">Page Ready</span>
             </span>
             @endif
         </div>
@@ -128,7 +128,7 @@
         <a href="{{ route('type.profile', ['seller', 'account']) }}"
            class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
             <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-building {{ $isDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                     </div>
@@ -163,7 +163,7 @@
         <a href="{{ route('type.profile', ['seller', 'profile']) }}"
            class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
             <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-camera {{ $isDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                     </div>
@@ -201,7 +201,7 @@
         <a href="{{ route('type.profile', ['seller', 'contact']) }}"
            class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
             <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-address-card {{ $isDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                     </div>
@@ -238,7 +238,7 @@
         <a href="{{ route('user.faqs.index') }}"
            class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : ($faqInProgress ? 'border-amber-200 hover:border-amber-300' : 'border-dashed border-slate-200 hover:border-teal-300') }} shadow-sm p-5 transition-all hover:shadow-md">
             <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : ($faqInProgress ? 'bg-amber-50' : 'bg-teal-50') }} rounded-xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-circle-question {{ $isDone ? 'text-emerald-600' : ($faqInProgress ? 'text-amber-500' : 'text-teal-600') }} text-sm"></i>
                     </div>
@@ -295,7 +295,7 @@
         @endphp
         <div class="bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200' }} shadow-sm p-5">
             <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-map-location-dot {{ $isDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                     </div>
@@ -364,7 +364,7 @@
         @endphp
         <div class="bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200' }} shadow-sm p-5">
             <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-award {{ $isDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                     </div>
@@ -488,7 +488,7 @@
     <a href="{{ route('seller.gallery') }}"
        class="group mt-4 block bg-white rounded-2xl border-2 {{ $galleryDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
         <div class="flex items-start justify-between gap-3 mb-3">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 {{ $galleryDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-images {{ $galleryDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                 </div>
@@ -540,7 +540,7 @@
     <a href="{{ route('seller.schedule') }}"
        class="group mt-4 block bg-white rounded-2xl border-2 {{ $scheduleDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
         <div class="flex items-start justify-between gap-3 mb-2">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 {{ $scheduleDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-calendar-days {{ $scheduleDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
                 </div>
