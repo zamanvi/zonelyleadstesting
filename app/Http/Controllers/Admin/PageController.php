@@ -278,6 +278,14 @@ class PageController extends Controller
             SUM(CASE WHEN paid_at IS NULL THEN fee ELSE 0 END) as pending_revenue
         ")->first();
 
+        // Overdue sellers: count via subquery to avoid N+1
+        // A seller is overdue when unpaid lead count >= their lead_threshold (default 3)
+        $defaultThreshold = (int) (\App\Models\Setting::where('key', 'default_lead_threshold')->value('value') ?? 3);
+        $overdueSellersCount = User::where('type', 'seller')
+            ->where('status', true)
+            ->whereHas('leads', fn($q) => $q->whereNull('paid_at'), '>=', $defaultThreshold)
+            ->count();
+
         // ── Time-based lead counts ──────────────────────
         $stats = [
             'total'           => (int)   ($s->total ?? 0),
@@ -289,7 +297,7 @@ class PageController extends Controller
             'week'            => Lead::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
             'month'           => Lead::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
             'year'            => Lead::whereYear('created_at', now()->year)->count(),
-            'overdue_sellers' => User::where('type', 'seller')->where('status', true)->get()->filter(fn($u) => $u->isOverdue())->count(),
+            'overdue_sellers' => $overdueSellersCount,
         ];
 
         // ── Period revenue (responds to tab filter) ─────
@@ -322,7 +330,13 @@ class PageController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        return view('admin.leads.index', compact('stats', 'periodStats', 'period', 'leads'));
+        // Pre-compute which sellers on this page are overdue (avoids N+1 in view)
+        $overdueSellers = $leads->pluck('seller')->filter()->unique('id')
+            ->filter(fn($u) => $u->isOverdue())
+            ->pluck('id')
+            ->toArray();
+
+        return view('admin.leads.index', compact('stats', 'periodStats', 'period', 'leads', 'overdueSellers'));
     }
 
     public function leadDetail($id)

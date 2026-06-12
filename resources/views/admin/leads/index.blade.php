@@ -150,7 +150,7 @@
                                 'pending' => ['Pending', 'badge bg-warning text-dark'],
                                 default   => ['New',     'badge bg-primary'],
                             };
-                            $sellerOverdue = $lead->seller?->isOverdue() ?? false;
+                            $sellerOverdue = in_array($lead->seller_id, $overdueSellers ?? []);
                         @endphp
                         <tr>
                             {{-- Lead ID --}}

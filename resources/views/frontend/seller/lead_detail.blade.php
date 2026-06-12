@@ -5,9 +5,10 @@
 <div class="max-w-xl mx-auto px-4 py-6 pb-16">
 
     {{-- Back --}}
-    <a href="{{ route('seller.dashboard') }}"
+    <a href="{{ auth()->user()?->type === 'admin' ? route('admin.leads') : route('seller.dashboard') }}"
        class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-teal-700 mb-6 transition">
-        <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Dashboard
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        {{ auth()->user()?->type === 'admin' ? 'Back to Leads' : 'Back to Dashboard' }}
     </a>
 
     @php
@@ -163,8 +164,10 @@
 
     {{-- Footer --}}
     <p class="text-center text-xs text-slate-400 mt-6">
-        Lead delivered by Zonely ·
-        <a href="{{ route('seller.billing') }}" class="text-teal-600 font-semibold hover:underline">View billing →</a>
+        Lead delivered by Zonely
+        @if(auth()->user()?->type === 'seller')
+        · <a href="{{ route('seller.billing') }}" class="text-teal-600 font-semibold hover:underline">View billing →</a>
+        @endif
     </p>
 
 </div>
