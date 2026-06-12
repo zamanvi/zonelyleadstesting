@@ -127,7 +127,7 @@ class SellerController extends Controller
             'email'         => 'required|email|unique:users,email,' . $user->id,
             'phone'         => 'nullable|string|max:50',
             'whatsapp'      => 'nullable|string|max:50',
-            'title'         => 'nullable|string|max:255',
+            'title'         => 'nullable|string|max:20',
             'city'          => 'nullable|string|max:100',
             'state'         => 'nullable|string|max:100',
             'profile_photo' => 'nullable|image|max:10240',
