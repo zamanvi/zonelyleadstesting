@@ -12,12 +12,13 @@
 
     @php
         $source       = $lead->source ?? 'form';
-        $channelIcon  = match($source) { 'phone'=>'📞', 'whatsapp'=>'💬', 'email'=>'📧', default=>'📋' };
-        $channelLabel = match($source) { 'phone'=>'Phone Call', 'whatsapp'=>'WhatsApp', 'email'=>'Email', default=>'Form' };
+        $channelIcon  = match($source) { 'phone'=>'📞', 'whatsapp'=>'💬', 'email'=>'📧', 'booking'=>'📅', default=>'📋' };
+        $channelLabel = match($source) { 'phone'=>'Phone Call', 'whatsapp'=>'WhatsApp', 'email'=>'Email', 'booking'=>'Booking', default=>'Form' };
         $channelColor = match($source) {
             'phone'    => 'bg-amber-50 text-amber-700 border-amber-200',
             'whatsapp' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
             'email'    => 'bg-blue-50 text-blue-700 border-blue-200',
+            'booking'  => 'bg-sky-50 text-sky-700 border-sky-200',
             default    => 'bg-slate-50 text-slate-600 border-slate-200',
         };
     @endphp
@@ -100,7 +101,29 @@
             </div>
             @endif
 
-            @if($lead->message && $lead->message !== 'Inbound call via Zonely tracking number.')
+            @if($source === 'booking' && $lead->message)
+            @php
+                preg_match('/Booking:\s*(\d{4}-\d{2}-\d{2})\s*@\s*(\d{2}:\d{2})/', $lead->message, $bm);
+                $bookingDate = isset($bm[1]) ? \Carbon\Carbon::parse($bm[1])->format('l, M j, Y') : null;
+                $bookingTime = $bm[2] ?? null;
+            @endphp
+            @if($bookingDate)
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-sky-50 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-calendar-check text-sky-600 text-xs"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Appointment</p>
+                    <p class="text-sm font-bold text-slate-800 mt-0.5">{{ $bookingDate }}</p>
+                    @if($bookingTime)
+                    <p class="text-xs text-sky-700 font-semibold mt-0.5">🕐 {{ \Carbon\Carbon::parse($bookingTime)->format('g:i A') }}</p>
+                    @endif
+                </div>
+            </div>
+            @endif
+            @endif
+
+            @if($lead->message && $lead->message !== 'Inbound call via Zonely tracking number.' && $source !== 'booking')
             <div class="flex items-start gap-3">
                 <div class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-message text-slate-500 text-xs"></i>
