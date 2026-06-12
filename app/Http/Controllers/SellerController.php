@@ -466,4 +466,36 @@ class SellerController extends Controller
             'link' => url('/r/' . $review->review_token),
         ]);
     }
+
+    /**
+     * Generate a review request link from the Reviews page directly (name + email, no lead required).
+     */
+    public function reviewRequestDirect(Request $request)
+    {
+        $data = $request->validate([
+            'name'  => 'required|string|max:100',
+            'email' => 'required|email|max:150',
+        ]);
+
+        // Reuse an unsent token for this email within 30 days
+        $existing = Review::where('seller_id', Auth::id())
+            ->where('reviewer_email', $data['email'])
+            ->whereNull('token_used_at')
+            ->whereNotNull('review_token')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->first();
+
+        if ($existing) {
+            return response()->json(['link' => url('/r/' . $existing->review_token)]);
+        }
+
+        $review = Review::create([
+            'seller_id'      => Auth::id(),
+            'reviewer_name'  => $data['name'],
+            'reviewer_email' => $data['email'],
+            'review_token'   => Str::random(48),
+        ]);
+
+        return response()->json(['link' => url('/r/' . $review->review_token)]);
+    }
 }

@@ -200,6 +200,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('schedule', [SellerController::class, 'scheduleUpdate'])->name('schedule.update');
         Route::get('reviews', [SellerController::class, 'reviews'])->name('reviews');
         Route::post('reviews/{id}/reply', [SellerController::class, 'reviewReply'])->name('reviews.reply');
+        Route::post('reviews/request', [SellerController::class, 'reviewRequestDirect'])->name('reviews.request');
         Route::get('notifications', [SellerController::class, 'notifications'])->name('notifications');
         Route::post('notifications/read-all', [SellerController::class, 'notificationsReadAll'])->name('notifications.read-all');
         Route::get('leads/{id}', [SellerController::class, 'leadDetail'])->name('lead.detail');
