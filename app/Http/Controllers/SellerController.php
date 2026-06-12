@@ -22,17 +22,37 @@ class SellerController extends Controller
 
     public function dashboard()
     {
-        $user  = Auth::user();
-        $leads = $user->leads()->with('seller')->latest()->get();
+        $user   = Auth::user();
+        $allLeads = $user->leads()->latest()->get();
 
+        // Period filter
+        $period = request('period', 'month');
+        $leads  = match($period) {
+            'today' => $allLeads->filter(fn($l) => $l->created_at->isToday()),
+            'week'  => $allLeads->filter(fn($l) => $l->created_at->isCurrentWeek()),
+            'year'  => $allLeads->filter(fn($l) => $l->created_at->isCurrentYear()),
+            default => $allLeads->filter(fn($l) => $l->created_at->isCurrentMonth()),
+        };
+
+        // Stats based on filtered period
         $stats = [
-            'total'   => $leads->count(),
-            'won'     => $leads->where('status', 'won')->count(),
-            'pending' => $leads->where('status', 'pending')->count(),
-            'unpaid'  => $leads->whereNull('paid_at')->count(),
+            'total'     => $leads->count(),
+            'today'     => $allLeads->filter(fn($l) => $l->created_at->isToday())->count(),
+            'form'      => $leads->where('source', 'form')->count(),
+            'phone'     => $leads->where('source', 'phone')->count(),
+            'whatsapp'  => $leads->where('source', 'whatsapp')->count(),
+            'email'     => $leads->where('source', 'email')->count(),
         ];
 
-        return view('frontend.seller.dashboard', compact('user', 'leads', 'stats'));
+        // Weekly chart — last 7 days
+        $weekDays   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        $weekCounts = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $d = now()->subDays($i);
+            $weekCounts[] = $allLeads->filter(fn($l) => $l->created_at->isSameDay($d))->count();
+        }
+
+        return view('frontend.seller.dashboard', compact('user', 'leads', 'allLeads', 'stats', 'period', 'weekDays', 'weekCounts'));
     }
 
     public function affiliate()
