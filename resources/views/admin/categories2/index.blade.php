@@ -244,7 +244,7 @@
                         <label class="form-label fw-semibold">Parent Category <span class="text-muted small">(leave blank for mother)</span></label>
                         <select name="parent_id" class="form-select">
                             <option value="">— No Parent (Mother Category) —</option>
-                            @foreach($paginated as $cat)
+                            @foreach($mothers as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->title }}</option>
                             @endforeach
                         </select>
@@ -312,7 +312,7 @@
                         <label class="form-label fw-semibold">Parent Category</label>
                         <select name="parent_id" id="editParentId" class="form-select">
                             <option value="">— No Parent (Mother Category) —</option>
-                            @foreach($paginated as $cat)
+                            @foreach($mothers as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->title }}</option>
                             @endforeach
                         </select>

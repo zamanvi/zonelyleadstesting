@@ -12,6 +12,7 @@ class CategoryController extends Controller
     {
         $paginated  = Category::whereNull('parent_id')->withCount('children')->with('children')->paginate(20);
         $categories = flattenCategories(Category::whereNull('parent_id')->with('children')->get()->all());
+        $mothers    = Category::whereNull('parent_id')->orderBy('title')->get(['id', 'title']);
         $stats = [
             'total'    => Category::count(),
             'mothers'  => Category::whereNull('parent_id')->count(),
@@ -19,7 +20,7 @@ class CategoryController extends Controller
             'active'   => Category::where('is_active', true)->count(),
             'inactive' => Category::where('is_active', false)->count(),
         ];
-        return view('admin.categories2.index', compact('paginated', 'categories', 'stats'));
+        return view('admin.categories2.index', compact('paginated', 'categories', 'mothers', 'stats'));
     }
 
     public function create()
@@ -32,10 +33,8 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'title'     => 'required|string|max:255',
             'slug'      => 'nullable|string|max:255',
-            'parent_id' => 'nullable',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
-
-        // dd($validated);
 
         $slug = generateUniqueSlug(Category::class, $validated['slug'] ?? $validated['title']);
 
@@ -44,7 +43,8 @@ class CategoryController extends Controller
             'slug'      => $slug,
             'parent_id' => $validated['parent_id'],
         ]);
-        return redirect()->route('admin.categories.index');
+        return redirect()->route('admin.categories.index')
+                         ->with('success', 'Category created successfully');
     }
 
     public function show($id)
@@ -67,10 +67,10 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug'  => 'nullable|string|max:255',
-            'is_active'  => 'nullable|boolean',
-            'parent_id' => 'nullable',
+            'title'     => 'required|string|max:255',
+            'slug'      => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
 
         // If slug is changed, regenerate unique slug
@@ -88,12 +88,14 @@ class CategoryController extends Controller
             'parent_id' => $validated['parent_id'],
         ]);
 
-        return redirect()->route('admin.categories.index');
+        return redirect()->route('admin.categories.index')
+                         ->with('success', 'Category updated successfully');
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
-        return redirect()->route('admin.categories.index');
+        return redirect()->route('admin.categories.index')
+                         ->with('success', 'Category deleted successfully');
     }
 }
