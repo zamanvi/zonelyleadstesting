@@ -15,6 +15,159 @@
     </div>
 </div>
 
+{{-- ── AUTOMATION ROADMAP BRIEF ── --}}
+<div class="card border-0 rounded-3 mb-4" style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);color:#e2e8f0">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="fas fa-map text-warning fs-5"></i>
+            <h6 class="fw-black mb-0 text-white" style="letter-spacing:.02em">HuntBot — Full Vision & Automation Roadmap</h6>
+            <span class="badge ms-2" style="background:rgba(255,255,255,.1);color:#94a3b8;font-size:10px">For developers & AI assistants reading this page</span>
+        </div>
+
+        <div class="row g-3">
+
+            {{-- Phase 1 --}}
+            <div class="col-md-6 col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-success rounded-pill">LIVE NOW</span>
+                        <span class="fw-bold text-white small">Phase 1 — Manual</span>
+                    </div>
+                    <p class="mb-0" style="font-size:12px;color:#94a3b8;line-height:1.6">
+                        Admin creates a campaign (city + category), adds business leads manually or via bulk paste (name, phone, address).
+                        Selects targets → clicks Launch → Twilio sends SMS inviting them to register on Zonely.
+                        Admin manually tracks who replied and who registered.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Phase 2 --}}
+            <div class="col-md-6 col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-warning text-dark rounded-pill">NEEDS API KEY</span>
+                        <span class="fw-bold text-white small">Phase 2 — Auto Discovery</span>
+                    </div>
+                    <p class="mb-2" style="font-size:12px;color:#94a3b8;line-height:1.6">
+                        Admin enters city + category → HuntBot calls <strong class="text-white">Google Maps Places API</strong> (Text Search + Place Details),
+                        finds up to 60 businesses, detects which ones have <strong class="text-white">no website</strong>,
+                        and fills the lead table automatically. Admin still clicks Launch manually.
+                    </p>
+                    <p class="mb-0" style="font-size:11px;color:#64748b">
+                        Requires: <code style="color:#fbbf24">GOOGLE_MAPS_KEY</code> in Railway env vars.<br>
+                        Enable: Google Maps Platform → Places API (Text Search + Place Details).<br>
+                        Cost: ~$0.017 per search, ~$0.003 per place detail.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Phase 3 --}}
+            <div class="col-md-6 col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary rounded-pill">FUTURE BUILD</span>
+                        <span class="fw-bold text-white small">Phase 3 — Full Automation</span>
+                    </div>
+                    <p class="mb-2" style="font-size:12px;color:#94a3b8;line-height:1.6">
+                        Laravel Scheduler runs a job daily at 9am. Reads configured target cities + categories from admin settings.
+                        Searches Google Maps, skips already-contacted businesses (checked by phone number dedup),
+                        auto-sends SMS via Twilio with no human action needed.
+                        When a business <strong class="text-white">replies via SMS</strong>, Twilio webhook fires → AI (Claude API / GPT)
+                        reads the reply, responds with answers, sends the Zonely registration link.
+                        Admin gets a daily digest notification: X contacted, X replied, X registered.
+                    </p>
+                    <p class="mb-0" style="font-size:11px;color:#64748b">
+                        Requires: Google Maps API + Claude/OpenAI API + Laravel Scheduler active on Railway + Twilio reply webhook configured.
+                    </p>
+                </div>
+            </div>
+
+            {{-- Phase 4 --}}
+            <div class="col-md-6 col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary rounded-pill">FUTURE BUILD</span>
+                        <span class="fw-bold text-white small">Phase 4 — WhatsApp Outreach</span>
+                    </div>
+                    <p class="mb-2" style="font-size:12px;color:#94a3b8;line-height:1.6">
+                        Replace or supplement SMS with <strong class="text-white">WhatsApp Business API</strong>.
+                        WhatsApp has 98% open rate vs 20% for SMS. AI holds full chat conversations,
+                        sends images (Zonely seller profile examples), answers questions, books onboarding calls.
+                        Especially effective for Bangladeshi-American business owners who prefer WhatsApp over SMS.
+                    </p>
+                    <p class="mb-0" style="font-size:11px;color:#64748b">
+                        Requires: Meta WhatsApp Business API approval + verified business account + webhook handler.
+                        Cost: ~$0.005–$0.015 per conversation (24hr window).
+                    </p>
+                </div>
+            </div>
+
+            {{-- Phase 5 --}}
+            <div class="col-md-6 col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary rounded-pill">FUTURE BUILD</span>
+                        <span class="fw-bold text-white small">Phase 5 — Integrated POS</span>
+                    </div>
+                    <p class="mb-2" style="font-size:12px;color:#94a3b8;line-height:1.6">
+                        Sellers don't just receive leads — they run their entire business inside Zonely.
+                        <strong class="text-white">Integrated Point of Sale:</strong> take payments, send invoices, manage bookings,
+                        track client history, all from their Zonely dashboard.
+                        HuntBot brings them in with the promise of new clients.
+                        POS locks them in because switching means losing their whole system.
+                        Zonely earns a <strong class="text-white">transaction fee on every payment</strong> — not just one-time lead fees.
+                        This transforms Zonely from a lead marketplace into a full business operating platform.
+                    </p>
+                    <p class="mb-0" style="font-size:11px;color:#64748b">
+                        Requires: Stripe Connect (seller payouts) + booking/calendar system + invoice builder + client CRM inside seller dashboard.
+                    </p>
+                </div>
+            </div>
+
+            {{-- End goal --}}
+            <div class="col-md-6 col-lg-4">
+                <div class="rounded-3 p-3 h-100" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25)">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fas fa-trophy text-warning"></i>
+                        <span class="fw-bold text-white small">End Goal — Zero-Touch Growth</span>
+                    </div>
+                    <p class="mb-3" style="font-size:12px;color:#94a3b8;line-height:1.6">
+                        Admin sets target cities and categories once inside Zonely admin panel.
+                        Every night HuntBot automatically finds new businesses, contacts them via WhatsApp/SMS,
+                        AI handles all replies and conversations, sends registration links.
+                        New sellers appear on Zonely with <strong class="text-white">zero manual work</strong>.
+                        Once registered, sellers use integrated POS — Zonely earns on every client transaction forever.
+                    </p>
+                    <div style="font-size:12px;color:#34d399;font-family:monospace;line-height:2">
+                        HuntBot finds business<br>
+                        → AI sends WhatsApp<br>
+                        → AI answers questions<br>
+                        → Seller registers free<br>
+                        → Seller gets first client via Zonely<br>
+                        → Seller pays lead fee → Zonely earns<br>
+                        → Seller uses POS → Zonely earns %<br>
+                        → Seller never leaves
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-3 pt-3 border-top" style="border-color:rgba(255,255,255,.1) !important">
+            <p class="mb-0" style="font-size:11px;color:#475569">
+                <i class="fas fa-info-circle me-1"></i>
+                <strong class="text-slate-400">For AI assistants:</strong>
+                This is Zonely — a local services marketplace connecting buyers with professional sellers (Professional, Healthcare, Home Services, Beauty categories).
+                Built on Laravel 10 + Blade. Admin panel uses Bootstrap 5 with <code>layouts.admin2</code> layout.
+                Twilio is already integrated for SMS (config key: <code>services.twilio</code>).
+                Google Maps key goes in <code>services.google_maps.key</code> (env: <code>GOOGLE_MAPS_KEY</code>).
+                HuntBot controller: <code>App\Http\Controllers\Admin\HuntBotController</code>.
+                Models: <code>HuntCampaign</code>, <code>HuntLead</code>. Routes prefixed: <code>admin.huntbot.*</code>.
+            </p>
+        </div>
+    </div>
+</div>
+
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show">
     <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
