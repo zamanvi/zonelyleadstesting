@@ -48,6 +48,10 @@ return [
         'mode'          => env('PAYPAL_MODE', 'sandbox'), // sandbox or live
     ],
 
+    'google_maps' => [
+        'key' => env('GOOGLE_MAPS_KEY'),
+    ],
+
     // ── Marketing Analytics ────────────────────────────────────────
     // Set these environment variables on Railway to activate tracking.
     'analytics' => [

@@ -151,6 +151,20 @@
         </li>
         @endif
 
+        {{-- ── GROWTH & OUTREACH ── --}}
+        @if($isAdmin || $isCoo)
+        <li class="nav-item mt-3">
+            <span class="nav-text ms-1 text-uppercase fw-bold" style="font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,.35)">Growth & Outreach</span>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.huntbot.index') }}"
+               class="{{ Route::is('admin.huntbot.*') ? 'active' : '' }}">
+                <i class="fas fa-robot"></i>
+                <span class="nav-text ms-2">HuntBot</span>
+            </a>
+        </li>
+        @endif
+
         {{-- ── SETTINGS ── --}}
         @if($isAdmin || $isCoo)
         <li class="nav-item mt-3">

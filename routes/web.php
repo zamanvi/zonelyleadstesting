@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\TwilioController;
 use App\Http\Controllers\Admin\PhonePoolController;
 use App\Http\Controllers\Admin\PricingController;
+use App\Http\Controllers\Admin\HuntBotController;
 use App\Http\Controllers\TwilioWebhookController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\BuyerController;
@@ -353,6 +354,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Contact Settings
         Route::get('settings/contact',  [PageController::class, 'contactSettings'])->name('settings.contact');
         Route::post('settings/contact', [PageController::class, 'contactSettingsUpdate'])->name('settings.contact.update');
+
+        // HuntBot — AI Seller Acquisition
+        Route::prefix('huntbot')->name('huntbot.')->group(function () {
+            Route::get('/',                              [HuntBotController::class, 'index'])->name('index');
+            Route::post('hunt',                          [HuntBotController::class, 'hunt'])->name('hunt');
+            Route::get('campaign/{campaign}',            [HuntBotController::class, 'campaign'])->name('campaign');
+            Route::post('campaign/{campaign}/launch',    [HuntBotController::class, 'launch'])->name('launch');
+            Route::patch('lead/{lead}/status',           [HuntBotController::class, 'updateLeadStatus'])->name('lead.status');
+            Route::post('templates',                     [HuntBotController::class, 'saveTemplates'])->name('templates');
+        });
     });
 
 });
