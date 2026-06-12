@@ -3,37 +3,51 @@
 
 @section('content')
 @php
-    // Detect mother category for category-aware hints
     $motherCat = $user->category?->parent?->title ?? $user->category?->title ?? '';
     $motherCat = strtolower($motherCat);
-    $isHealthcare  = str_contains($motherCat, 'health') || str_contains($motherCat, 'wellness') || str_contains($motherCat, 'medical');
-    $isHome        = str_contains($motherCat, 'home') || str_contains($motherCat, 'repair') || str_contains($motherCat, 'service');
-    $isBeauty      = str_contains($motherCat, 'beauty') || str_contains($motherCat, 'personal care') || str_contains($motherCat, 'salon');
+    $isHealthcare = str_contains($motherCat, 'health') || str_contains($motherCat, 'wellness') || str_contains($motherCat, 'medical');
+    $isHome       = str_contains($motherCat, 'home')   || str_contains($motherCat, 'repair')   || str_contains($motherCat, 'service');
+    $isBeauty     = str_contains($motherCat, 'beauty') || str_contains($motherCat, 'personal care') || str_contains($motherCat, 'salon');
 
     $certHint = $isHealthcare ? 'Medical license, board certifications, specializations'
-        : ($isHome    ? 'Contractor license, insurance certificate, trade certifications'
-        : ($isBeauty  ? 'Cosmetology license, beauty certifications, specialist training'
-        :               'CPA, CFA, bar license, professional credentials'));
+        : ($isHome   ? 'Contractor license, insurance certificate, trade certifications'
+        : ($isBeauty ? 'Cosmetology license, beauty certifications, specialist training'
+        :              'CPA, CFA, bar license, professional credentials'));
 
     $memberHint = $isHealthcare ? 'Medical associations, health boards, specialist societies'
-        : ($isHome    ? 'Trade associations, union memberships, contractor orgs'
-        : ($isBeauty  ? 'Beauty associations, professional orgs, industry groups'
-        :               'Bar associations, boards, professional orgs'));
+        : ($isHome   ? 'Trade associations, union memberships, contractor orgs'
+        : ($isBeauty ? 'Beauty associations, professional orgs, industry groups'
+        :              'Bar associations, boards, professional orgs'));
 
     $faqHint = $isBeauty
         ? 'Add at least 5 FAQs — pricing, availability, booking process, products used. <strong class="text-red-500">Minimum 5 required.</strong>'
         : 'Add at least 5 FAQs — pricing, turnaround times, service area questions. <strong class="text-red-500">Minimum 5 required.</strong>';
 
+    $faqCount    = $user->faqs->count();
+    $faqProgress = $faqCount > 0 && $faqCount < 5; // partial state
+
+    $galleryCount = ($isHome || $isBeauty) ? $user->gallery()->count() : 0;
+    $galleryDone  = $galleryCount >= 3;
+
+    $langCount = $user->languages->count();
+
     $done = [
         'basics'      => filled($user->business_name) || filled($user->title),
         'bio'         => filled($user->bio),
         'contact'     => filled($user->whatsapp) || $user->contacts()->count() > 0,
-        'faqs'        => $user->faqs->count() >= 5,
+        'faqs'        => $faqCount >= 5,
         'loc_services'=> (filled($user->city) || filled($user->zip_code)) && $user->services->count() > 0,
         'credentials' => $user->educations->count() > 0 || $user->memberships->count() > 0 || $user->experiences->count() > 0 || $user->certifications->count() > 0,
     ];
 
-    $total     = 6;
+    // Fix 3: count gallery in progress for Home/Beauty
+    if ($isHome || $isBeauty) {
+        $done['gallery'] = $galleryDone;
+        $total = 7;
+    } else {
+        $total = 6;
+    }
+
     $completed = collect($done)->filter()->count();
     $pct       = round($completed / $total * 100);
 @endphp
@@ -109,7 +123,7 @@
     {{-- Section Cards --}}
     <div class="grid sm:grid-cols-2 gap-4">
 
-        {{-- 1. Your Business Identity --}}
+        {{-- 1. Business Identity --}}
         @php $isDone = $done['basics']; @endphp
         <a href="{{ route('type.profile', ['seller', 'account']) }}"
            class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
@@ -216,45 +230,62 @@
             </div>
         </a>
 
-        {{-- 4. Client FAQs & Questions --}}
-        @php $isDone = $done['faqs']; @endphp
+        {{-- 4. Client FAQs — Fix 1: show in-progress state --}}
+        @php
+            $isDone      = $done['faqs'];
+            $faqInProgress = $faqCount > 0 && !$isDone;
+        @endphp
         <a href="{{ route('user.faqs.index') }}"
-           class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
+           class="group block bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : ($faqInProgress ? 'border-amber-200 hover:border-amber-300' : 'border-dashed border-slate-200 hover:border-teal-300') }} shadow-sm p-5 transition-all hover:shadow-md">
             <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-circle-question {{ $isDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
+                    <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : ($faqInProgress ? 'bg-amber-50' : 'bg-teal-50') }} rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-circle-question {{ $isDone ? 'text-emerald-600' : ($faqInProgress ? 'text-amber-500' : 'text-teal-600') }} text-sm"></i>
                     </div>
                     <div>
                         <p class="font-bold text-slate-900 text-sm">Client FAQs & Questions</p>
                         <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ Answer questions before clients even ask</p>
                     </div>
                 </div>
-                <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-500' }}">
-                    {{ $isDone ? 'Complete' : 'Required' }}
-                </span>
+                @if($isDone)
+                    <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700">Complete</span>
+                @elseif($faqInProgress)
+                    <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-100 text-amber-700">{{ $faqCount }}/5 added</span>
+                @else
+                    <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg bg-red-50 text-red-500">Required</span>
+                @endif
             </div>
+
             @if($isDone)
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs text-slate-600">
-                    <p class="font-semibold mb-1">{{ $user->faqs->count() }}/5 questions added
-                        @if($user->faqs->count() < 5)<span class="text-red-500 font-normal"> ({{ 5 - $user->faqs->count() }} more needed)</span>@endif
-                    </p>
+                    <p class="font-semibold mb-1">{{ $faqCount }} questions added</p>
                     @if($user->faqs->first())
                         <p class="text-slate-500 truncate">{{ $user->faqs->first()->question }}</p>
                     @endif
                 </div>
+            @elseif($faqInProgress)
+                <div class="bg-amber-50 rounded-xl px-3 py-2.5 text-xs">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="font-semibold text-amber-700">{{ $faqCount }} of 5 added</span>
+                        <span class="text-amber-500">{{ 5 - $faqCount }} more needed</span>
+                    </div>
+                    <div class="w-full bg-amber-100 rounded-full h-1.5">
+                        <div class="bg-amber-400 h-1.5 rounded-full" style="width:{{ round($faqCount/5*100) }}%"></div>
+                    </div>
+                </div>
             @else
                 <p class="text-xs text-slate-400">{!! $faqHint !!}</p>
             @endif
+
             <div class="mt-3 flex items-center justify-end">
                 <span class="text-xs font-bold {{ $isDone ? 'text-slate-400 group-hover:text-teal-700' : 'text-teal-700' }} flex items-center gap-1 transition">
                     <i class="fa-solid {{ $isDone ? 'fa-pen' : 'fa-plus' }} text-[10px]"></i>
-                    {{ $isDone ? 'Manage' : 'Add Now' }}
+                    {{ $isDone ? 'Manage' : ($faqInProgress ? 'Continue' : 'Add Now') }}
                 </span>
             </div>
         </a>
 
-        {{-- 5. Location, Services & Pricing (MERGED) --}}
+        {{-- 5. Location, Services & Pricing — Fix 5: no hover shadow (not a clickable div) --}}
         @php
             $locDone = filled($user->city) || filled($user->zip_code);
             $svcDone = $user->services->count() > 0;
@@ -262,7 +293,7 @@
             $oc = $user->city  ? (is_numeric($user->city)  ? (\App\Models\City::find($user->city)?->title  ?? $user->city)  : $user->city)  : null;
             $os = $user->state ? (is_numeric($user->state) ? (\App\Models\State::find($user->state)?->title ?? $user->state) : $user->state) : null;
         @endphp
-        <div class="bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200' }} shadow-sm p-5 transition-all hover:shadow-md">
+        <div class="bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200' }} shadow-sm p-5">
             <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
@@ -279,7 +310,6 @@
             </div>
 
             <div class="space-y-2 mb-3">
-                {{-- Location sub-row --}}
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                         <i class="fa-solid fa-location-dot {{ $locDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
@@ -301,7 +331,6 @@
                     </a>
                 </div>
 
-                {{-- Services sub-row --}}
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                         <i class="fa-solid fa-list-check {{ $svcDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
@@ -324,15 +353,16 @@
             </div>
         </div>
 
-        {{-- 6. Credentials & Trust (MERGED — always shown) --}}
+        {{-- 6. Credentials & Trust — Fix 2: add Languages sub-row, Fix 5: no hover shadow --}}
         @php
             $eduDone  = $user->educations->count() > 0;
             $memDone  = $user->memberships->count() > 0;
             $expDone  = $user->experiences->count() > 0;
             $certDone = $user->certifications->count() > 0;
+            $langDone = $langCount > 0;
             $isDone   = $done['credentials'];
         @endphp
-        <div class="bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200' }} shadow-sm p-5 transition-all hover:shadow-md">
+        <div class="bg-white rounded-2xl border-2 {{ $isDone ? 'border-emerald-200' : 'border-dashed border-slate-200' }} shadow-sm p-5">
             <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 {{ $isDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
@@ -340,7 +370,7 @@
                     </div>
                     <div>
                         <p class="font-bold text-slate-900 text-sm">Credentials & Trust</p>
-                        <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ Experience, education, certifications & memberships</p>
+                        <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ Experience, education, certifications & languages</p>
                     </div>
                 </div>
                 <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
@@ -349,7 +379,7 @@
             </div>
 
             <div class="space-y-2 mb-3">
-                {{-- Work Experience sub-row --}}
+                {{-- Work Experience --}}
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                         <i class="fa-solid fa-briefcase {{ $expDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
@@ -364,13 +394,12 @@
                             @endif
                         </div>
                     </div>
-                    <a href="{{ route('user.experiences.index') }}"
-                       class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
+                    <a href="{{ route('user.experiences.index') }}" class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
                         {{ $expDone ? 'Manage' : 'Add' }}
                     </a>
                 </div>
 
-                {{-- Education sub-row --}}
+                {{-- Education --}}
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                         <i class="fa-solid fa-graduation-cap {{ $eduDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
@@ -385,13 +414,12 @@
                             @endif
                         </div>
                     </div>
-                    <a href="{{ route('user.educations.index') }}"
-                       class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
+                    <a href="{{ route('user.educations.index') }}" class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
                         {{ $eduDone ? 'Manage' : 'Add' }}
                     </a>
                 </div>
 
-                {{-- Certifications sub-row --}}
+                {{-- Certifications --}}
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                         <i class="fa-solid fa-certificate {{ $certDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
@@ -406,13 +434,12 @@
                             @endif
                         </div>
                     </div>
-                    <a href="{{ route('user.certifications.index') }}"
-                       class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
+                    <a href="{{ route('user.certifications.index') }}" class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
                         {{ $certDone ? 'Manage' : 'Add' }}
                     </a>
                 </div>
 
-                {{-- Memberships sub-row --}}
+                {{-- Memberships --}}
                 <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                         <i class="fa-solid fa-id-badge {{ $memDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
@@ -427,9 +454,28 @@
                             @endif
                         </div>
                     </div>
-                    <a href="{{ route('user.memberships.index') }}"
-                       class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
+                    <a href="{{ route('user.memberships.index') }}" class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
                         {{ $memDone ? 'Manage' : 'Add' }}
+                    </a>
+                </div>
+
+                {{-- Fix 2: Languages sub-row --}}
+                <div class="bg-slate-50 rounded-xl px-3 py-2.5 text-xs flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <i class="fa-solid fa-language {{ $langDone ? 'text-emerald-500' : 'text-slate-300' }} shrink-0"></i>
+                        <div class="min-w-0">
+                            <p class="font-semibold text-slate-700">Languages</p>
+                            @if($langDone)
+                                <p class="text-slate-500 truncate">
+                                    {{ $user->languages->take(3)->pluck('name')->implode(', ') }}{{ $langCount > 3 ? ' +'.($langCount-3).' more' : '' }}
+                                </p>
+                            @else
+                                <p class="text-slate-400">Languages you speak — builds trust with bilingual clients</p>
+                            @endif
+                        </div>
+                    </div>
+                    <a href="{{ route('user.languages.index') }}" class="shrink-0 text-[10px] font-bold text-teal-700 hover:underline">
+                        {{ $langDone ? 'Manage' : 'Add' }}
                     </a>
                 </div>
             </div>
@@ -437,9 +483,8 @@
 
     </div>
 
-    {{-- Gallery card — Home Services & Beauty only --}}
+    {{-- Gallery card — Home Services & Beauty only (Fix 3: now counted in progress) --}}
     @if($isHome || $isBeauty)
-    @php $galleryCount = $user->gallery()->count(); $galleryDone = $galleryCount >= 3; @endphp
     <a href="{{ route('seller.gallery') }}"
        class="group mt-4 block bg-white rounded-2xl border-2 {{ $galleryDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
         <div class="flex items-start justify-between gap-3 mb-3">
@@ -452,13 +497,9 @@
                     <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ Show your best work photos</p>
                 </div>
             </div>
-            @if($galleryDone)
-            <span class="shrink-0 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                <i class="fa-solid fa-check text-white text-[10px]"></i>
+            <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $galleryDone ? 'bg-emerald-100 text-emerald-700' : ($galleryCount > 0 ? 'bg-amber-100 text-amber-700' : 'bg-red-50 text-red-500') }}">
+                {{ $galleryDone ? 'Complete' : ($galleryCount > 0 ? $galleryCount.'/3 photos' : 'Required') }}
             </span>
-            @else
-            <span class="shrink-0 w-6 h-6 border-2 border-slate-200 rounded-full group-hover:border-teal-400 transition"></span>
-            @endif
         </div>
         @if($galleryDone)
         <div class="flex gap-1.5 mt-2">
@@ -469,14 +510,60 @@
             <div class="w-12 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-500 font-bold">+{{ $galleryCount - 4 }}</div>
             @endif
         </div>
+        @elseif($galleryCount > 0)
+        <div class="bg-amber-50 rounded-xl px-3 py-2.5 text-xs">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="font-semibold text-amber-700">{{ $galleryCount }} of 3 photos uploaded</span>
+                <span class="text-amber-500">{{ 3 - $galleryCount }} more needed</span>
+            </div>
+            <div class="w-full bg-amber-100 rounded-full h-1.5">
+                <div class="bg-amber-400 h-1.5 rounded-full" style="width:{{ round($galleryCount/3*100) }}%"></div>
+            </div>
+        </div>
         @else
         <p class="text-xs text-slate-400">
             @if($isBeauty) Upload 3+ photos of your work — hairstyles, nail art, before & afters
             @else Upload 3+ photos of completed jobs — kitchens, bathrooms, installations @endif
         </p>
         @endif
+        <div class="mt-3 flex items-center justify-end">
+            <span class="text-xs font-bold {{ $galleryDone ? 'text-slate-400 group-hover:text-teal-700' : 'text-teal-700' }} flex items-center gap-1 transition">
+                <i class="fa-solid {{ $galleryDone ? 'fa-pen' : 'fa-plus' }} text-[10px]"></i>
+                {{ $galleryDone ? 'Manage' : ($galleryCount > 0 ? 'Continue' : 'Upload Photos') }}
+            </span>
+        </div>
     </a>
     @endif
+
+    {{-- Fix 4: Schedule / Availability card --}}
+    @php $scheduleDone = !is_null($user->schedule); @endphp
+    <a href="{{ route('seller.schedule') }}"
+       class="group mt-4 block bg-white rounded-2xl border-2 {{ $scheduleDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
+        <div class="flex items-start justify-between gap-3 mb-2">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 {{ $scheduleDone ? 'bg-emerald-100' : 'bg-teal-50' }} rounded-xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-calendar-days {{ $scheduleDone ? 'text-emerald-600' : 'text-teal-600' }} text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-slate-900 text-sm">Availability & Schedule</p>
+                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ When you're open for bookings</p>
+                </div>
+            </div>
+            <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $scheduleDone ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                {{ $scheduleDone ? 'Complete' : 'Optional' }}
+            </span>
+        </div>
+        <p class="text-xs text-slate-400 mb-3">
+            @if($scheduleDone) Your availability is set — clients know when to expect you
+            @else Let clients know your working hours and days — reduces back-and-forth messages @endif
+        </p>
+        <div class="flex items-center justify-end">
+            <span class="text-xs font-bold {{ $scheduleDone ? 'text-slate-400 group-hover:text-teal-700' : 'text-teal-700' }} flex items-center gap-1 transition">
+                <i class="fa-solid {{ $scheduleDone ? 'fa-pen' : 'fa-plus' }} text-[10px]"></i>
+                {{ $scheduleDone ? 'Edit Schedule' : 'Set Availability' }}
+            </span>
+        </div>
+    </a>
 
     {{-- Bottom CTA --}}
     <div class="mt-6 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -490,7 +577,7 @@
             @endif
         </div>
         <a href="{{ route('frontend.service.show', $user->slug ?? $user->id) }}" target="_blank"
-           class="shrink-0 px-6 py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold flex items-center gap-2 transition">
+           class="shrink-0 w-full sm:w-auto text-center px-6 py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold flex items-center justify-center gap-2 transition">
             <i class="fa-solid fa-eye"></i> Preview My Page
         </a>
     </div>
