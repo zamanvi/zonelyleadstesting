@@ -37,16 +37,16 @@
 
 {{-- Overdue warning banner --}}
 @if($overdue)
-<div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between gap-4">
+<div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div class="flex items-center gap-3">
-        <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg"></i>
+        <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg shrink-0"></i>
         <div>
             <p class="text-sm font-bold text-red-700">Balance has reached your payment threshold</p>
             <p class="text-xs text-red-500 mt-0.5">Pay now to keep receiving new leads — ${{ number_format($balance['unpaid'], 2) }} outstanding</p>
         </div>
     </div>
     <button onclick="payAllDue()"
-        class="shrink-0 bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+        class="w-full sm:w-auto shrink-0 bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition text-center">
         Pay All Due
     </button>
 </div>
@@ -125,14 +125,14 @@
                     {{ ucfirst($period === 'week' ? 'this week' : ($period === 'today' ? 'today' : 'this ' . $period)) }}
                 </p>
             </div>
-            <div class="flex gap-2 flex-wrap">
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <button id="paySelectedBtn" onclick="openPaySelected()"
-                    class="hidden bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+                    class="hidden w-full sm:w-auto justify-center bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-2.5 sm:py-2 rounded-xl text-xs transition flex items-center gap-1.5">
                     <i class="fa-solid fa-credit-card text-[10px]"></i>
                     Pay Selected (<span id="selectedTotal">$0.00</span>)
                 </button>
                 <button onclick="payAllDue()"
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5 {{ $unpaidCount === 0 ? 'opacity-40 cursor-not-allowed' : '' }}"
+                    class="w-full sm:w-auto justify-center bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 sm:py-2 rounded-xl text-xs transition flex items-center gap-1.5 {{ $unpaidCount === 0 ? 'opacity-40 cursor-not-allowed' : '' }}"
                     {{ $unpaidCount === 0 ? 'disabled' : '' }}>
                     <i class="fa-solid fa-bolt text-[10px]"></i> Pay All Due
                 </button>
@@ -175,8 +175,8 @@
                     </th>
                     <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Lead</th>
                     <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Channel</th>
-                    <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Date</th>
-                    <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Service</th>
+                    <th class="hidden sm:table-cell px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Date</th>
+                    <th class="hidden sm:table-cell px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wider text-[10px]">Service</th>
                     <th class="px-4 py-3 text-right font-bold text-slate-500 uppercase tracking-wider text-[10px]">Fee</th>
                     <th class="px-4 py-3 text-center font-bold text-slate-500 uppercase tracking-wider text-[10px]">Status</th>
                 </tr>
@@ -218,8 +218,8 @@
                             {{ $chIcon }} {{ $chLabel }}
                         </span>
                     </td>
-                    <td class="px-4 py-3 text-slate-500">{{ $lead->created_at->format('M d, Y') }}</td>
-                    <td class="px-4 py-3 text-slate-500">{{ $lead->service && !in_array($lead->service, ['Phone Call','General Inquiry']) ? $lead->service : '—' }}</td>
+                    <td class="hidden sm:table-cell px-4 py-3 text-slate-500">{{ $lead->created_at->format('M d, Y') }}</td>
+                    <td class="hidden sm:table-cell px-4 py-3 text-slate-500">{{ $lead->service && !in_array($lead->service, ['Phone Call','General Inquiry']) ? $lead->service : '—' }}</td>
                     <td class="px-4 py-3 text-right font-bold text-slate-800">${{ number_format($lead->fee, 2) }}</td>
                     <td class="px-4 py-3 text-center">
                         @if($isPaid)

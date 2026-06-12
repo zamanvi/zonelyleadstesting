@@ -38,14 +38,14 @@
 @if(($unpaidBalance ?? 0) > 0)
 <a href="{{ route('seller.billing') }}"
    class="flex items-center justify-between gap-3 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-6 hover:bg-red-100 transition group">
-    <div class="flex items-center gap-3">
-        <i class="fa-solid fa-circle-exclamation text-red-500 text-base"></i>
+    <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-circle-exclamation text-red-500 text-base shrink-0"></i>
         <div>
-            <p class="text-xs font-bold text-red-700">You have ${{ number_format($unpaidBalance, 2) }} in unpaid lead fees</p>
+            <p class="text-xs font-bold text-red-700">${{ number_format($unpaidBalance, 2) }} in unpaid lead fees</p>
             <p class="text-[11px] text-red-400 mt-0.5">{{ $unpaidCount }} lead{{ $unpaidCount > 1 ? 's' : '' }} pending payment</p>
         </div>
     </div>
-    <span class="text-xs font-bold text-red-600 group-hover:underline whitespace-nowrap">Pay now →</span>
+    <span class="text-xs font-bold text-red-600 group-hover:underline whitespace-nowrap shrink-0">Pay now →</span>
 </a>
 @endif
 
