@@ -29,12 +29,19 @@ class LeadController extends Controller
         $leads = $query->paginate(30)->withQueryString();
 
         $stats = [
-            'total'    => Lead::count(),
-            'form'     => Lead::where('source', 'form')->count(),
-            'whatsapp' => Lead::where('source', 'whatsapp')->count(),
-            'email'    => Lead::where('source', 'email')->count(),
-            'paid'     => Lead::whereNotNull('paid_at')->count(),
-            'unpaid'   => Lead::whereNull('paid_at')->count(),
+            'total'           => Lead::count(),
+            'new'             => Lead::where('status', 'new')->count(),
+            'won'             => Lead::where('status', 'won')->count(),
+            'lost'            => Lead::where('status', 'lost')->count(),
+            'form'            => Lead::where('source', 'form')->count(),
+            'phone'           => Lead::where('source', 'phone')->count(),
+            'whatsapp'        => Lead::where('source', 'whatsapp')->count(),
+            'email'           => Lead::where('source', 'email')->count(),
+            'booking'         => Lead::where('source', 'booking')->count(),
+            'paid'            => Lead::whereNotNull('paid_at')->count(),
+            'unpaid'          => Lead::whereNull('paid_at')->count(),
+            'revenue'         => Lead::whereNotNull('paid_at')->sum('fee'),
+            'pending_revenue' => Lead::whereNull('paid_at')->sum('fee'),
         ];
 
         return view('admin.leads.index', compact('leads', 'stats'));
