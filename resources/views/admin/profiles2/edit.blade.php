@@ -167,6 +167,95 @@
                     </div>
                 </div>
 
+                {{-- Working Hours (sellers only) --}}
+                @if($user->type === 'seller')
+                @php
+                    $adminSched    = is_array($user->schedule) ? $user->schedule : (json_decode($user->schedule, true) ?? []);
+                    $adminOhOn     = (bool)($adminSched['show_office_hours'] ?? false);
+                    $adminOh       = $adminSched['office_hours'] ?? null;
+                    $adminOhDays   = ['mon'=>'Mon','tue'=>'Tue','wed'=>'Wed','thu'=>'Thu','fri'=>'Fri','sat'=>'Sat','sun'=>'Sun'];
+                    $adminRtLabels = ['30_min'=>'~30 min','1_hour'=>'~1 hr','4_hours'=>'~4 hrs','24_hours'=>'~24 hrs','48_hours'=>'~2 days'];
+                @endphp
+                <div class="section-card mb-4">
+                    <div class="card-header p-3 d-flex justify-content-between align-items-center"
+                         style="background:#0f766e;color:#fff">
+                        <h6 class="mb-0"><i class="fas fa-business-time me-2"></i>Working Hours</h6>
+                        <span class="badge {{ $adminOhOn && $adminOh ? 'bg-success' : 'bg-secondary' }}">
+                            {{ $adminOhOn && $adminOh ? 'Enabled' : 'Disabled' }}
+                        </span>
+                    </div>
+                    <div class="card-body p-3">
+                        @if(!$adminOhOn || !$adminOh)
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-circle-xmark text-secondary me-1"></i>
+                                Seller has not configured working hours, or they are hidden from the profile.
+                            </p>
+                        @else
+                            {{-- Meta badges --}}
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                @if($adminOh['timezone'] ?? null)
+                                <span class="badge bg-light text-dark border" style="font-size:11px">
+                                    <i class="fas fa-globe me-1 text-secondary"></i>{{ $adminOh['timezone'] }}
+                                </span>
+                                @endif
+                                @if($adminOh['response_time'] ?? null)
+                                <span class="badge bg-light text-dark border" style="font-size:11px">
+                                    <i class="fas fa-bolt me-1 text-warning"></i>
+                                    {{ $adminRtLabels[$adminOh['response_time']] ?? $adminOh['response_time'] }}
+                                </span>
+                                @endif
+                                @if($adminOh['emergency_available'] ?? false)
+                                <span class="badge bg-danger" style="font-size:11px">
+                                    <i class="fas fa-phone me-1"></i>Emergency
+                                </span>
+                                @endif
+                            </div>
+
+                            {{-- Day rows --}}
+                            <div class="border rounded-2 overflow-hidden mb-2">
+                                @foreach($adminOhDays as $dk => $ds)
+                                @php
+                                    $ad      = $adminOh['days'][$dk] ?? null;
+                                    $adOpen  = $ad && ($ad['open'] ?? false);
+                                    $adSlots = $ad['slots'] ?? [];
+                                @endphp
+                                <div class="d-flex align-items-center gap-2 px-3 py-1 border-bottom {{ $loop->last ? 'border-0' : '' }}"
+                                     style="font-size:12px;background:{{ $adOpen ? '#fff' : '#f8fafc' }}">
+                                    <span class="fw-bold text-muted" style="width:28px;flex-shrink:0">{{ $ds }}</span>
+                                    @if($adOpen)
+                                        <span class="badge bg-success" style="font-size:9px;padding:2px 5px">Open</span>
+                                        <span class="text-dark">
+                                            @foreach($adSlots as $asi => $asl)
+                                                @if($asi > 0) <span class="text-muted mx-1">·</span> @endif
+                                                {{ \Carbon\Carbon::createFromTimeString($asl['from'] ?? '00:00')->format('g:i A') }}
+                                                –
+                                                {{ \Carbon\Carbon::createFromTimeString($asl['to'] ?? '00:00')->format('g:i A') }}
+                                            @endforeach
+                                        </span>
+                                    @else
+                                        <span class="text-muted fst-italic">Closed</span>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+
+                            @if($adminOh['note'] ?? null)
+                            <p class="small text-muted mb-2">
+                                <i class="fas fa-circle-info me-1"></i>{{ $adminOh['note'] }}
+                            </p>
+                            @endif
+
+                            @if($user->slug)
+                            <a href="{{ route('service.show', $user->slug) }}" target="_blank"
+                               class="btn btn-sm btn-outline-secondary w-100">
+                                <i class="fas fa-external-link-alt me-1"></i> View Live on Profile
+                            </a>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 {{-- Danger Zone --}}
                 <div class="section-card border border-danger">
                     <div class="card-header bg-danger text-white p-3">
