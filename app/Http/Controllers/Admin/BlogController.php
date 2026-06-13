@@ -32,8 +32,8 @@ class BlogController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'description' => 'required'
+            'name'        => 'required|string|max:255',
+            'description' => 'required|string',
         ]);
         $blogs = Blog::createStore($request);
         if ($blogs) {
@@ -85,6 +85,6 @@ class BlogController extends Controller
             delete_file($blog->image_path);
         }
         $blog->delete();
-        return redirect(route('admin.blogs.create'))->with('warning', 'Blog "' . $name . '" deleted.');
+        return redirect(route('admin.blogs.index'))->with('warning', 'Blog "' . $name . '" deleted.');
     }
 }
