@@ -25,6 +25,65 @@
     $avgRating        = $reviewCount ? round($user->reviews->avg('rating'), 1) : null;
     $schedule         = is_array($user->schedule) ? $user->schedule : (json_decode($user->schedule, true) ?? []);
     $workingDays      = $schedule['working_days'] ?? [];
+    // Working hours display
+    $oh               = $schedule['office_hours'] ?? null;
+    $showOH           = ($schedule['show_office_hours'] ?? false) && $oh && !empty($oh['days']);
+    $ohIsOpen         = false;
+    $ohStatusText     = '';
+    $ohStatusColor    = 'bg-slate-100 text-slate-500';
+    if ($showOH) {
+        try {
+            $ohTz    = $oh['timezone'] ?? 'America/New_York';
+            $now     = \Carbon\Carbon::now($ohTz);
+            $todayK  = strtolower($now->format('D')); // 'mon','tue'...
+            $todayD  = $oh['days'][$todayK] ?? null;
+            if ($todayD && ($todayD['open'] ?? false)) {
+                foreach ($todayD['slots'] ?? [] as $sl) {
+                    $f = \Carbon\Carbon::createFromTimeString($sl['from'] ?? '00:00', $ohTz)->setDateFrom($now);
+                    $t = \Carbon\Carbon::createFromTimeString($sl['to']   ?? '00:00', $ohTz)->setDateFrom($now);
+                    if ($now->between($f, $t)) {
+                        $ohIsOpen = true;
+                        $minsLeft = (int) $now->diffInMinutes($t);
+                        $ohStatusText  = $minsLeft <= 60
+                            ? 'Open · Closes in ' . $minsLeft . ' min'
+                            : 'Open · Closes ' . $t->format('g:i A');
+                        $ohStatusColor = 'bg-emerald-100 text-emerald-700';
+                        break;
+                    }
+                }
+                if (!$ohIsOpen) {
+                    foreach ($todayD['slots'] ?? [] as $sl) {
+                        $f = \Carbon\Carbon::createFromTimeString($sl['from'] ?? '00:00', $ohTz)->setDateFrom($now);
+                        if ($f->gt($now)) {
+                            $ohStatusText  = 'Closed · Opens today ' . $f->format('g:i A');
+                            $ohStatusColor = 'bg-amber-100 text-amber-700';
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!$ohIsOpen && !$ohStatusText) {
+                for ($nd = 1; $nd <= 7; $nd++) {
+                    $nDay  = $now->copy()->addDays($nd);
+                    $nKey  = strtolower($nDay->format('D'));
+                    $nData = $oh['days'][$nKey] ?? null;
+                    if ($nData && ($nData['open'] ?? false) && !empty($nData['slots'])) {
+                        $nf   = \Carbon\Carbon::createFromTimeString($nData['slots'][0]['from'] ?? '09:00', $ohTz)->setDateFrom($nDay);
+                        $lbl  = $nd === 1 ? 'Tomorrow' : $nDay->format('l');
+                        $ohStatusText  = 'Closed · Opens ' . $lbl . ' ' . $nf->format('g:i A');
+                        $ohStatusColor = 'bg-red-100 text-red-600';
+                        break;
+                    }
+                }
+                if (!$ohStatusText) {
+                    $ohStatusText  = 'Currently Closed';
+                    $ohStatusColor = 'bg-red-100 text-red-600';
+                }
+            }
+        } catch (\Exception $e) {
+            $showOH = false;
+        }
+    }
     $allDays          = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     $phone            = $user->contacts->where('type','phone')->first();
     $wa               = $user->contacts->where('type','whatsapp')->first();
@@ -686,6 +745,98 @@
                     </div>
                 </div>
                 @endforeach
+            </div>
+        </section>
+        @endif
+
+        {{-- ── WORKING HOURS ────────────────────────────────────────── --}}
+        @if($showOH)
+        @php
+        $rtLabels = ['30_min'=>'Responds within 30 min','1_hour'=>'Responds within 1 hour','4_hours'=>'Responds within 4 hours','24_hours'=>'Responds within 24 hours','48_hours'=>'Responds within 2 days'];
+        $ohDayNames = ['mon'=>'Monday','tue'=>'Tuesday','wed'=>'Wednesday','thu'=>'Thursday','fri'=>'Friday','sat'=>'Saturday','sun'=>'Sunday'];
+        $ohTodayKey = strtolower(\Carbon\Carbon::now($oh['timezone'] ?? 'America/New_York')->format('D'));
+        @endphp
+        <section>
+            <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+                <h3 class="font-bold text-2xl sm:text-3xl sh">Working Hours</h3>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full {{ $ohStatusColor }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $ohIsOpen ? 'bg-emerald-500' : 'bg-red-400' }} inline-block"></span>
+                    {{ $ohStatusText }}
+                </span>
+            </div>
+
+            <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+                <table class="w-full text-sm">
+                    <tbody>
+                        @foreach($ohDayNames as $key => $name)
+                        @php
+                            $d       = $oh['days'][$key] ?? null;
+                            $isOpen  = $d && ($d['open'] ?? false);
+                            $isToday = $key === $ohTodayKey;
+                        @endphp
+                        <tr class="{{ $isToday ? 'bg-teal-50 border-l-4 border-teal-500' : 'border-l-4 border-transparent' }} border-b border-slate-50 last:border-0">
+                            <td class="px-5 py-3.5 font-{{ $isToday ? 'black' : 'semibold' }} text-{{ $isToday ? 'teal-800' : 'slate-600' }} w-28">
+                                {{ $name }}
+                                @if($isToday)<span class="ml-1.5 text-[10px] font-bold bg-teal-600 text-white px-1.5 py-0.5 rounded-full">Today</span>@endif
+                            </td>
+                            <td class="px-5 py-3.5">
+                                @if($isOpen)
+                                    @php $slots = $d['slots'] ?? []; @endphp
+                                    @if($slots)
+                                        <span class="text-slate-700 font-medium">
+                                            @foreach($slots as $si => $sl)
+                                                @if($si > 0) <span class="text-slate-300 mx-1.5">·</span> @endif
+                                                {{ \Carbon\Carbon::createFromTimeString($sl['from'])->format('g:i A') }}
+                                                <span class="text-slate-400 mx-0.5">–</span>
+                                                {{ \Carbon\Carbon::createFromTimeString($sl['to'])->format('g:i A') }}
+                                            @endforeach
+                                        </span>
+                                    @else
+                                        <span class="text-slate-500">Open</span>
+                                    @endif
+                                @else
+                                    <span class="text-slate-400 italic">Closed</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3.5 text-right w-16">
+                                @if($isOpen)
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                {{-- Footer badges --}}
+                @php
+                    $rt = $oh['response_time'] ?? null;
+                    $emergency = $oh['emergency_available'] ?? false;
+                    $note = trim($oh['note'] ?? '');
+                    $hasBadges = $rt || $emergency || $note;
+                @endphp
+                @if($hasBadges)
+                <div class="px-5 py-3.5 border-t border-slate-100 flex flex-wrap items-center gap-2">
+                    @if($rt && isset($rtLabels[$rt]))
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-bolt text-blue-400 text-[10px]"></i>
+                        {{ $rtLabels[$rt] }}
+                    </span>
+                    @endif
+                    @if($emergency)
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold bg-red-50 text-red-700 border border-red-100 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-phone text-red-400 text-[10px]"></i>
+                        Emergency calls accepted
+                    </span>
+                    @endif
+                    @if($note)
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-circle-info text-slate-400 text-[10px]"></i>
+                        {{ $note }}
+                    </span>
+                    @endif
+                </div>
+                @endif
             </div>
         </section>
         @endif

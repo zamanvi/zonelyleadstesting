@@ -332,6 +332,7 @@ class SellerController extends Controller
     public function scheduleUpdate(Request $request)
     {
         $data = $request->validate([
+            // Booking schedule
             'working_days'       => 'nullable|array',
             'working_days.*'     => 'string|in:mon,tue,wed,thu,fri,sat,sun',
             'periods'            => 'nullable|array|max:10',
@@ -344,6 +345,19 @@ class SellerController extends Controller
             'advance_days'       => 'nullable|integer|min:0|max:365',
             'min_notice_hours'   => 'nullable|integer|min:0|max:72',
             'booking_type'       => 'nullable|in:instant,manual',
+            // Working hours
+            'show_office_hours'                              => 'nullable|boolean',
+            'office_hours'                                   => 'nullable|array',
+            'office_hours.timezone'                          => 'nullable|string|timezone',
+            'office_hours.response_time'                     => 'nullable|in:30_min,1_hour,4_hours,24_hours,48_hours',
+            'office_hours.emergency_available'               => 'nullable|boolean',
+            'office_hours.note'                              => 'nullable|string|max:200',
+            'office_hours.days'                              => 'nullable|array',
+            'office_hours.days.*'                            => 'nullable|array',
+            'office_hours.days.*.open'                       => 'nullable|boolean',
+            'office_hours.days.*.slots'                      => 'nullable|array|max:2',
+            'office_hours.days.*.slots.*.from'               => ['nullable', 'string', 'regex:/^\d{2}:\d{2}$/'],
+            'office_hours.days.*.slots.*.to'                 => ['nullable', 'string', 'regex:/^\d{2}:\d{2}$/'],
         ]);
 
         Auth::user()->update(['schedule' => $data]);

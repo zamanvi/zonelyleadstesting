@@ -167,6 +167,167 @@
                 </div>
             </div>
 
+            {{-- ── WORKING HOURS ──────────────────────────────────────────── --}}
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-6 mb-4">
+                <div class="flex items-start justify-between gap-4 mb-5">
+                    <div>
+                        <h2 class="font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-business-time text-teal-700 text-sm"></i> Working Hours
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Show when you're available on your public profile</p>
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer flex-shrink-0 mt-0.5">
+                        <span class="text-xs font-semibold text-slate-500">Show on profile</span>
+                        <input type="hidden" name="show_office_hours" value="0">
+                        <div class="relative">
+                            <input type="checkbox" name="show_office_hours" value="1"
+                                id="showOfficeHoursToggle" class="sr-only peer"
+                                {{ ($schedule['show_office_hours'] ?? false) ? 'checked' : '' }}
+                                onchange="document.getElementById('officeHoursBody').classList.toggle('hidden',!this.checked)">
+                            <div class="w-11 h-6 bg-slate-200 peer-checked:bg-teal-600 rounded-full transition-colors duration-200"></div>
+                            <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="officeHoursBody" class="{{ ($schedule['show_office_hours'] ?? false) ? '' : 'hidden' }} space-y-5">
+
+                    {{-- Meta row --}}
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1 block">Timezone</label>
+                            @php
+                            $tzList = [
+                                'America/New_York'    => 'Eastern Time (ET)',
+                                'America/Chicago'     => 'Central Time (CT)',
+                                'America/Denver'      => 'Mountain Time (MT)',
+                                'America/Phoenix'     => 'Mountain Time – Arizona',
+                                'America/Los_Angeles' => 'Pacific Time (PT)',
+                                'America/Anchorage'   => 'Alaska Time',
+                                'Pacific/Honolulu'    => 'Hawaii Time',
+                                'America/Puerto_Rico' => 'Atlantic Time',
+                                'Europe/London'       => 'London (GMT/BST)',
+                                'Europe/Paris'        => 'Central European Time',
+                                'Asia/Dubai'          => 'Dubai (GST)',
+                                'Asia/Karachi'        => 'Pakistan (PKT)',
+                                'Asia/Dhaka'          => 'Bangladesh (BST)',
+                                'Asia/Kolkata'        => 'India (IST)',
+                                'Australia/Sydney'    => 'Sydney (AEST)',
+                            ];
+                            $savedTz = $schedule['office_hours']['timezone'] ?? 'America/New_York';
+                            @endphp
+                            <select name="office_hours[timezone]"
+                                class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 bg-white">
+                                @foreach($tzList as $val => $label)
+                                <option value="{{ $val }}" {{ $savedTz === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1 block">Response Time</label>
+                            @php $savedRt = $schedule['office_hours']['response_time'] ?? ''; @endphp
+                            <select name="office_hours[response_time]"
+                                class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['30_min'=>'Within 30 minutes','1_hour'=>'Within 1 hour','4_hours'=>'Within 4 hours','24_hours'=>'Within 24 hours','48_hours'=>'Within 2 days'] as $val=>$lbl)
+                                <option value="{{ $val }}" {{ $savedRt === $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- Emergency + Note --}}
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-2xl cursor-pointer hover:bg-red-100 transition">
+                            <input type="hidden" name="office_hours[emergency_available]" value="0">
+                            <input type="checkbox" name="office_hours[emergency_available]" value="1" id="emergencyAvailable"
+                                {{ ($schedule['office_hours']['emergency_available'] ?? false) ? 'checked' : '' }}
+                                class="w-4 h-4 text-red-600 rounded border-slate-300 focus:ring-red-500">
+                            <div>
+                                <p class="text-sm font-bold text-red-700">Emergency Available</p>
+                                <p class="text-xs text-red-500">24/7 emergency calls accepted</p>
+                            </div>
+                        </label>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1 block">Special Note <span class="font-normal text-slate-400">(optional)</span></label>
+                            <input type="text" name="office_hours[note]"
+                                value="{{ $schedule['office_hours']['note'] ?? '' }}"
+                                placeholder="e.g. Closed public holidays"
+                                class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 bg-white">
+                        </div>
+                    </div>
+
+                    {{-- Day-by-day schedule --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Weekly Schedule</label>
+                            <button type="button" onclick="copyWeekdays()"
+                                class="text-xs font-bold text-teal-600 hover:text-teal-800 transition">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy Mon → Weekdays
+                            </button>
+                        </div>
+                        <div class="space-y-2">
+                            @php
+                            $ohDays = ['mon'=>'Mon','tue'=>'Tue','wed'=>'Wed','thu'=>'Thu','fri'=>'Fri','sat'=>'Sat','sun'=>'Sun'];
+                            $defaultOpen = ['mon'=>true,'tue'=>true,'wed'=>true,'thu'=>true,'fri'=>true,'sat'=>false,'sun'=>false];
+                            @endphp
+                            @foreach($ohDays as $dayKey => $dayShort)
+                            @php
+                                $dayData = $schedule['office_hours']['days'][$dayKey] ?? null;
+                                $isDayOpen = (bool)($dayData['open'] ?? $defaultOpen[$dayKey]);
+                                $slots = $dayData['slots'] ?? [['from'=>'09:00','to'=>'17:00']];
+                            @endphp
+                            <div class="oh-day-row flex items-center gap-2 sm:gap-3 bg-slate-50 rounded-2xl border border-slate-200 px-3 py-2.5" data-day="{{ $dayKey }}">
+                                {{-- Day label --}}
+                                <div class="w-8 text-xs font-black text-slate-500 shrink-0">{{ $dayShort }}</div>
+                                {{-- Toggle --}}
+                                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                    <input type="hidden" name="office_hours[days][{{ $dayKey }}][open]" value="0">
+                                    <input type="checkbox" name="office_hours[days][{{ $dayKey }}][open]" value="1"
+                                        class="sr-only peer oh-day-toggle"
+                                        {{ $isDayOpen ? 'checked' : '' }}
+                                        onchange="ohToggleDay(this,'{{ $dayKey }}')">
+                                    <div class="w-9 h-5 bg-slate-200 peer-checked:bg-teal-600 rounded-full transition-colors duration-200"></div>
+                                    <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-4"></div>
+                                </label>
+                                {{-- Status label --}}
+                                <span class="oh-day-label text-xs font-bold w-10 shrink-0 {{ $isDayOpen ? 'text-teal-700' : 'text-slate-400' }}">
+                                    {{ $isDayOpen ? 'Open' : 'Closed' }}
+                                </span>
+                                {{-- Slots --}}
+                                <div class="oh-slots flex flex-wrap items-center gap-1.5 flex-1 {{ $isDayOpen ? '' : 'hidden' }}" id="ohSlots-{{ $dayKey }}">
+                                    @foreach($slots as $si => $slot)
+                                    <div class="oh-slot-pair flex items-center gap-1">
+                                        <input type="time" name="office_hours[days][{{ $dayKey }}][slots][{{ $si }}][from]"
+                                            value="{{ $slot['from'] ?? '09:00' }}"
+                                            class="px-2 py-1 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-teal-600 bg-white w-[7rem]">
+                                        <span class="text-slate-400 text-xs">–</span>
+                                        <input type="time" name="office_hours[days][{{ $dayKey }}][slots][{{ $si }}][to]"
+                                            value="{{ $slot['to'] ?? '17:00' }}"
+                                            class="px-2 py-1 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-teal-600 bg-white w-[7rem]">
+                                        @if($si > 0)
+                                        <button type="button" onclick="ohRemoveSlot(this,'{{ $dayKey }}')"
+                                            class="text-slate-300 hover:text-red-400 text-xs px-1">
+                                            <i class="fa-solid fa-times"></i>
+                                        </button>
+                                        @endif
+                                    </div>
+                                    @endforeach
+                                    @if(count($slots) < 2)
+                                    <button type="button" onclick="ohAddSplit('{{ $dayKey }}')"
+                                        class="oh-add-split text-xs font-bold text-slate-400 hover:text-teal-600 transition px-1 whitespace-nowrap">
+                                        + split
+                                    </button>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-4 rounded-2xl text-base transition">
                 <i class="fa-solid fa-floppy-disk mr-2"></i> Save Schedule
             </button>
@@ -247,6 +408,84 @@ function removePeriod(btn) {
     block.remove();
     updatePreview();
 }
+
+// ── Working Hours JS ──────────────────────────────────────────────────
+function ohToggleDay(checkbox, day) {
+    const row   = checkbox.closest('.oh-day-row');
+    const slots = document.getElementById('ohSlots-' + day);
+    const label = row.querySelector('.oh-day-label');
+    if (checkbox.checked) {
+        slots.classList.remove('hidden');
+        label.textContent = 'Open';
+        label.className = 'oh-day-label text-xs font-bold w-10 shrink-0 text-teal-700';
+    } else {
+        slots.classList.add('hidden');
+        label.textContent = 'Closed';
+        label.className = 'oh-day-label text-xs font-bold w-10 shrink-0 text-slate-400';
+    }
+}
+
+function ohAddSplit(day) {
+    const slots  = document.getElementById('ohSlots-' + day);
+    const addBtn = slots.querySelector('.oh-add-split');
+    const count  = slots.querySelectorAll('.oh-slot-pair').length;
+    const html = `
+        <div class="oh-slot-pair flex items-center gap-1">
+            <input type="time" name="office_hours[days][${day}][slots][${count}][from]"
+                value="13:00"
+                class="px-2 py-1 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-teal-600 bg-white w-[7rem]">
+            <span class="text-slate-400 text-xs">–</span>
+            <input type="time" name="office_hours[days][${day}][slots][${count}][to]"
+                value="17:00"
+                class="px-2 py-1 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-teal-600 bg-white w-[7rem]">
+            <button type="button" onclick="ohRemoveSlot(this,'${day}')"
+                class="text-slate-300 hover:text-red-400 text-xs px-1">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>`;
+    if (addBtn) { addBtn.insertAdjacentHTML('beforebegin', html); addBtn.remove(); }
+    else        { slots.insertAdjacentHTML('beforeend', html); }
+}
+
+function ohRemoveSlot(btn, day) {
+    btn.closest('.oh-slot-pair').remove();
+    const slots = document.getElementById('ohSlots-' + day);
+    if (!slots.querySelector('.oh-add-split')) {
+        slots.insertAdjacentHTML('beforeend',
+            `<button type="button" onclick="ohAddSplit('${day}')"
+                class="oh-add-split text-xs font-bold text-slate-400 hover:text-teal-600 transition px-1 whitespace-nowrap">
+                + split</button>`);
+    }
+}
+
+function copyWeekdays() {
+    const monSlotsDiv = document.getElementById('ohSlots-mon');
+    const monToggle   = document.querySelector('input[name="office_hours[days][mon][open]"][type="checkbox"]');
+    const isOpen      = monToggle && monToggle.checked;
+    const fromInputs  = monSlotsDiv ? [...monSlotsDiv.querySelectorAll('input[type="time"]')] : [];
+
+    ['tue','wed','thu','fri'].forEach(day => {
+        const toggle = document.querySelector(`input[name="office_hours[days][${day}][open]"][type="checkbox"]`);
+        if (!toggle) return;
+        toggle.checked = isOpen;
+        ohToggleDay(toggle, day);
+
+        const slotsDiv = document.getElementById('ohSlots-' + day);
+        if (!slotsDiv) return;
+        // Remove extra split slots, keep only first pair
+        slotsDiv.querySelectorAll('.oh-slot-pair:not(:first-child)').forEach(p => p.remove());
+        if (!slotsDiv.querySelector('.oh-add-split')) {
+            slotsDiv.insertAdjacentHTML('beforeend',
+                `<button type="button" onclick="ohAddSplit('${day}')"
+                    class="oh-add-split text-xs font-bold text-slate-400 hover:text-teal-600 transition px-1 whitespace-nowrap">
+                    + split</button>`);
+        }
+        // Copy time values
+        const dayInputs = [...slotsDiv.querySelectorAll('input[type="time"]')];
+        fromInputs.forEach((src, i) => { if (dayInputs[i]) dayInputs[i].value = src.value; });
+    });
+}
+// ── End Working Hours JS ────────────────────────────────────────────────
 
 function updatePreview() {
     const slots = [];
