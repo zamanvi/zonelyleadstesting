@@ -125,15 +125,6 @@
                        style="min-height:unset;">
                         View Profile
                     </a>
-                    @auth
-                    @if(auth()->user()->type === 'user')
-                    <a href="{{ route('buyer.book', $user->slug ?? $user->id) }}"
-                       class="bg-teal-50 hover:bg-teal-100 text-teal-700 px-3 py-2.5 rounded-xl text-xs font-bold transition shrink-0"
-                       style="min-height:unset;" title="Book">
-                        <i class="fa-solid fa-calendar-plus"></i>
-                    </a>
-                    @endif
-                    @endauth
                 </div>
             </div>
 
