@@ -774,8 +774,8 @@
                             $isOpen  = $d && ($d['open'] ?? false);
                             $isToday = $key === $ohTodayKey;
                         @endphp
-                        <tr class="{{ $isToday ? 'bg-teal-50 border-l-4 border-teal-500' : 'border-l-4 border-transparent' }} border-b border-slate-50 last:border-0">
-                            <td class="px-5 py-3.5 font-{{ $isToday ? 'black' : 'semibold' }} text-{{ $isToday ? 'teal-800' : 'slate-600' }} w-28">
+                        <tr class="{{ $isToday ? 'bg-teal-50 border-l-4 border-teal-500' : 'border-l-4 border-transparent' }} border-b border-slate-50 last:border-b-0">
+                            <td class="px-5 py-3.5 w-28 {{ $isToday ? 'font-black text-teal-800' : 'font-semibold text-slate-600' }}">
                                 {{ $name }}
                                 @if($isToday)<span class="ml-1.5 text-[10px] font-bold bg-teal-600 text-white px-1.5 py-0.5 rounded-full">Today</span>@endif
                             </td>
@@ -786,9 +786,9 @@
                                         <span class="text-slate-700 font-medium">
                                             @foreach($slots as $si => $sl)
                                                 @if($si > 0) <span class="text-slate-300 mx-1.5">·</span> @endif
-                                                {{ \Carbon\Carbon::createFromTimeString($sl['from'])->format('g:i A') }}
+                                                {{ \Carbon\Carbon::createFromTimeString($sl['from'] ?? '00:00')->format('g:i A') }}
                                                 <span class="text-slate-400 mx-0.5">–</span>
-                                                {{ \Carbon\Carbon::createFromTimeString($sl['to'])->format('g:i A') }}
+                                                {{ \Carbon\Carbon::createFromTimeString($sl['to'] ?? '00:00')->format('g:i A') }}
                                             @endforeach
                                         </span>
                                     @else
