@@ -135,6 +135,7 @@ class HomeController extends Controller
         $categories = Category::where('is_active', true)->whereNull('parent_id')->withCount('children')->take(8)->get();
         $featuredReviews = \App\Models\Review::with('reviewer:id,name,profile_photo', 'seller:id,name,slug,title,designation')
             ->where('rating', '>=', 4)
+            ->whereNotNull('reviewer_id')
             ->latest()
             ->take(6)
             ->get();
@@ -381,18 +382,22 @@ class HomeController extends Controller
         NotificationService::newLead($lead);
 
         // Send email to seller
-        \Mail::raw(
-            "New email inquiry from {$request->name} via Zonely!\n\n"
-            . "Name: {$request->name}\n"
-            . "Email: {$request->email}\n"
-            . ($request->phone ? "Phone: {$request->phone}\n" : '')
-            . "Message: {$request->message}\n\n"
-            . "View lead: " . route('seller.dashboard'),
-            function ($m) use ($seller, $request) {
-                $m->to($seller->email)
-                  ->subject("New Inquiry from {$request->name} — Zonely");
-            }
-        );
+        try {
+            \Mail::raw(
+                "New email inquiry from {$request->name} via Zonely!\n\n"
+                . "Name: {$request->name}\n"
+                . "Email: {$request->email}\n"
+                . ($request->phone ? "Phone: {$request->phone}\n" : '')
+                . "Message: {$request->message}\n\n"
+                . "View lead: " . route('seller.dashboard'),
+                function ($m) use ($seller, $request) {
+                    $m->to($seller->email)
+                      ->subject("New Inquiry from {$request->name} — Zonely");
+                }
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Email inquiry mail failed: ' . $e->getMessage());
+        }
 
         // SMS alert
         if ($seller->twilio_enabled && $seller->phone) {

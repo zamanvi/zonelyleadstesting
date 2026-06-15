@@ -168,6 +168,25 @@ class ProfileController extends Controller
 
     public function profileUpdateDashboard(Request $request)
     {
+        $request->validate([
+            'name'                => 'nullable|string|max:255',
+            'phone'               => 'nullable|string|max:50',
+            'whatsapp'            => 'nullable|string|max:50',
+            'bio'                 => 'nullable|string|max:5000',
+            'about'               => 'nullable|string|max:10000',
+            'work_address'        => 'nullable|string|max:500',
+            'designation'         => 'nullable|string|max:255',
+            'business_name'       => 'nullable|string|max:255',
+            'seller_service_type' => 'nullable|string|max:255',
+            'experience'          => 'nullable|string|max:255',
+            'country'             => 'nullable|string|max:100',
+            'state'               => 'nullable|string|max:100',
+            'city'                => 'nullable|string|max:100',
+            'zip_code'            => 'nullable|string|max:20',
+            'tags'                => 'nullable|string|max:500',
+            'show_phone'          => 'nullable|boolean',
+        ]);
+
         $allowed = ['name', 'phone', 'whatsapp', 'bio', 'about', 'work_address',
                     'designation', 'business_name', 'seller_service_type', 'experience',
                     'country', 'state', 'city', 'zip_code', 'tags', 'show_phone'];

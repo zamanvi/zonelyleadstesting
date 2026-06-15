@@ -268,6 +268,10 @@ class HuntBotController extends Controller
 
     public function updateLeadStatus(Request $request, HuntLead $lead)
     {
+        $actor = auth()->user();
+        if (!in_array($actor->type, ['admin', 'coo']) && $lead->campaign->created_by !== $actor->id) {
+            abort(403, 'You do not have permission to update this lead.');
+        }
         $request->validate(['status' => 'required|in:found,selected,contacted,replied,registered,skipped']);
         $old = $lead->status;
         $lead->update(['status' => $request->status]);

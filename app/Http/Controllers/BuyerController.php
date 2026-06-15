@@ -181,6 +181,11 @@ class BuyerController extends Controller
     public function review($sellerId)
     {
         $seller  = User::where('id', $sellerId)->where('type', 'seller')->firstOrFail();
+        $buyer   = Auth::user();
+        abort_unless(
+            Lead::where('seller_id', $seller->id)->where('email', $buyer->email)->exists(),
+            403, 'You can only review sellers you have interacted with.'
+        );
         $booking = (object)[
             'id'        => $sellerId,
             'date'      => now(),
@@ -194,6 +199,11 @@ class BuyerController extends Controller
     public function reviewStore(Request $request, $sellerId)
     {
         $seller = User::where('id', $sellerId)->where('type', 'seller')->firstOrFail();
+        $buyer  = Auth::user();
+        abort_unless(
+            Lead::where('seller_id', $seller->id)->where('email', $buyer->email)->exists(),
+            403, 'You can only review sellers you have interacted with.'
+        );
 
         $data = $request->validate([
             'rating' => 'required|integer|min:1|max:5',

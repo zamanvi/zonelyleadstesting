@@ -215,31 +215,32 @@ class SellerController extends Controller
 
     public function billing()
     {
-        $user     = Auth::user();
-        $period   = request('period', 'month');
-        $allLeads = $user->leads()->latest()->get();
+        $user   = Auth::user();
+        $period = request('period', 'month');
 
-        $periodLeads = match($period) {
-            'today' => $allLeads->filter(fn($l) => $l->created_at->isToday()),
-            'week'  => $allLeads->filter(fn($l) => $l->created_at->isCurrentWeek()),
-            'year'  => $allLeads->filter(fn($l) => $l->created_at->isCurrentYear()),
-            default => $allLeads->filter(fn($l) => $l->created_at->isCurrentMonth()),
+        $periodQuery = match($period) {
+            'today' => $user->leads()->whereDate('created_at', today()),
+            'week'  => $user->leads()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'year'  => $user->leads()->whereYear('created_at', now()->year),
+            default => $user->leads()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
         };
+
+        $allLeads    = $user->leads()->latest()->get();
+        $periodLeads = $periodQuery->get();
 
         $stateId   = \App\Models\State::where('title', $user->state)->value('id');
         $cityId    = \App\Models\City::where('title', $user->city)->value('id');
         $threshold = (int) PlatformCharge::resolve('lead_threshold', $user->category_id, $stateId, $cityId);
 
-        $unpaidAll = $allLeads->whereNull('paid_at');
         $balance = [
-            'unpaid'       => $unpaidAll->sum('fee'),
-            'unpaid_count' => $unpaidAll->count(),
-            'total_paid'   => $allLeads->whereNotNull('paid_at')->sum('fee'),
-            'total_billed' => $allLeads->sum('fee'),
-            'total_leads'  => $allLeads->count(),
-            'period_billed'=> $periodLeads->sum('fee'),
-            'period_paid'  => $periodLeads->whereNotNull('paid_at')->sum('fee'),
-            'period_count' => $periodLeads->count(),
+            'unpaid'        => $user->leads()->whereNull('paid_at')->sum('fee'),
+            'unpaid_count'  => $user->leads()->whereNull('paid_at')->count(),
+            'total_paid'    => $user->leads()->whereNotNull('paid_at')->sum('fee'),
+            'total_billed'  => $user->leads()->sum('fee'),
+            'total_leads'   => $user->leads()->count(),
+            'period_billed' => $periodQuery->sum('fee'),
+            'period_paid'   => (clone $periodQuery)->whereNotNull('paid_at')->sum('fee'),
+            'period_count'  => $periodLeads->count(),
         ];
 
         return view('frontend.seller.billing', compact('allLeads', 'balance', 'period', 'threshold'));

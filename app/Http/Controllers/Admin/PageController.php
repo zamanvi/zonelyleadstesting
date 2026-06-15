@@ -222,33 +222,37 @@ class PageController extends Controller
             $supportWhatsapp = Setting::get('support_whatsapp', '');
             $waLink          = $supportWhatsapp ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $supportWhatsapp) : null;
 
-            if (!$newStatus) {
-                // Account disabled
-                Mail::raw(
-                    "Hi {$user->name},\n\n"
-                    . "Your Zonely seller account has been temporarily suspended by our admin team.\n\n"
-                    . "This may be due to incomplete profile information, a policy concern, or a routine review. "
-                    . "Please contact us immediately so we can resolve this quickly.\n\n"
-                    . "Contact us:\n"
-                    . "📧 Email: {$supportEmail}\n"
-                    . ($waLink ? "💬 WhatsApp: {$supportWhatsapp}\n" : '')
-                    . "\nWe aim to resolve all account issues within 24 hours.\n\n"
-                    . "— Zonely Admin Team",
-                    fn($m) => $m->to($user->email)->subject('Your Zonely Account Has Been Suspended')
-                );
-            } else {
-                // Account re-enabled
-                Mail::raw(
-                    "Hi {$user->name},\n\n"
-                    . "Great news! Your Zonely seller account has been reactivated and is now live again.\n\n"
-                    . "Your profile is visible to buyers and you can start receiving leads immediately.\n\n"
-                    . "If you have any questions, feel free to contact us:\n"
-                    . "📧 Email: {$supportEmail}\n"
-                    . ($waLink ? "💬 WhatsApp: {$supportWhatsapp}\n" : '')
-                    . "\nWelcome back!\n\n"
-                    . "— Zonely Admin Team",
-                    fn($m) => $m->to($user->email)->subject('Your Zonely Account Has Been Reactivated')
-                );
+            try {
+                if (!$newStatus) {
+                    // Account disabled
+                    Mail::raw(
+                        "Hi {$user->name},\n\n"
+                        . "Your Zonely seller account has been temporarily suspended by our admin team.\n\n"
+                        . "This may be due to incomplete profile information, a policy concern, or a routine review. "
+                        . "Please contact us immediately so we can resolve this quickly.\n\n"
+                        . "Contact us:\n"
+                        . "📧 Email: {$supportEmail}\n"
+                        . ($waLink ? "💬 WhatsApp: {$supportWhatsapp}\n" : '')
+                        . "\nWe aim to resolve all account issues within 24 hours.\n\n"
+                        . "— Zonely Admin Team",
+                        fn($m) => $m->to($user->email)->subject('Your Zonely Account Has Been Suspended')
+                    );
+                } else {
+                    // Account re-enabled
+                    Mail::raw(
+                        "Hi {$user->name},\n\n"
+                        . "Great news! Your Zonely seller account has been reactivated and is now live again.\n\n"
+                        . "Your profile is visible to buyers and you can start receiving leads immediately.\n\n"
+                        . "If you have any questions, feel free to contact us:\n"
+                        . "📧 Email: {$supportEmail}\n"
+                        . ($waLink ? "💬 WhatsApp: {$supportWhatsapp}\n" : '')
+                        . "\nWelcome back!\n\n"
+                        . "— Zonely Admin Team",
+                        fn($m) => $m->to($user->email)->subject('Your Zonely Account Has Been Reactivated')
+                    );
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Seller status email failed: ' . $e->getMessage());
             }
         }
 

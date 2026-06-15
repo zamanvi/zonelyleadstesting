@@ -68,6 +68,10 @@ class BlogController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
         $blog = Blog::findOrFail($id);
         $name = $blog->name;
         Blog::updateStore($request, $id);
