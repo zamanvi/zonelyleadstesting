@@ -354,8 +354,9 @@ class PageController extends Controller
     public function leadMarkPaid($id)
     {
         $lead = Lead::findOrFail($id);
-        $lead->update(['paid_at' => $lead->paid_at ? null : now()]);
-        return back()->with('success', $lead->paid_at ? 'Lead marked as paid.' : 'Lead marked as unpaid.');
+        $newPaidAt = $lead->paid_at ? null : now();
+        $lead->update(['paid_at' => $newPaidAt]);
+        return back()->with('success', $newPaidAt ? 'Lead marked as paid.' : 'Lead marked as unpaid.');
     }
 
     public function leadDestroy($id)

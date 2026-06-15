@@ -41,7 +41,8 @@ class CategoryController extends Controller
         Category::create([
             'title'     => $validated['title'],
             'slug'      => $slug,
-            'parent_id' => $validated['parent_id'],
+            'parent_id' => $validated['parent_id'] ?? null,
+            'is_active' => true,
         ]);
         return redirect()->route('admin.categories.index')
                          ->with('success', 'Category created successfully');

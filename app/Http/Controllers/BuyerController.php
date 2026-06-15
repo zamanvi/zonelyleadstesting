@@ -280,7 +280,7 @@ class BuyerController extends Controller
 
         // Only allow buyer who made the booking to see confirmation
         $user = Auth::user();
-        if ($lead->email && $lead->email !== $user->email) {
+        if (!$lead->email || $lead->email !== $user->email) {
             abort(403);
         }
 

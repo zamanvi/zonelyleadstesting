@@ -230,7 +230,7 @@ class HomeController extends Controller
             ->with(['services', 'category', 'reviews'])
             ->firstOrFail();
 
-        (new \App\Services\OgImageService())->render($user);
+        return (new \App\Services\OgImageService())->render($user);
     }
 
     function serviceInquiry(Request $request, $slug)
