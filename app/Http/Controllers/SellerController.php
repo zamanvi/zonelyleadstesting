@@ -279,23 +279,37 @@ class SellerController extends Controller
             return response()->json(['error' => 'Missing data'], 422);
         }
 
-        $leads = Lead::whereIn('id', $ids)
-            ->where('seller_id', Auth::id())
-            ->whereNull('paid_at')
-            ->get();
-
-        if ($leads->isEmpty()) {
-            return response()->json(['error' => 'No valid leads'], 422);
+        // Check PayPal order hasn't already been used (replay attack prevention)
+        if (Lead::where('paypal_order_id', $orderId)->exists()) {
+            return response()->json(['error' => 'Payment already processed'], 422);
         }
 
-        $total    = $leads->sum('fee');
-        $verified = $this->verifyPayPalOrder($orderId, $total);
-        if (!$verified) {
-            return response()->json(['error' => 'PayPal payment verification failed'], 422);
+        $result = \Illuminate\Support\Facades\DB::transaction(function () use ($ids, $orderId) {
+            $leads = Lead::whereIn('id', $ids)
+                ->where('seller_id', Auth::id())
+                ->whereNull('paid_at')
+                ->lockForUpdate()
+                ->get();
+
+            if ($leads->isEmpty()) {
+                return ['error' => 'No valid leads'];
+            }
+
+            $total    = $leads->sum('fee');
+            $verified = $this->verifyPayPalOrder($orderId, $total);
+            if (!$verified) {
+                return ['error' => 'PayPal payment verification failed'];
+            }
+
+            $leads->each(fn($l) => $l->update(['paid_at' => now(), 'paypal_order_id' => $orderId]));
+            return ['ok' => true, 'paid' => $leads->count(), 'fee' => $total];
+        });
+
+        if (isset($result['error'])) {
+            return response()->json(['error' => $result['error']], 422);
         }
 
-        $leads->each(fn($l) => $l->update(['paid_at' => now(), 'paypal_order_id' => $orderId]));
-        NotificationService::paymentReceived(Auth::user(), $leads->sum('fee'), $leads->count());
+        NotificationService::paymentReceived(Auth::user(), $result['fee'], $result['paid']);
 
         return response()->json(['ok' => true, 'paid' => $leads->count()]);
     }
@@ -453,7 +467,7 @@ class SellerController extends Controller
 
     public function leadStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:won,lost,pending,new']);
+        $request->validate(['status' => 'required|in:new,pending,won,lost,closed']);
         Lead::where('id', $id)->where('seller_id', Auth::id())->update(['status' => $request->status]);
         return response()->json(['success' => true]);
     }

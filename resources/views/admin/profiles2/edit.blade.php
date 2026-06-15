@@ -32,7 +32,7 @@
                 {{-- Avatar card --}}
                 <div class="section-card mb-4 text-center p-4">
                     @if($user->profile_photo)
-                    <img src="{{ asset($user->profile_photo) }}"
+                    <img src="{{ get_file($user->profile_photo, 'user') }}"
                          onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=120&background=0ea5e9&color=fff'"
                          class="rounded-circle mb-3" width="100" height="100" style="object-fit:cover">
                     @else

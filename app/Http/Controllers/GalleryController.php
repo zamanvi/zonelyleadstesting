@@ -47,6 +47,16 @@ class GalleryController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
+        // Delete actual file from R2 or local storage
+        if ($photo->image_path) {
+            if (str_starts_with($photo->image_path, 'http')) {
+                $key = ltrim(parse_url($photo->image_path, PHP_URL_PATH), '/');
+                \Illuminate\Support\Facades\Storage::disk('r2')->delete($key);
+            } else {
+                delete_file($photo->image_path);
+            }
+        }
+
         $photo->delete();
 
         return back()->with('success', 'Photo removed.');

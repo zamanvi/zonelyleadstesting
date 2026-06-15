@@ -130,27 +130,29 @@ class BuyerController extends Controller
         $seller   = User::findOrFail($data['seller_id']);
         $schedule = $seller->schedule ?? [];
 
-        // Enforce max bookings per day
+        // Enforce max bookings per day (lockForUpdate prevents overbooking race condition)
         $maxPerDay = (int) ($schedule['max_per_day'] ?? 4);
         $dayCount  = Lead::where('seller_id', $seller->id)
             ->where('service', 'like', 'Booking: ' . $data['selected_date'] . ' %')
             ->whereNotIn('status', ['lost', 'closed'])
+            ->lockForUpdate()
             ->count();
 
         if ($dayCount >= $maxPerDay) {
             return back()->withErrors(['selected_date' => 'No more slots available on this date.'])->withInput();
         }
 
-        // Enforce min notice hours
+        // Enforce min notice hours (parse in seller's timezone if set)
         $minNotice = (int) ($schedule['min_notice_hours'] ?? 2);
-        $slotDt    = \Carbon\Carbon::parse($data['selected_date'] . ' ' . $data['selected_slot']);
-        if ($slotDt->lt(now()->addHours($minNotice))) {
+        $sellerTz  = $schedule['office_hours']['timezone'] ?? config('app.timezone');
+        $slotDt    = \Carbon\Carbon::parse($data['selected_date'] . ' ' . $data['selected_slot'], $sellerTz);
+        if ($slotDt->lt(now($sellerTz)->addHours($minNotice))) {
             return back()->withErrors(['selected_slot' => 'This slot requires at least ' . $minNotice . ' hour(s) advance notice.'])->withInput();
         }
 
         // Enforce advance booking window
         $advanceDays = (int) ($schedule['advance_days'] ?? 30);
-        if ($slotDt->gt(now()->addDays($advanceDays))) {
+        if ($slotDt->gt(now($sellerTz)->addDays($advanceDays))) {
             return back()->withErrors(['selected_date' => 'Bookings can only be made up to ' . $advanceDays . ' days in advance.'])->withInput();
         }
 

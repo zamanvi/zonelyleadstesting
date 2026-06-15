@@ -350,7 +350,7 @@ class PageController extends Controller
 
     public function leadUpdateStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:new,pending,won,lost']);
+        $request->validate(['status' => 'required|in:new,pending,won,lost,closed']);
         Lead::findOrFail($id)->update(['status' => $request->status]);
         return back()->with('success', 'Lead status updated.');
     }

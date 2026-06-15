@@ -19,7 +19,7 @@
   "datePublished": "{{ $blog->created_at?->toIso8601String() }}",
   "dateModified": "{{ $blog->updated_at?->toIso8601String() }}",
   @if($blog->image_path ?? false)
-  "image": "{{ asset($blog->image_path) }}",
+  "image": "{{ get_file($blog->image_path, 'blog') }}",
   @endif
   "publisher": {
     "@type": "Organization",

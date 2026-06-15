@@ -120,7 +120,7 @@
                                     </div>
                                     <div class="d-flex align-items-center gap-1">
                                         <span class="text-muted" style="font-size:11px;font-weight:600;min-width:64px">PASSWORD</span>
-                                        <code class="bg-white px-2 py-1 rounded border small" id="pwd_{{ $manager->id }}">{{ $profile->plain_password }}</code>
+                                        <code class="bg-white px-2 py-1 rounded border small" id="pwd_{{ $manager->id }}">{{ try_decrypt($profile->plain_password) }}</code>
                                         <button class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="copyText('pwd_{{ $manager->id }}')" title="Copy"><i class="fas fa-copy" style="font-size:11px"></i></button>
                                     </div>
                                     <div class="d-flex align-items-center gap-1">

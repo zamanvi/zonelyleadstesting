@@ -72,7 +72,7 @@
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-2">
                                 @if($seller->profile_photo)
-                                <img src="{{ asset($seller->profile_photo) }}"
+                                <img src="{{ get_file($seller->profile_photo, 'user') }}"
                                      onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($seller->name) }}&size=36&background=0ea5e9&color=fff'"
                                      width="36" height="36" class="rounded-circle object-fit-cover">
                                 @else

@@ -71,7 +71,7 @@ class ManagerController extends Controller
             'modules'        => $isGeneral ? [] : $request->modules,
             'status'         => 'active',
             'notes'          => $request->notes,
-            'plain_password' => $request->password,
+            'plain_password' => encrypt($request->password),
             'login_url'      => $loginUrl,
         ]);
 
@@ -118,7 +118,7 @@ class ManagerController extends Controller
 
         if ($request->filled('password')) {
             $manager->update(['password' => Hash::make($request->password)]);
-            $profileData['plain_password'] = $request->password;
+            $profileData['plain_password'] = encrypt($request->password);
         }
 
         $manager->managerProfile()->updateOrCreate(

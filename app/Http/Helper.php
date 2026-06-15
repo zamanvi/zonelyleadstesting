@@ -127,3 +127,15 @@ if (!function_exists('empty_image')) {
         };
     }
 }
+
+if (!function_exists('try_decrypt')) {
+    function try_decrypt(?string $value): string
+    {
+        if (!$value) return '';
+        try {
+            return decrypt($value);
+        } catch (\Throwable $e) {
+            return $value; // already plaintext (legacy records)
+        }
+    }
+}

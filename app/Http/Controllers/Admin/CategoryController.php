@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -71,7 +72,7 @@ class CategoryController extends Controller
             'title'     => 'required|string|max:255',
             'slug'      => 'nullable|string|max:255',
             'is_active' => 'nullable|boolean',
-            'parent_id' => 'nullable|exists:categories,id',
+            'parent_id' => ['nullable', Rule::exists('categories', 'id')->whereNot('id', $category->id)],
         ]);
 
         // If slug is changed, regenerate unique slug

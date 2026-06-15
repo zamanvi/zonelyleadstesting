@@ -47,7 +47,7 @@ class Blog extends Model
             }
             $image = upload_file($request->file('image_path'));
         }
-        $slug = $request->slug != null ? make_slug($request->slug) : make_slug($request->name) . '-' . get_random_number(10);
+        $slug = $request->slug ? make_slug($request->slug) : ($blog->slug ?: make_slug($request->name));
         if ($slug != $blog->slug) {
             while (self::where('slug', $slug)->exists()) {
                 $slug = set_increment_slug(Blog::class, $slug);
