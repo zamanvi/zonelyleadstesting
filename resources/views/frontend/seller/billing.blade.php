@@ -220,7 +220,7 @@
                         <a href="{{ route('seller.lead.detail', $lead->id) }}"
                            class="font-bold text-teal-700 hover:underline text-xs">#ZL-{{ $lead->id }}</a>
                         <p class="text-slate-400 text-[11px] mt-0.5">
-                            {{ ($lead->name && $lead->name !== 'Phone Lead') ? $lead->name : 'Phone lead' }}
+                            {{ ($lead->name && !in_array($lead->name, ['Phone Lead','WhatsApp Lead'])) ? $lead->name : ucfirst($source) . ' lead' }}
                         </p>
                     </td>
                     <td class="px-4 py-3">
@@ -229,7 +229,7 @@
                         </span>
                     </td>
                     <td class="hidden sm:table-cell px-4 py-3 text-slate-500">{{ $lead->created_at->format('M d, Y') }}</td>
-                    <td class="hidden sm:table-cell px-4 py-3 text-slate-500">{{ $lead->service && !in_array($lead->service, ['Phone Call','General Inquiry']) ? $lead->service : '—' }}</td>
+                    <td class="hidden sm:table-cell px-4 py-3 text-slate-500">{{ $lead->service && !in_array($lead->service, ['Phone Call','General Inquiry','WhatsApp Click']) ? $lead->service : '—' }}</td>
                     <td class="px-4 py-3 text-right font-bold text-slate-800">${{ number_format($lead->fee, 2) }}</td>
                     <td class="px-4 py-3 text-center">
                         @if($isPaid)

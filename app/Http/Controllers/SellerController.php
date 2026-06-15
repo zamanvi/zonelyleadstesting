@@ -311,7 +311,7 @@ class SellerController extends Controller
 
         NotificationService::paymentReceived(Auth::user(), $result['fee'], $result['paid']);
 
-        return response()->json(['ok' => true, 'paid' => $leads->count()]);
+        return response()->json(['ok' => true, 'paid' => $result['paid']]);
     }
 
     private function verifyPayPalOrder(string $orderId, float $expectedAmount): bool
