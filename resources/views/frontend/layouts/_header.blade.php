@@ -52,9 +52,25 @@
             {{-- DESKTOP AUTH --}}
             <div class="hidden lg:flex items-center gap-3">
                 @auth
-                <a href="{{ route('dashboard') }}" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-xl text-xs font-bold transition" style="min-height:unset;">
-                    Dashboard
-                </a>
+                <div class="relative" id="desktopUserMenu">
+                    <button onclick="document.getElementById('desktopUserDropdown').classList.toggle('hidden')" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition" style="min-height:unset;">
+                        <span class="w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center text-[10px] font-black shrink-0">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
+                        {{ Str::limit(auth()->user()->name, 14) }}
+                        <svg class="w-3 h-3 opacity-60" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div id="desktopUserDropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden">
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-700 transition font-semibold" style="min-height:unset;">
+                            <i class="fas fa-gauge-high w-4 text-center text-slate-400"></i> Dashboard
+                        </a>
+                        <div class="border-t border-slate-100"></div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold" style="min-height:unset;">
+                                <i class="fas fa-sign-out-alt w-4 text-center"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
                 @else
                 <a href="{{ route('user.login') }}"    class="text-xs font-bold text-slate-600 hover:text-teal-700 px-3 py-2 transition" style="min-height:unset;">Log in</a>
                 <a href="{{ route('user.register1') }}" class="bg-teal-700 hover:bg-teal-800 text-white px-5 py-2 rounded-xl text-xs font-bold transition" style="min-height:unset;">Get Started</a>
@@ -64,9 +80,23 @@
             {{-- MOBILE RIGHT SIDE --}}
             <div class="flex lg:hidden items-center gap-2">
                 @auth
-                <a href="{{ route('dashboard') }}" class="w-9 h-9 bg-teal-700 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0" style="min-height:unset;min-width:unset;">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                </a>
+                <div class="relative" id="mobileUserMenu">
+                    <button onclick="document.getElementById('mobileUserDropdown').classList.toggle('hidden')" class="w-9 h-9 bg-teal-700 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0" style="min-height:unset;min-width:unset;">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                    </button>
+                    <div id="mobileUserDropdown" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden">
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-700 transition font-semibold" style="min-height:unset;">
+                            <i class="fas fa-gauge-high w-4 text-center text-slate-400"></i> Dashboard
+                        </a>
+                        <div class="border-t border-slate-100"></div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold" style="min-height:unset;">
+                                <i class="fas fa-sign-out-alt w-4 text-center"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
                 @endauth
                 <button id="menuBtn" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-700 hover:bg-slate-100 transition" aria-label="Open menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -128,6 +158,12 @@
                 <a href="{{ route('dashboard') }}" class="flex-1 py-3 bg-slate-900 text-white text-center text-sm font-bold rounded-2xl hover:bg-slate-800 transition">
                     Dashboard
                 </a>
+                <form action="{{ route('logout') }}" method="POST" class="flex-1">
+                    @csrf
+                    <button type="submit" class="w-full py-3 border border-red-200 text-red-600 text-sm font-bold rounded-2xl hover:bg-red-50 transition">
+                        Logout
+                    </button>
+                </form>
                 @else
                 <a href="{{ route('user.login') }}"     class="flex-1 py-3 border border-slate-200 text-slate-700 text-center text-sm font-bold rounded-2xl hover:bg-slate-50 transition">Log in</a>
                 <a href="{{ route('user.register1') }}" class="flex-1 py-3 bg-teal-700 text-white text-center text-sm font-bold rounded-2xl hover:bg-teal-800 transition">Get Started</a>
@@ -137,3 +173,16 @@
         </div>
     </div>
 </nav>
+
+<script>
+// Close user dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+    ['desktopUserMenu','mobileUserMenu'].forEach(function(id) {
+        var menu = document.getElementById(id);
+        if (menu && !menu.contains(e.target)) {
+            var dd = menu.querySelector('[id$="Dropdown"]');
+            if (dd) dd.classList.add('hidden');
+        }
+    });
+});
+</script>
