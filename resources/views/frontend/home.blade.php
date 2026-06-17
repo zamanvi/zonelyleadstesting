@@ -392,6 +392,9 @@
                     <li><a href="{{ route('frontend.service.search') }}?q=Lawyer" class="hover:text-white transition">Lawyers</a></li>
                     <li><a href="{{ route('frontend.service.search') }}?q=Plumber" class="hover:text-white transition">Plumbers</a></li>
                     <li><a href="{{ route('frontend.service.search') }}?q=Tax+Expert" class="hover:text-white transition">Tax Experts</a></li>
+                    <li><a href="{{ route('frontend.tools') }}" class="hover:text-white transition">Free Tools</a></li>
+                    <li><a href="{{ route('frontend.blog') }}" class="hover:text-white transition">Blog</a></li>
+                    <li><a href="{{ route('frontend.help') }}" class="hover:text-white transition">Help Center</a></li>
                 </ul>
             </div>
             <div>
