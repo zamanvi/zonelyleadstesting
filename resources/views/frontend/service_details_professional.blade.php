@@ -884,7 +884,7 @@
         </section>
         @endif
 
-        {{-- ── WORKING HOURS ────────────────────────────────────────── --}}
+        {{-- ── AVAILABILITY & WORKING HOURS ────────────────────────── --}}
         @if($showOH)
         @php
         $rtLabels = ['30_min'=>'Responds within 30 min','1_hour'=>'Responds within 1 hour','4_hours'=>'Responds within 4 hours','24_hours'=>'Responds within 24 hours','48_hours'=>'Responds within 2 days'];
@@ -892,12 +892,17 @@
         $ohTodayKey = strtolower(\Carbon\Carbon::now($oh['timezone'] ?? 'America/New_York')->format('D'));
         @endphp
         <section>
-            <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
-                <h3 class="font-bold text-2xl sm:text-3xl sh">Working Hours</h3>
-                <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full {{ $ohStatusColor }}">
-                    <span class="w-1.5 h-1.5 rounded-full {{ $ohIsOpen ? 'bg-emerald-500' : 'bg-red-400' }} inline-block"></span>
-                    {{ $ohStatusText }}
-                </span>
+            <div class="mb-6">
+                <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                        <h3 class="font-bold text-2xl sm:text-3xl sh">Availability & Working Hours</h3>
+                        <p class="text-slate-500 mt-2 text-sm font-medium">When you can reach this professional — office hours, response time & availability</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full {{ $ohStatusColor }} mt-1 flex-shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $ohIsOpen ? 'bg-emerald-500' : 'bg-red-400' }} inline-block"></span>
+                        {{ $ohStatusText }}
+                    </span>
+                </div>
             </div>
 
             <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
