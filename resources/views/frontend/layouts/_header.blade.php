@@ -48,7 +48,7 @@
                             <p class="text-teal-200 text-xs mt-0.5">We're here to help — reach us anytime</p>
                         </div>
                         {{-- Email --}}
-                        <a href="mailto:contact@zonelyleads.com"
+                        <a href="mailto:contact@zonelyleads.com" target="_blank" rel="noopener"
                            class="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition group/item border-b border-slate-50" style="min-height:unset;">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center shrink-0 group-hover/item:bg-teal-100 transition">
                                 <i class="fas fa-envelope text-teal-600 text-sm"></i>
@@ -174,7 +174,7 @@
                     <p class="text-white font-bold text-sm">Get in Touch</p>
                     <p class="text-teal-200 text-xs">We're here to help — reach us anytime</p>
                 </div>
-                <a href="mailto:contact@zonelyleads.com" class="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 transition border-b border-slate-50" style="min-height:unset;">
+                <a href="mailto:contact@zonelyleads.com" target="_blank" rel="noopener" class="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 transition border-b border-slate-50" style="min-height:unset;">
                     <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center shrink-0">
                         <i class="fas fa-envelope text-teal-600 text-xs"></i>
                     </div>
