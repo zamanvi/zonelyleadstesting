@@ -26,8 +26,8 @@
     $faqCount    = $user->faqs->count();
     $faqProgress = $faqCount > 0 && $faqCount < 5; // partial state
 
-    $galleryCount = ($isHome || $isBeauty) ? $user->gallery()->count() : 0;
-    $galleryDone  = $galleryCount >= 3;
+    $galleryCount = $user->gallery()->count();
+    $galleryDone  = $galleryCount > 0;
 
     $langCount = $user->languages->count();
 
@@ -40,13 +40,7 @@
         'credentials' => $user->educations->count() > 0 || $user->memberships->count() > 0 || $user->experiences->count() > 0 || $user->certifications->count() > 0,
     ];
 
-    // Fix 3: count gallery in progress for Home/Beauty
-    if ($isHome || $isBeauty) {
-        $done['gallery'] = $galleryDone;
-        $total = 7;
-    } else {
-        $total = 6;
-    }
+    $total = 6;
 
     $completed = collect($done)->filter()->count();
     $pct       = round($completed / $total * 100);
@@ -483,8 +477,7 @@
 
     </div>
 
-    {{-- Gallery card — Home Services & Beauty only (Fix 3: now counted in progress) --}}
-    @if($isHome || $isBeauty)
+    {{-- Gallery card — optional for all seller types --}}
     <a href="{{ route('seller.gallery') }}"
        class="group mt-4 block bg-white rounded-2xl border-2 {{ $galleryDone ? 'border-emerald-200' : 'border-dashed border-slate-200 hover:border-teal-300' }} shadow-sm p-5 transition-all hover:shadow-md">
         <div class="flex items-start justify-between gap-3 mb-3">
@@ -497,8 +490,8 @@
                     <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wide">→ Show your best work photos</p>
                 </div>
             </div>
-            <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $galleryDone ? 'bg-emerald-100 text-emerald-700' : ($galleryCount > 0 ? 'bg-amber-100 text-amber-700' : 'bg-red-50 text-red-500') }}">
-                {{ $galleryDone ? 'Complete' : ($galleryCount > 0 ? $galleryCount.'/3 photos' : 'Required') }}
+            <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg {{ $galleryDone ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                {{ $galleryDone ? $galleryCount.' '.Str::plural('photo', $galleryCount) : 'Optional' }}
             </span>
         </div>
         @if($galleryDone)
@@ -510,30 +503,16 @@
             <div class="w-12 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-500 font-bold">+{{ $galleryCount - 4 }}</div>
             @endif
         </div>
-        @elseif($galleryCount > 0)
-        <div class="bg-amber-50 rounded-xl px-3 py-2.5 text-xs">
-            <div class="flex items-center justify-between mb-1.5">
-                <span class="font-semibold text-amber-700">{{ $galleryCount }} of 3 photos uploaded</span>
-                <span class="text-amber-500">{{ 3 - $galleryCount }} more needed</span>
-            </div>
-            <div class="w-full bg-amber-100 rounded-full h-1.5">
-                <div class="bg-amber-400 h-1.5 rounded-full" style="width:{{ round($galleryCount/3*100) }}%"></div>
-            </div>
-        </div>
         @else
-        <p class="text-xs text-slate-400">
-            @if($isBeauty) Upload 3+ photos of your work — hairstyles, nail art, before & afters
-            @else Upload 3+ photos of completed jobs — kitchens, bathrooms, installations @endif
-        </p>
+        <p class="text-xs text-slate-400">Upload photos of your work to build trust with potential clients</p>
         @endif
         <div class="mt-3 flex items-center justify-end">
             <span class="text-xs font-bold {{ $galleryDone ? 'text-slate-400 group-hover:text-teal-700' : 'text-teal-700' }} flex items-center gap-1 transition">
                 <i class="fa-solid {{ $galleryDone ? 'fa-pen' : 'fa-plus' }} text-[10px]"></i>
-                {{ $galleryDone ? 'Manage' : ($galleryCount > 0 ? 'Continue' : 'Upload Photos') }}
+                {{ $galleryDone ? 'Manage' : 'Upload Photos' }}
             </span>
         </div>
     </a>
-    @endif
 
     {{-- Fix 4: Schedule / Availability card --}}
     @php $scheduleDone = !is_null($user->schedule); @endphp
