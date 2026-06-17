@@ -33,20 +33,6 @@
                 </div>
                 @endforeach
 
-                {{-- Others dropdown --}}
-                <div class="relative group">
-                    <a href="#" class="hover:text-teal-700 transition flex items-center gap-1.5 py-2 whitespace-nowrap" style="min-height:unset;">
-                        Others
-                        <svg class="w-3 h-3 mt-[2px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </a>
-                    <div class="absolute left-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <a href="{{ route('frontend.tools') }}"  class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-700 transition" style="min-height:unset;">Tools</a>
-                        <a href="{{ route('frontend.blog') }}"   class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-700 transition" style="min-height:unset;">Blog</a>
-                        <a href="{{ route('frontend.help') }}"   class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-700 transition" style="min-height:unset;">Help</a>
-                    </div>
-                </div>
             </div>
 
             {{-- DESKTOP AUTH --}}
@@ -137,20 +123,6 @@
             </div>
             @endforeach
 
-            {{-- Others --}}
-            <div>
-                <button class="mobile-toggle w-full flex justify-between items-center px-3 py-3 text-sm font-semibold text-slate-700 rounded-xl hover:bg-slate-50 transition">
-                    Others
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div class="mobile-submenu hidden pl-4 pb-1 space-y-0.5">
-                    <a href="{{ route('frontend.tools') }}" class="block px-3 py-2.5 text-sm text-slate-600 hover:text-teal-700 rounded-xl hover:bg-slate-50 transition">Tools</a>
-                    <a href="{{ route('frontend.blog') }}"  class="block px-3 py-2.5 text-sm text-slate-600 hover:text-teal-700 rounded-xl hover:bg-slate-50 transition">Blog</a>
-                    <a href="{{ route('frontend.help') }}"  class="block px-3 py-2.5 text-sm text-slate-600 hover:text-teal-700 rounded-xl hover:bg-slate-50 transition">Help</a>
-                </div>
-            </div>
 
             {{-- Auth buttons --}}
             <div class="pt-3 border-t border-slate-100 flex gap-3">
