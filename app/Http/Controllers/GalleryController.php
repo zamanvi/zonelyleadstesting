@@ -24,9 +24,13 @@ class GalleryController extends Controller
         }
 
         $request->validate([
-            'photo'   => 'required|image|max:10240',
+            'photo'   => 'nullable|image|max:10240',
             'caption' => 'nullable|string|max:150',
         ]);
+
+        if (!$request->hasFile('photo')) {
+            return back();
+        }
 
         $path      = ImageOptimizer::saveGalleryPhoto($request->file('photo'));
         $nextOrder = ($user->gallery()->max('sort_order') ?? -1) + 1;
