@@ -84,7 +84,7 @@ class ProfileController extends Controller
             } catch (\Throwable $e) {
                 return back()->withInput()->withErrors(['save_error' => 'Could not save: ' . $e->getMessage()]);
             }
-            return redirect()->route('type.profile', [$type, 'account'])->with('success', 'Business info saved.');
+            return back()->with('success', 'Business info saved.');
 
         } elseif ($setup === 'service_location') {
             $request->validate([
@@ -107,7 +107,7 @@ class ProfileController extends Controller
             } catch (\Throwable $e) {
                 return back()->withInput()->withErrors(['save_error' => 'Could not save: ' . $e->getMessage()]);
             }
-            return redirect()->route('type.profile', [$type, 'service_location'])->with('success', 'Location saved.');
+            return back()->with('success', 'Location saved.');
 
         } elseif ($setup === 'contact') {
             $request->validate([
@@ -123,7 +123,7 @@ class ProfileController extends Controller
             } catch (\Throwable $e) {
                 return back()->withInput()->withErrors(['save_error' => 'Could not save: ' . $e->getMessage()]);
             }
-            return redirect()->route('type.profile', [$type, 'contact'])->with('success', 'Contact info saved.');
+            return back()->with('success', 'Contact info saved.');
 
         } elseif ($setup === 'profile') {
             $request->validate([
@@ -158,7 +158,7 @@ class ProfileController extends Controller
                 return back()->withInput()->withErrors(['save_error' => 'Could not save profile: ' . $e->getMessage()]);
             }
 
-            return redirect()->route('type.profile', [$type, 'profile'])->with('success', 'Profile saved successfully.');
+            return back()->with('success', 'Profile saved successfully.');
 
         } elseif ($setup === 'review') {
             return redirect()->route('seller.dashboard')->with('success', 'Profile completed!');
