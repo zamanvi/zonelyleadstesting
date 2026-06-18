@@ -5,7 +5,7 @@
     $countryName = $user->country ? (is_numeric($user->country) ? (\App\Models\Country::find($user->country)?->title ?? $user->country) : $user->country) : null;
 
     $meta_title       = 'Trusted ' . ($user->category?->title ?? 'Professional') . ' in ' . ($cityName ?? 'Your City') . ($stateName ? ', '.$stateName : '') . ' | ' . $user->name;
-    $meta_description = $user->name . ' — verified ' . ($user->category?->title ?? 'professional') . ($cityName ? ' in '.$cityName : '') . '. ' . Str::limit(strip_tags($user->about ?? $user->bio ?? ''), 120);
+    $meta_description = $user->name . ' — verified ' . ($user->category?->title ?? 'professional') . ($cityName ? ' in '.$cityName : '') . '. ' . Str::limit(strip_tags($user->bio ?? $user->about ?? ''), 120);
     // Mother category detection for section labels
     $motherTitle = strtolower($user->category?->parent?->title ?? $user->category?->title ?? '');
     $isHealthcare = str_contains($motherTitle, 'health') || str_contains($motherTitle, 'wellness');

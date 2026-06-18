@@ -105,11 +105,11 @@
         {{-- Bio --}}
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
             <label class="block text-sm font-bold text-slate-700 mb-1">Short Bio <span class="text-red-500">*</span></label>
-            <p class="text-xs text-slate-400 mb-3">2–3 sentences about your expertise and what you offer clients</p>
-            <textarea name="bio" rows="4"
+            <p class="text-xs text-slate-400 mb-3">2–3 sentences about your expertise — shown in Google search results</p>
+            <textarea name="bio" rows="4" maxlength="200"
                 placeholder="{{ $bioPlaceholder }}"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition resize-none">{{ old('bio', $user->bio) }}</textarea>
-            <p class="text-xs text-slate-400 mt-2 text-right" id="bioCount">{{ strlen($user->bio ?? '') }} / 2000</p>
+            <p class="text-xs text-slate-400 mt-2 text-right" id="bioCount">{{ strlen($user->bio ?? '') }} / 200</p>
         </div>
 
         {{-- About --}}
@@ -159,7 +159,7 @@ const bioTextarea = document.querySelector('textarea[name="bio"]');
 const bioCount    = document.getElementById('bioCount');
 if (bioTextarea && bioCount) {
     bioTextarea.addEventListener('input', () => {
-        bioCount.textContent = bioTextarea.value.length + ' / 2000';
+        bioCount.textContent = bioTextarea.value.length + ' / 200';
     });
 }
 

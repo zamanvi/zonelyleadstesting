@@ -127,7 +127,7 @@ class ProfileController extends Controller
 
         } elseif ($setup === 'profile') {
             $request->validate([
-                'bio'           => 'nullable|string|max:2000',
+                'bio'           => 'nullable|string|max:200',
                 'about'         => 'nullable|string|max:3000',
                 'title'         => 'nullable|string|max:255',
                 'experience'    => 'nullable|integer|min:0|max:99',
