@@ -52,16 +52,17 @@ class ManagerController extends Controller
         $request->validate($rules);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'type'     => $isGeneral ? 'coo' : 'manager',
-            'status'   => true,
-            'city'     => $request->city,
-            'state'    => $request->state,
-            'country'  => $request->country,
-            'zip_code' => $request->zip_code,
-            'slug'     => generateUniqueSlug(User::class, $request->name),
+            'name'               => $request->name,
+            'email'              => $request->email,
+            'password'           => Hash::make($request->password),
+            'type'               => $isGeneral ? 'coo' : 'manager',
+            'status'             => true,
+            'email_verified_at'  => now(),
+            'city'               => $request->city,
+            'state'              => $request->state,
+            'country'            => $request->country,
+            'zip_code'           => $request->zip_code,
+            'slug'               => generateUniqueSlug(User::class, $request->name),
         ]);
 
         $loginUrl = route('user.login');
