@@ -65,8 +65,8 @@
                         @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Business Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="business_name" value="{{ old('business_name', auth()->user()->business_name) }}" required
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Business Name</label>
+                        <input type="text" name="business_name" value="{{ old('business_name', auth()->user()->business_name) }}"
                             class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-50 transition">
                         @error('business_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
