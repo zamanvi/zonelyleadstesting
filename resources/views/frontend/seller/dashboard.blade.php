@@ -34,6 +34,72 @@
     </a>
 </div>
 
+{{-- Promotion popup --}}
+@if(($activePromos ?? collect())->isNotEmpty())
+@php $promo = $activePromos->first(); @endphp
+<div id="promoPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden" style="animation:slideUp .3s ease;">
+        {{-- Header --}}
+        <div style="background:linear-gradient(135deg,#d97706,#f59e0b);padding:24px 24px 20px;">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-amber-100 uppercase tracking-widest">Limited Time Offer</span>
+                <button onclick="dismissPromo()" class="text-white/70 hover:text-white transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <h2 class="text-white font-black text-xl leading-tight">
+                {{ $promo->promotion_label ?: 'Special Promotion Active!' }}
+            </h2>
+            @if($promo->effective_to)
+            <p class="text-amber-100 text-xs mt-1 font-semibold">
+                <i class="fas fa-clock me-1"></i>Ends {{ $promo->effective_to->format('M d, Y') }}
+                @if($promo->daysRemaining() !== null)
+                · {{ $promo->daysRemaining() }} days left
+                @endif
+            </p>
+            @endif
+        </div>
+        {{-- Body --}}
+        <div class="p-6">
+            <div class="flex items-center gap-4 mb-5">
+                <div class="text-center">
+                    <p class="text-xs text-slate-400 font-semibold mb-0.5">Standard Rate</p>
+                    <p class="text-2xl font-black text-slate-300 line-through">${{ number_format(\App\Models\Setting::where('key','default_lead_fee')->value('value') ?? 35, 2) }}</p>
+                </div>
+                <div class="text-2xl text-amber-400"><i class="fas fa-arrow-right"></i></div>
+                <div class="text-center">
+                    <p class="text-xs text-slate-400 font-semibold mb-0.5">Your Rate Now</p>
+                    @if((float)$promo->amount === 0.0)
+                    <p class="text-3xl font-black text-emerald-500">FREE</p>
+                    @else
+                    <p class="text-3xl font-black text-amber-500">${{ number_format($promo->amount, 2) }}</p>
+                    @endif
+                </div>
+            </div>
+            <p class="text-xs text-slate-500 text-center mb-5">
+                @if($promo->category) For {{ $promo->category->title }} @endif
+                @if($promo->state) in {{ $promo->state->title }} @endif
+                @if(!$promo->category && !$promo->state) Applies to all lead categories and locations @endif
+            </p>
+            <button onclick="dismissPromo()" class="w-full py-3 font-bold text-white rounded-2xl transition"
+                style="background:linear-gradient(135deg,#d97706,#f59e0b);">
+                Got It — Let's Go!
+            </button>
+        </div>
+    </div>
+</div>
+<style>@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}</style>
+<script>
+function dismissPromo() {
+    document.getElementById('promoPopup').style.display = 'none';
+    sessionStorage.setItem('promoDismissed_{{ $promo->id }}', '1');
+}
+if (sessionStorage.getItem('promoDismissed_{{ $promo->id }}')) {
+    document.getElementById('promoPopup').style.display = 'none';
+}
+</script>
+@endif
+
 {{-- Unpaid balance banner --}}
 @if(($unpaidBalance ?? 0) > 0)
 <a href="{{ route('seller.billing') }}"

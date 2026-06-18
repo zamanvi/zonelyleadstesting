@@ -413,6 +413,11 @@
 const statesData  = @json($states);
 const categoriesData = @json($categories->toArray());
 
+function togglePromoLabel(fieldId, checked) {
+    const wrap = document.getElementById(fieldId + '_wrap');
+    if (wrap) wrap.style.display = checked ? 'block' : 'none';
+}
+
 // Load cities dynamically
 async function loadCities(stateId, selectId) {
     const select = document.getElementById(selectId);
@@ -436,6 +441,15 @@ function openEdit(charge) {
     form.querySelector('#edit_effective_to').value   = charge.effective_to?.substring(0,10)   ?? '';
     form.querySelector('#edit_priority').value       = charge.priority      ?? 0;
     form.querySelector('#edit_notes').value          = charge.notes         ?? '';
+
+    // Promotion
+    const promoChk = form.querySelector('#edit_is_promotion');
+    if (promoChk) {
+        promoChk.checked = !!charge.is_promotion;
+        togglePromoLabel('edit_promotion_label', !!charge.is_promotion);
+    }
+    const promoLbl = form.querySelector('#edit_promotion_label');
+    if (promoLbl) promoLbl.value = charge.promotion_label ?? '';
 
     // Category
     const catSel = form.querySelector('#edit_category_id');

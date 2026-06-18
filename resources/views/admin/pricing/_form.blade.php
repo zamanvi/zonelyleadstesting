@@ -106,10 +106,38 @@
 </div>
 
 {{-- Notes --}}
-<div>
+<div class="mb-4">
     <label class="form-label fw-semibold small">Notes <span class="text-muted fw-normal">(optional)</span></label>
     <textarea name="notes" id="{{ $p('notes') }}" class="form-control" rows="2" style="border-radius:9px;"
               placeholder="e.g. Summer promotion for Nashville plumbers — July 2026"></textarea>
+</div>
+
+{{-- Divider --}}
+<hr style="border-color:#e2e8f0;margin:0 0 16px;">
+
+{{-- Section: Promotion --}}
+<div>
+    <p class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size:13px;">
+        <span style="width:22px;height:22px;background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">
+            <i class="fas fa-star text-white" style="font-size:9px;"></i>
+        </span>
+        Promotion <span class="fw-normal text-muted ms-1" style="font-size:12px;">— optional, shows banner to sellers</span>
+    </p>
+    <div class="p-3" style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;">
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="is_promotion" id="{{ $p('is_promotion') }}" value="1"
+                   onchange="togglePromoLabel('{{ $p('promotion_label') }}', this.checked)" style="width:2.5em;height:1.3em;">
+            <label class="form-check-label fw-semibold small ms-2" for="{{ $p('is_promotion') }}">
+                Mark as Promotion — show popup banner to sellers
+            </label>
+        </div>
+        <div id="{{ $p('is_promotion') }}_label_wrap" style="display:none;">
+            <label class="form-label fw-semibold small">Promotion Label <span class="text-muted fw-normal">(shown to sellers)</span></label>
+            <input type="text" name="promotion_label" id="{{ $p('promotion_label') }}" class="form-control" style="border-radius:9px;"
+                   placeholder="e.g. Summer Deal — 70% Off Lead Fees!">
+            <div class="form-text">This text appears in the seller dashboard popup and payment screen.</div>
+        </div>
+    </div>
 </div>
 
 {{-- Priority guide --}}

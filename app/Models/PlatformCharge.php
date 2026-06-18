@@ -13,13 +13,14 @@ class PlatformCharge extends Model
     protected $fillable = [
         'type', 'category_id', 'state_id', 'city_id',
         'amount', 'effective_from', 'effective_to',
-        'priority', 'is_active', 'notes', 'created_by',
+        'priority', 'is_active', 'is_promotion', 'promotion_label', 'notes', 'created_by',
     ];
 
     protected $casts = [
         'effective_from' => 'date',
         'effective_to'   => 'date',
         'is_active'      => 'boolean',
+        'is_promotion'   => 'boolean',
         'amount'         => 'decimal:2',
     ];
 
@@ -40,6 +41,22 @@ class PlatformCharge extends Model
     public function scopeOfType($q, string $type)
     {
         return $q->where('type', $type);
+    }
+
+    public function scopePromotions($q)
+    {
+        return $q->where('is_promotion', true);
+    }
+
+    public static function activePromotions(): \Illuminate\Database\Eloquent\Collection
+    {
+        return static::active()->promotions()->with(['category', 'state', 'city'])->orderByDesc('priority')->get();
+    }
+
+    public function daysRemaining(): ?int
+    {
+        if (!$this->effective_to) return null;
+        return max(0, (int) now()->diffInDays($this->effective_to, false));
     }
 
     // ── Static Resolver ────────────────────────────────

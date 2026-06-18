@@ -272,6 +272,23 @@
             <span id="modal-lead-count"></span> ·
             Total: <span id="modal-amount" class="font-bold text-slate-900"></span>
         </p>
+        @if(($activePromos ?? collect())->isNotEmpty())
+        @php $promo = $activePromos->first(); @endphp
+        <div class="mb-4 px-3 py-2.5 rounded-xl flex items-center gap-3" style="background:#fffbeb;border:1px solid #fde68a;">
+            <i class="fas fa-star text-amber-500 text-sm shrink-0"></i>
+            <div>
+                <p class="text-xs font-bold text-amber-700">{{ $promo->promotion_label ?: 'Promotion Active' }}</p>
+                <p class="text-xs text-amber-600">
+                    @if((float)$promo->amount === 0.0)
+                    Free leads applied — no charge!
+                    @else
+                    Reduced rate of ${{ number_format($promo->amount, 2) }} per lead applied
+                    @endif
+                    @if($promo->effective_to) · Ends {{ $promo->effective_to->format('M d') }} @endif
+                </p>
+            </div>
+        </div>
+        @endif
         <div id="paypal-button-container" class="min-h-[50px]"></div>
         <p class="text-xs text-slate-400 text-center mt-3">Secured by PayPal. Your card details are never stored.</p>
     </div>

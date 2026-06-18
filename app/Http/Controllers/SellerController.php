@@ -65,8 +65,9 @@ class SellerController extends Controller
         $unpaidCount   = $user->leads()->whereNull('paid_at')->count();
         $unpaidBalance = $user->leads()->whereNull('paid_at')->sum('fee');
         $allLeads      = $leads; // keep for view compatibility
+        $activePromos  = PlatformCharge::activePromotions();
 
-        return view('frontend.seller.dashboard', compact('user', 'leads', 'allLeads', 'stats', 'period', 'weekDays', 'weekCounts', 'unpaidCount', 'unpaidBalance'));
+        return view('frontend.seller.dashboard', compact('user', 'leads', 'allLeads', 'stats', 'period', 'weekDays', 'weekCounts', 'unpaidCount', 'unpaidBalance', 'activePromos'));
     }
 
     public function affiliate()
@@ -243,7 +244,8 @@ class SellerController extends Controller
             'period_count'  => $periodLeads->count(),
         ];
 
-        return view('frontend.seller.billing', compact('allLeads', 'balance', 'period', 'threshold'));
+        $activePromos = PlatformCharge::activePromotions();
+        return view('frontend.seller.billing', compact('allLeads', 'balance', 'period', 'threshold', 'activePromos'));
     }
 
     public function payLead(Request $request, $id)

@@ -58,20 +58,23 @@ class PricingController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'type'           => 'required|in:lead_fee,affiliate_commission,buyer_referral_commission',
-            'category_id'    => 'nullable|exists:categories,id',
-            'state_id'       => 'nullable|exists:states,id',
-            'city_id'        => 'nullable|exists:cities,id',
-            'amount'         => 'required|numeric|min:0|max:9999',
-            'effective_from' => 'required|date',
-            'effective_to'   => 'nullable|date|after_or_equal:effective_from',
-            'priority'       => 'nullable|integer|min:0|max:999',
-            'notes'          => 'nullable|string|max:500',
+            'type'             => 'required|in:lead_fee,affiliate_commission,buyer_referral_commission',
+            'category_id'      => 'nullable|exists:categories,id',
+            'state_id'         => 'nullable|exists:states,id',
+            'city_id'          => 'nullable|exists:cities,id',
+            'amount'           => 'required|numeric|min:0|max:9999',
+            'effective_from'   => 'required|date',
+            'effective_to'     => 'nullable|date|after_or_equal:effective_from',
+            'priority'         => 'nullable|integer|min:0|max:999',
+            'is_promotion'     => 'nullable|boolean',
+            'promotion_label'  => 'nullable|string|max:100',
+            'notes'            => 'nullable|string|max:500',
         ]);
 
-        $data['is_active']   = true;
-        $data['created_by']  = Auth::id();
-        $data['priority']  ??= 0;
+        $data['is_active']    = true;
+        $data['created_by']   = Auth::id();
+        $data['priority']   ??= 0;
+        $data['is_promotion'] = $request->boolean('is_promotion');
 
         PlatformCharge::create($data);
         PlatformCharge::bustCache();
@@ -84,16 +87,20 @@ class PricingController extends Controller
         $charge = PlatformCharge::findOrFail($id);
 
         $data = $request->validate([
-            'type'           => 'required|in:lead_fee,affiliate_commission,buyer_referral_commission',
-            'category_id'    => 'nullable|exists:categories,id',
-            'state_id'       => 'nullable|exists:states,id',
-            'city_id'        => 'nullable|exists:cities,id',
-            'amount'         => 'required|numeric|min:0|max:9999',
-            'effective_from' => 'required|date',
-            'effective_to'   => 'nullable|date|after_or_equal:effective_from',
-            'priority'       => 'nullable|integer|min:0|max:999',
-            'notes'          => 'nullable|string|max:500',
+            'type'             => 'required|in:lead_fee,affiliate_commission,buyer_referral_commission',
+            'category_id'      => 'nullable|exists:categories,id',
+            'state_id'         => 'nullable|exists:states,id',
+            'city_id'          => 'nullable|exists:cities,id',
+            'amount'           => 'required|numeric|min:0|max:9999',
+            'effective_from'   => 'required|date',
+            'effective_to'     => 'nullable|date|after_or_equal:effective_from',
+            'priority'         => 'nullable|integer|min:0|max:999',
+            'is_promotion'     => 'nullable|boolean',
+            'promotion_label'  => 'nullable|string|max:100',
+            'notes'            => 'nullable|string|max:500',
         ]);
+
+        $data['is_promotion'] = $request->boolean('is_promotion');
 
         $charge->update($data);
         PlatformCharge::bustCache();
