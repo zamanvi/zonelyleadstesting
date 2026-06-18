@@ -79,8 +79,12 @@ class ProfileController extends Controller
                 'phone'         => 'nullable|string|max:50',
                 'business_name' => 'nullable|string|max:255',
             ]);
-            $user->update($request->only(['name', 'phone', 'business_name']));
-            $next = 'service_location';
+            try {
+                $user->update($request->only(['name', 'phone', 'business_name']));
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['save_error' => 'Could not save: ' . $e->getMessage()]);
+            }
+            return redirect()->route('type.profile', [$type, 'account'])->with('success', 'Business info saved.');
 
         } elseif ($setup === 'service_location') {
             $request->validate([
@@ -91,27 +95,35 @@ class ProfileController extends Controller
                 'zip_code'           => 'nullable|integer',
                 'additional_details' => 'nullable|string|max:500',
             ]);
-            $user->update([
-                'category_id'        => $request->category_id ?: null,
-                'country'            => $request->country ? (Country::find($request->country)?->title ?? $request->country) : null,
-                'state'              => $request->state   ? (State::find($request->state)?->title   ?? $request->state)   : null,
-                'city'               => $request->city    ? (City::find($request->city)?->title     ?? $request->city)    : null,
-                'zip_code'           => $request->zip_code ? (PostalCode::find($request->zip_code)?->code ?? $request->zip_code) : null,
-                'additional_details' => $request->additional_details,
-            ]);
-            return redirect()->route('seller.onboarding')->with('success', 'Location saved.');
+            try {
+                $user->update([
+                    'category_id'        => $request->category_id ?: null,
+                    'country'            => $request->country ? (Country::find($request->country)?->title ?? $request->country) : null,
+                    'state'              => $request->state   ? (State::find($request->state)?->title   ?? $request->state)   : null,
+                    'city'               => $request->city    ? (City::find($request->city)?->title     ?? $request->city)    : null,
+                    'zip_code'           => $request->zip_code ? (PostalCode::find($request->zip_code)?->code ?? $request->zip_code) : null,
+                    'additional_details' => $request->additional_details,
+                ]);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['save_error' => 'Could not save: ' . $e->getMessage()]);
+            }
+            return redirect()->route('type.profile', [$type, 'service_location'])->with('success', 'Location saved.');
 
         } elseif ($setup === 'contact') {
             $request->validate([
                 'phone'    => 'nullable|string|max:50',
                 'whatsapp' => 'nullable|string|max:50',
             ]);
-            $user->update([
-                'phone'      => $request->phone,
-                'whatsapp'   => $request->whatsapp,
-                'show_phone' => $request->boolean('show_phone'),
-            ]);
-            return redirect()->route('seller.onboarding')->with('success', 'Contact info saved.');
+            try {
+                $user->update([
+                    'phone'      => $request->phone,
+                    'whatsapp'   => $request->whatsapp,
+                    'show_phone' => $request->boolean('show_phone'),
+                ]);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['save_error' => 'Could not save: ' . $e->getMessage()]);
+            }
+            return redirect()->route('type.profile', [$type, 'contact'])->with('success', 'Contact info saved.');
 
         } elseif ($setup === 'profile') {
             $request->validate([
@@ -154,8 +166,6 @@ class ProfileController extends Controller
         } else {
             abort(404);
         }
-
-        return redirect()->route('type.profile', [$type, $next])->with('success', 'Saved.');
     }
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
