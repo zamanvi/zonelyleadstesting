@@ -7,27 +7,40 @@
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h4 class="mb-0 fw-bold"><i class="fas fa-tags text-primary me-2"></i>Pricing Rules</h4>
-            <p class="text-muted small mb-0">Manage lead fees and affiliate commissions by location, category, and date range</p>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <div style="width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-tags text-white" style="font-size:15px;"></i>
+                </div>
+                <h4 class="mb-0 fw-bold">Pricing Rules</h4>
+            </div>
+            <p class="text-muted small mb-0" style="padding-left:44px;">Manage lead fees and affiliate commissions by location, category, and date range</p>
         </div>
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRuleModal">
-            <i class="fas fa-plus me-1"></i> Add Rule
+        <button class="btn fw-bold px-4" data-bs-toggle="modal" data-bs-target="#addRuleModal"
+            style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(29,78,216,.25);">
+            <i class="fas fa-plus me-2"></i> Add Pricing Rule
         </button>
     </div>
 
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-        <i class="fas fa-circle-check me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert border-0 mb-4 d-flex align-items-center gap-3" style="background:#f0fdf9;border-left:4px solid #0d9488 !important;border-radius:10px;" role="alert">
+        <div style="width:32px;height:32px;background:#0d9488;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-check text-white" style="font-size:13px;"></i>
+        </div>
+        <div class="flex-grow-1 small fw-semibold text-success mb-0">{{ session('success') }}</div>
+        <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
     </div>
     @endif
 
     {{-- ── GLOBAL DEFAULTS ── --}}
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-bottom d-flex align-items-center gap-2 py-3">
-            <i class="fas fa-globe text-primary"></i>
-            <strong>Global Defaults</strong>
-            <span class="badge bg-primary-subtle text-primary ms-1">Fallback when no rule matches</span>
+    <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;overflow:hidden;">
+        <div class="px-4 py-3 d-flex align-items-center gap-3" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+            <div style="width:34px;height:34px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-globe text-white" style="font-size:13px;"></i>
+            </div>
+            <div>
+                <p class="mb-0 fw-bold text-dark" style="font-size:14px;">Global Defaults</p>
+                <p class="mb-0 text-muted" style="font-size:12px;">Fallback pricing applied when no specific rule matches</p>
+            </div>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.pricing.defaults') }}" method="POST">
@@ -61,7 +74,7 @@
                         <div class="form-text">Paid to buyer who refers another buyer</div>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-dark w-100 mt-4">
+                        <button type="submit" class="btn fw-bold w-100 mt-4" style="background:linear-gradient(135deg,#1e293b,#334155);color:#fff;border-radius:9px;">
                             <i class="fas fa-save me-1"></i> Save
                         </button>
                     </div>
@@ -71,11 +84,15 @@
     </div>
 
     {{-- ── PREVIEW TOOL ── --}}
-    <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #0ea5e9 !important;">
-        <div class="card-header bg-white border-bottom d-flex align-items-center gap-2 py-3">
-            <i class="fas fa-magnifying-glass text-info"></i>
-            <strong>Rule Preview</strong>
-            <span class="badge bg-info-subtle text-info ms-1">Check what charge applies for a specific scenario</span>
+    <div class="card border-0 shadow-sm mb-4" style="border-radius:14px;overflow:hidden;">
+        <div class="px-4 py-3 d-flex align-items-center gap-3" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+            <div style="width:34px;height:34px;background:linear-gradient(135deg,#0891b2,#06b6d4);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-magnifying-glass text-white" style="font-size:13px;"></i>
+            </div>
+            <div>
+                <p class="mb-0 fw-bold text-dark" style="font-size:14px;">Rule Preview</p>
+                <p class="mb-0 text-muted" style="font-size:12px;">Check what charge applies for a specific scenario</p>
+            </div>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.pricing.index') }}">
@@ -121,7 +138,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-info w-100 text-white">
+                        <button type="submit" class="btn fw-semibold w-100 text-white" style="background:linear-gradient(135deg,#0891b2,#06b6d4);border-radius:9px;">
                             <i class="fas fa-search me-1"></i> Preview
                         </button>
                     </div>
@@ -153,7 +170,7 @@
     </div>
 
     {{-- ── FILTERS ── --}}
-    <div class="card border-0 shadow-sm mb-3">
+    <div class="card border-0 shadow-sm mb-3" style="border-radius:14px;overflow:hidden;">
         <div class="card-body py-3">
             <form method="GET" class="row g-2 align-items-end">
                 <div class="col-md-3">
@@ -191,18 +208,21 @@
                     </select>
                 </div>
                 <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-dark btn-sm w-100">Filter</button>
-                    <a href="{{ route('admin.pricing.index') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+                    <button type="submit" class="btn btn-sm fw-semibold w-100" style="background:linear-gradient(135deg,#1e293b,#334155);color:#fff;border-radius:8px;">Filter</button>
+                    <a href="{{ route('admin.pricing.index') }}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">Clear</a>
                 </div>
             </form>
         </div>
     </div>
 
     {{-- ── RULES TABLE ── --}}
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-            <strong>Active Rules <span class="badge bg-secondary ms-1">{{ $charges->total() }}</span></strong>
-            <small class="text-muted">Priority: City → State → Category → Global</small>
+    <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden;">
+        <div class="px-4 py-3 d-flex align-items-center justify-content-between" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+            <div class="d-flex align-items-center gap-2">
+                <strong style="font-size:14px;">Active Rules</strong>
+                <span class="badge" style="background:#e2e8f0;color:#475569;font-size:11px;">{{ $charges->total() }}</span>
+            </div>
+            <small class="text-muted" style="font-size:11px;">Priority: City → State → Category → Global</small>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
