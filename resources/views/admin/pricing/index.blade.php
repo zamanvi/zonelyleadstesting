@@ -346,16 +346,26 @@
         <div class="modal-content">
             <form action="{{ route('admin.pricing.store') }}" method="POST">
                 @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle text-primary me-2"></i>Add Pricing Rule</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:38px;height:38px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-plus text-white" style="font-size:14px;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0">Add Pricing Rule</h5>
+                            <p class="text-muted mb-0" style="font-size:12px;">Define a new charge or commission rule</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body px-4 pt-3">
                     @include('admin.pricing._form', ['charge' => null, 'formId' => 'add'])
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save Rule</button>
+                <div class="modal-footer border-0 px-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" style="border-radius:9px;">Cancel</button>
+                    <button type="submit" class="btn fw-bold px-4" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border-radius:9px;">
+                        <i class="fas fa-save me-1"></i>Save Rule
+                    </button>
                 </div>
             </form>
         </div>
@@ -370,16 +380,26 @@
         <div class="modal-content">
             <form id="editRuleForm" method="POST">
                 @csrf @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-pen text-warning me-2"></i>Edit Pricing Rule</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:38px;height:38px;background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-pen text-white" style="font-size:13px;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0">Edit Pricing Rule</h5>
+                            <p class="text-muted mb-0" style="font-size:12px;">Update an existing charge or commission rule</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body px-4 pt-3">
                     @include('admin.pricing._form', ['charge' => null, 'formId' => 'edit'])
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning text-white"><i class="fas fa-save me-1"></i>Update Rule</button>
+                <div class="modal-footer border-0 px-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" style="border-radius:9px;">Cancel</button>
+                    <button type="submit" class="btn fw-bold px-4" style="background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;border-radius:9px;">
+                        <i class="fas fa-save me-1"></i>Update Rule
+                    </button>
                 </div>
             </form>
         </div>
