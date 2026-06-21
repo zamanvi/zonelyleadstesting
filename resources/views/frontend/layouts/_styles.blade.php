@@ -97,9 +97,7 @@
     /* ── Bottom nav ──────────────────────────── */
     .bottom-nav-safe { padding-bottom: calc(.75rem + env(safe-area-inset-bottom)); }
     .has-bottom-nav  { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
-    @media (max-width: 1023px) {
-        .has-bottom-nav footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
-    }
+    .has-bottom-nav footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
     .bnav-item { transition:color .15s,background .15s; }
     .bnav-item.active { color:#2a8c87; }
     .bnav-item.active .bnav-icon { background:#F0FDFA; }
