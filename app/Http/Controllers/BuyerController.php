@@ -249,7 +249,7 @@ class BuyerController extends Controller
             'work_address'  => 'nullable|string|max:255',
             'country'       => 'nullable|string|max:100',
             'zip_code'      => 'nullable|string|max:20',
-            'profile_photo' => 'nullable|image|max:10240',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
         ]);
 
         // Remove profile_photo from $data — only set it if a new file was uploaded

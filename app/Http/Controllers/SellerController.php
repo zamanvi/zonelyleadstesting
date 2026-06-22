@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Services\NotificationService;
 
@@ -140,7 +141,7 @@ class SellerController extends Controller
             'title'         => 'nullable|string|max:20',
             'city'          => 'nullable|string|max:100',
             'state'         => 'nullable|string|max:100',
-            'profile_photo' => 'nullable|image|max:10240',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
         ]);
 
         // Remove profile_photo from $data — only set if new file uploaded
@@ -276,6 +277,7 @@ class SellerController extends Controller
         });
 
         if (isset($result['error'])) {
+            Log::error('payLead failed', ['lead_id' => $id, 'seller_id' => Auth::id(), 'order_id' => $orderId, 'error' => $result['error']]);
             return response()->json(['error' => $result['error']], 422);
         }
 
@@ -319,6 +321,7 @@ class SellerController extends Controller
         });
 
         if (isset($result['error'])) {
+            Log::error('payLeads failed', ['lead_ids' => $ids, 'seller_id' => Auth::id(), 'order_id' => $orderId, 'error' => $result['error']]);
             return response()->json(['error' => $result['error']], 422);
         }
 
