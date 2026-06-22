@@ -51,33 +51,45 @@ class HuntBotController extends Controller
         $results  = [];
         $nextPageToken = null;
 
-        for ($page = 0; $page < 3; $page++) {
-            $url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query={$query}&key={$apiKey}";
-            if ($nextPageToken) {
-                $url .= '&pagetoken=' . $nextPageToken;
-                sleep(2);
-            }
-            $data = Http::get($url)->json();
-            if (($data['status'] ?? '') !== 'OK') break;
+        try {
+            for ($page = 0; $page < 2; $page++) {
+                $url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query={$query}&key={$apiKey}";
+                if ($nextPageToken) {
+                    $url .= '&pagetoken=' . $nextPageToken;
+                    sleep(2);
+                }
+                $data = Http::timeout(10)->get($url)->json();
+                if (($data['status'] ?? '') !== 'OK') break;
 
-            foreach ($data['results'] as $place) {
-                $results[] = [
-                    'place_id'      => $place['place_id'] ?? null,
-                    'business_name' => $place['name'] ?? '',
-                    'address'       => $place['formatted_address'] ?? '',
-                    'rating'        => $place['rating'] ?? null,
-                    'review_count'  => $place['user_ratings_total'] ?? 0,
-                ];
+                foreach ($data['results'] as $place) {
+                    $results[] = [
+                        'place_id'      => $place['place_id'] ?? null,
+                        'business_name' => $place['name'] ?? '',
+                        'address'       => $place['formatted_address'] ?? '',
+                        'rating'        => $place['rating'] ?? null,
+                        'review_count'  => $place['user_ratings_total'] ?? 0,
+                    ];
+                }
+                $nextPageToken = $data['next_page_token'] ?? null;
+                if (!$nextPageToken) break;
             }
-            $nextPageToken = $data['next_page_token'] ?? null;
-            if (!$nextPageToken) break;
+        } catch (\Throwable $e) {
+            if (!empty($results)) {
+                // partial results — continue with what we have
+            } else {
+                return back()->with('error', 'Google Maps request failed: ' . $e->getMessage());
+            }
         }
 
         // Fetch details (phone + website)
         $leads = [];
         foreach ($results as $place) {
-            $detail = Http::get("https://maps.googleapis.com/maps/api/place/details/json?place_id={$place['place_id']}&fields=name,formatted_phone_number,website&key={$apiKey}")->json();
-            $r = $detail['result'] ?? [];
+            try {
+                $detail = Http::timeout(8)->get("https://maps.googleapis.com/maps/api/place/details/json?place_id={$place['place_id']}&fields=name,formatted_phone_number,website&key={$apiKey}")->json();
+                $r = $detail['result'] ?? [];
+            } catch (\Throwable $e) {
+                $r = [];
+            }
             $place['phone']       = $r['formatted_phone_number'] ?? null;
             $place['has_website'] = !empty($r['website']);
             $place['website_url'] = $r['website'] ?? null;

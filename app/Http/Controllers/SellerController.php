@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Services\NotificationService;
@@ -250,25 +251,35 @@ class SellerController extends Controller
 
     public function payLead(Request $request, $id)
     {
-        $lead = Lead::where('id', $id)->where('seller_id', Auth::id())->firstOrFail();
-
-        if ($lead->paid_at) {
-            return response()->json(['error' => 'Already paid'], 422);
-        }
-
         $orderId = $request->input('paypal_order_id');
         if (!$orderId) {
             return response()->json(['error' => 'Missing PayPal order ID'], 422);
         }
 
-        $verified = $this->verifyPayPalOrder($orderId, $lead->fee);
-        if (!$verified) {
-            return response()->json(['error' => 'PayPal payment verification failed'], 422);
+        $result = DB::transaction(function () use ($id, $orderId) {
+            $lead = Lead::where('id', $id)
+                ->where('seller_id', Auth::id())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lead->paid_at) {
+                return ['error' => 'Already paid'];
+            }
+
+            $verified = $this->verifyPayPalOrder($orderId, $lead->fee);
+            if (!$verified) {
+                return ['error' => 'PayPal payment verification failed'];
+            }
+
+            $lead->update(['paid_at' => now(), 'paypal_order_id' => $orderId]);
+            return ['ok' => true, 'fee' => $lead->fee];
+        });
+
+        if (isset($result['error'])) {
+            return response()->json(['error' => $result['error']], 422);
         }
 
-        $lead->update(['paid_at' => now(), 'paypal_order_id' => $orderId]);
-        NotificationService::paymentReceived(Auth::user(), (float) $lead->fee, 1);
-
+        NotificationService::paymentReceived(Auth::user(), (float) $result['fee'], 1);
         return response()->json(['ok' => true]);
     }
 
