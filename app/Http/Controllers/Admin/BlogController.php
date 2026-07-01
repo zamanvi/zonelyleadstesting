@@ -22,8 +22,7 @@ class BlogController extends Controller
      */
     public function create()
     {
-        $blogs = Blog::latest()->paginate(20);
-        return view('admin.blog2.index', compact('blogs'));
+        return view('admin.blog2.create');
     }
 
     /**

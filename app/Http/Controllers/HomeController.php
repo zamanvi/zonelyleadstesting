@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Blog;
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Lead;
 use App\Models\PlatformCharge;
 use App\Models\State;
@@ -516,6 +515,7 @@ class HomeController extends Controller
             ->where('status', true)
             ->whereNotNull('slug')
             ->select('slug', 'updated_at')
+            ->limit(50000)
             ->get()
             ->map(fn($u) => [
                 'loc'        => route('frontend.service.show', $u->slug),
