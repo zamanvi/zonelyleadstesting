@@ -133,6 +133,15 @@
     "addressCountry": "US"
   }
   @if($callNumber),"telephone": "{{ $callNumber }}"@endif
+  @if($avgRating),
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ $avgRating }}",
+    "reviewCount": "{{ $reviewCount }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+  @endif
 }
 </script>
 @endsection

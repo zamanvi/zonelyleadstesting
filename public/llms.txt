@@ -1,0 +1,30 @@
+# Zonely — Find & Hire Verified Local Experts
+
+Zonely is a US marketplace connecting clients with verified local professionals including lawyers, CPAs, plumbers, notaries, electricians, and more.
+
+## What Zonely Does
+- Clients find and contact verified local professionals by category and city
+- Professionals list their services and receive qualified leads
+- Pay-per-lead model: professionals only pay when they receive a verified inquiry
+
+## Key Pages
+- Homepage: https://www.zonelyleads.com
+- Browse Professionals: https://www.zonelyleads.com/all-service
+- Professional Profiles: https://www.zonelyleads.com/service/{slug}
+- Categories: https://www.zonelyleads.com/category/{slug}
+- Blog: https://www.zonelyleads.com/blog
+- Sitemap: https://www.zonelyleads.com/sitemap.xml
+
+## Coverage
+- United States only
+- Categories: Professional Services, Healthcare & Wellness, Home Services & Repairs, Beauty & Personal Care, Legal, Financial, and more
+
+## Data & Content
+- All professional profiles contain: name, title, bio, location, services, reviews, experience, education, certifications
+- JSON-LD structured data (LocalBusiness, AggregateRating) present on all professional profile pages
+- Reviews are verified client submissions
+
+## Contact
+- Website: https://www.zonelyleads.com
+- Help: https://www.zonelyleads.com/help
+- About: https://www.zonelyleads.com/about-us

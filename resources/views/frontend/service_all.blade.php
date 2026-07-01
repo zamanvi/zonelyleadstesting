@@ -2,9 +2,24 @@
     $meta_title       = $meta_title ?? 'All Professionals';
     $meta_description = $meta_description ?? '';
     $meta_keywords    = $meta_keywords ?? '';
+
+    $listingTitle = isset($category)
+        ? $category->title . (isset($city) ? ' in ' . $city : '') . ' | Zonely'
+        : (isset($city) ? 'Top Professionals in ' . $city . ' | Zonely' : 'Top Professionals | Zonely');
 @endphp
 @extends('frontend.layouts._app')
-@section('title', 'All Professionals')
+@section('title', $listingTitle)
+
+@section('css')
+@if(isset($users) && $users->hasPages())
+  @if(!$users->onFirstPage())
+  <link rel="prev" href="{{ $users->previousPageUrl() }}">
+  @endif
+  @if($users->hasMorePages())
+  <link rel="next" href="{{ $users->nextPageUrl() }}">
+  @endif
+@endif
+@endsection
 @section('content')
 
 {{-- ── Header ───────────────────────────────────────── --}}
