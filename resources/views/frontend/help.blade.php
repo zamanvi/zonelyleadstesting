@@ -72,4 +72,95 @@ function toggleFaq(i) {
 }
 </script>
 
+@section('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How does Zonely help my local business grow?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Zonely is a specialized platform that takes your offline local business and gives it a high-performance digital presence in under 1 minute, focusing on capturing \"near-me\" search intent to drive more calls and bookings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do I need a Zonely page if I already have a Google Business Profile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "While Google shows where you are, a Zonely page shows who you are — it acts as a dedicated landing page that Google's AI uses to verify your services, which can significantly improve your ranking in the local map pack."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the initial website really free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, we build a professional demo page using your existing public data at no cost, allowing you to activate a branded website link on your Google profile immediately without any upfront investment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the Pay-Per-Lead model work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our model is designed to be risk-free: you only pay when we deliver a verified, high-quality lead (a real person asking for your service), ensuring you never waste money on empty clicks or bot traffic."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the Premium Dashboard?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Premium Dashboard is an advanced management tool that tracks your visitors, records direct inquiries, and provides real-time analytics so you can respond to potential customers faster than your competitors."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I manage and update my services and photos myself?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. Once you activate your account, you have full control to update your business hours, add new service photos, or change your contact information at any time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Zonely ensure the leads I receive are high-quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We use lead verification and call tracking to filter out spam, ensuring that notifications you receive represent genuine customers ready to hire a local expert."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens after I activate a paid growth campaign?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When you switch to a paid campaign, we use targeted digital marketing to push your business to the top of local searches, which typically increases order volume significantly for service providers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does using Zonely require any technical knowledge?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "None at all. Zonely is built for non-tech owners — we handle the hosting, SEO, and technical updates so you can focus entirely on serving your clients."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the long-term vision for businesses on Zonely?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Zonely will evolve into a full ecosystem offering automated workflow tools and industry-specific widgets, moving from a simple lead-gen tool to a complete management system for your local service business."
+      }
+    }
+  ]
+}
+</script>
+@endsection
+
 @endsection
